@@ -102,8 +102,8 @@ them back when the client attacks or interacts.
 - **Reader edits its input (Set Equipment).** `topBitSetTerminatedArray` clears the "more entries follow" bit of each slot byte
   in place while parsing, and a raw-forwarding proxy is handed that same buffer afterwards. Any multi-entry Set Equipment that
   passes through the library arrives damaged (first entry marked last) and the vanilla client kicks itself with "N bytes extra".
-  Seen once at night on hard difficulty (armed mobs). Handled in three places: `proxy/sanitize.js` repairs it before it is
-  forwarded (recorder proxy, live proxy), `codec.parse` in `parse.js` reads such a packet as all its entries (so captures that
+  Seen once at night on hard difficulty (armed mobs). New recorder captures tap uncompressed frames before the parser and retain the original bytes. For older captures and the
+  live transformation proxy, `proxy/sanitize.js` repairs it before it is forwarded, `codec.parse` in `parse.js` reads such a packet as all its entries (so captures that
   contain it are fine), and `engine/schedule.js` repairs it for replays. `codec.parse` also parses a copy so callers' bytes are
   not edited.
 - **Writer encoder, inline registry holders.** `registryEntryHolder` skips a byte without writing it in the inline branch (inline

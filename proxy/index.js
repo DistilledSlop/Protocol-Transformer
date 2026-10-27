@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { randomUUID } = require('crypto');
 const { createRecorder } = require('./recorder');
-const sanitize = require('./sanitize');
+const { installWireTap } = require('./wire');
 const states = mc.states;
 
 // the proxy listens on PROXY_PORT and forwards to the server at TARGET_HOST:TARGET_PORT (your local server by default)
@@ -74,22 +74,24 @@ server.on('login', (incomingClient) => {
     openRecorders.add(rec);
     rec.header({
         version: VERSION,
+        protocol: 767,
+        preParserFrames: true,
         runId: process.env.CAPTURE_RUN_ID || null,
-        captureScope: 'login terminated on each leg; configuration and play forwarded; handshake/status not recorded',
+        captureScope: 'uncompressed frames captured before packet parsing; login terminated on each leg; configuration and play forwarded; handshake/status not recorded',
         target: `${TARGET_HOST}:${TARGET_PORT}`,
         username: incomingClient.username,
     });
     console.log(`[Recorder] Saving capture to: ${base}.{bin,jsonl${LOG_PARSED ? ',parsed.jsonl' : ''}}`);
 
-    const repairs = new Map(); // packets repaired on the way to the client, by name
+    let stopWireTaps = () => {};
     let closing = false;
     const closeRecorder = () => {
         if (closing) return;
         closing = true;
+        stopWireTaps();
         rec.close().then(({ bytes, summary }) => {
             openRecorders.delete(rec);
             sessions.delete(stopSession);
-            if (repairs.size) console.log(`[Proxy] repaired malformed server packets for the client: ${JSON.stringify([...repairs])} (the reader repairs the same in a capture)`);
             console.log(`[Recorder] Closed ${base} (${bytes} raw bytes). Packets by direction/state/name:`);
             for (const [key, n] of summary) console.log(`  ${String(n).padStart(8)}  ${key}`);
         }).catch((error) => {
@@ -165,12 +167,12 @@ server.on('login', (incomingClient) => {
 
     // ==========================================================================
     // A. RAW PACKET FORWARDING + RAW RECORDING
-    //    Every packet is recorded at receipt (before queueing or forwarding), in
-    //    every state this proxy sees, so configuration and play are both captured
-    //    with a monotonic timestamp. Login is terminated on each leg, so only the
-    //    target leg's login packets show up here.
+    //    Every complete uncompressed frame is copied before the library parses it,
+    //    then recorded before queueing or forwarding. Parser failures and mutation
+    //    cannot drop/alter recorded configuration or play traffic. Login remains
+    //    terminated on each leg; only frames visible after session setup are captured.
     // ==========================================================================
-    incomingClient.on('raw', (buffer, meta) => {
+    const stopIncomingTap = installWireTap(incomingClient, (buffer, meta) => {
         if (!rec.raw('C2S', meta, buffer)) return;
         if (endedTarget) return;
 
@@ -198,14 +200,14 @@ server.on('login', (incomingClient) => {
         }
     });
 
-    targetClient.on('raw', (buffer, meta) => {
+    const stopTargetTap = installWireTap(targetClient, (buffer, meta) => {
         if (!rec.raw('S2C', meta, buffer)) return;
         if (endedIncoming) return;
 
         if (meta.state === states.CONFIGURATION || meta.state === states.PLAY) {
             if (incomingClient.state === meta.state) {
-                // recorded above as received; the client gets it repaired if the library damaged it on the way in (see sanitize.js)
-                incomingClient.writeRaw(meta.state === states.PLAY ? sanitize.forServer(meta.name, buffer, repairs) : buffer);
+                // Forward original bytes; parser mutation and parsing failure cannot change this path.
+                incomingClient.writeRaw(buffer);
             } else if (meta.state === states.CONFIGURATION) {
                 enqueue(toIncomingQueue, buffer);
             } else {
@@ -213,6 +215,8 @@ server.on('login', (incomingClient) => {
             }
         }
     });
+
+    stopWireTaps = () => { stopIncomingTap(); stopTargetTap(); };
 
     // ==========================================================================
     // B. PARSED PACKET LOGGING (optional convenience copy of play traffic)
