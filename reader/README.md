@@ -40,6 +40,15 @@ and no prediction loss. Engine mode snapshots compile to no packets; abilities a
 rows never compile to packets even if produced by a model. Later observed `change_game_mode`
 events retain their existing model output rows and packet compiler.
 
+For protocol 767, `protocol767.js` corrects the pinned minecraft-data recipe serializer registry before
+NMP compiles its codecs. The dependency retains obsolete `crafting_special_banneraddpattern` at ID 11;
+Minecraft 1.21.1's own `RecipeSerializer` registration order instead has shield decoration at 11,
+repair item at 14, smelting at 15, and decorated pots at 22. The stale entry shifts all later IDs and
+misparses valid vanilla recipe payloads. This correction changes the decoder/encoder schema only;
+recorded and forwarded frames remain untouched. Independent special/smelting wire fixtures test the
+IDs, and the real pre-parser Creative-build capture roundtrips all 32,467 packets byte for byte,
+including its 108,271-byte recipe packet (1,290 recipes).
+
 Handlers live in `handlers/` by family (entity, world, inventory, text) and are mixed into `Reader`. Text is
 never English tokens: strings become templates with numbers and player names cut out (`component.js`), and open
 text the model only repeats is an opaque span.
