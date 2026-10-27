@@ -1,0 +1,122 @@
+This article documents the '''Data''' field in the [[Minecraft Wiki:Projects/wiki.vg merge/Protocol#Spawn Entity|Spawn Entity]] packet. The field is of type Int, and the meaning of its contents depend on the [[Minecraft Wiki:Projects/wiki.vg merge/Entity_metadata|type of entity]] being spawned, as defined in the Type field of the same packet, and is documented below.
+
+== [[Minecraft Wiki:Projects/wiki.vg merge/Entity_metadata#Item_Frame|Item Frame]] ==
+
+{| class="wikitable"
+ |-
+ ! Value
+ ! Orientation
+ |-
+ | 0
+ | Down
+ |-
+ | 1
+ | Up
+ |-
+ | 2
+ | North
+ |-
+ | 3
+ | South
+ |-
+ | 4
+ | West
+ |-
+ | 5
+ | East
+ |}
+
+The Notchian client clamps invalid values into the valid range through the modulus operator. If the resulting value is negative, the absolute value is used.
+
+Velocity in the packet is always ignored.
+
+== [[Minecraft Wiki:Projects/wiki.vg merge/Entity_metadata#Painting|Painting]] ==
+
+{| class="wikitable"
+ |-
+ ! Value
+ ! Orientation
+ |-
+ | 2
+ | North
+ |-
+ | 3
+ | South
+ |-
+ | 4
+ | West
+ |-
+ | 5
+ | East
+ |}
+
+The Notchian client clamps invalid values into the valid range through the modulus operator. If the resulting value is negative, the absolute value is used.
+
+{{Warning|Although the values of 0 and 1 are invalid, the Notchian client uses the same clamping algorithm as [[#Item_Frame|Item Frame]], which can result in any value from 0 to 5. If the resulting value is invalid, the entity will fail to spawn.}}
+
+Velocity in the packet is always ignored.
+
+== [[Minecraft Wiki:Projects/wiki.vg merge/Entity_metadata#Falling_Block|Falling Block]] ==
+
+{| class="wikitable"
+ |-
+ ! Field name
+ ! Field type
+ ! Notes
+ |-
+ | Block state ID
+ | {{Type|Int}}
+ | ID of the block state that the falling block will represent.
+ |}
+
+Velocity in the packet is always ignored.
+
+== [[Minecraft Wiki:Projects/wiki.vg merge/Entity_metadata#Fishing_Hook|Fishing Hook]] ==
+
+{| class="wikitable"
+ ! Field name
+ ! Field type
+ ! Notes
+ |-
+ | Owner
+ | {{Type|Int}}
+ | The entity ID of the owner
+ |}
+
+{{Warning|If the entity with the Owner ID doesn't exist in the client, the entity will fail to spawn.}}
+
+Velocity in the packet is ignored, and instead should be inferred from the shooter's position.
+
+{{missing info|section|What's the exact algorithm for determining this?}}
+
+== [[Minecraft Wiki:Projects/wiki.vg merge/Entity_metadata#Projectile|Projectile]] ==
+
+{| class="wikitable"
+ |-
+ ! Field name
+ ! Field type
+ ! Notes
+ |-
+ | Owner ID
+ | {{Type|Int}}
+ | The entity ID of the owner
+ |}
+
+== [[Minecraft Wiki:Projects/wiki.vg merge/Entity_metadata#Warden|Warden]] ==
+
+{| class="wikitable"
+ |-
+ ! Field name
+ ! Field type
+ ! Notes
+ |-
+ | Pose
+ | {{Type|Int}}
+ | If a value of 1 is specified, the Warden will spawn in the [[Minecraft Wiki:Projects/wiki.vg merge/Entity_metadata#Entity_Metadata_Format|emerging pose]].
+Any other value is silently ignored.
+ |}
+
+
+[[Category:Protocol Details]]
+[[Category:Java Edition protocol]]
+{{license wiki.vg}}

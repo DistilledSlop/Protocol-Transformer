@@ -1,0 +1,281 @@
+{
+ "Entity": {
+  "extends": null,
+  "codes": {
+   "53": "Spawns honey block slide particles at the entities feet"
+  }
+ },
+ "Projectile": {
+  "extends": "Entity",
+  "codes": {}
+ },
+ "Snowball": {
+  "extends": "Projectile",
+  "codes": {
+   "3": "Displays 8 <code>snowballpoof</code> particles at the snowball's location"
+  }
+ },
+ "Egg": {
+  "extends": "Projectile",
+  "codes": {
+   "3": "Displays 8 <code>iconcrack</code> particles with the egg as a parameter at the egg's location"
+  }
+ },
+ "Fishing Hook": {
+  "extends": "Entity",
+  "codes": {
+   "31": "If the caught entity is the connected player, then cause them to be pulled toward the caster of the fishing rod."
+  }
+ },
+ "Abstract Arrow": {
+  "extends": "Entity",
+  "codes": {}
+ },
+ "Arrow": {
+  "extends": "Arrow",
+  "codes": {
+   "0": "Spawns tipped arrow particle effects, if the color is not -1."
+  }
+ },
+ "Firework Rocket": {
+  "extends": "Entity",
+  "codes": {
+   "17": "Triggers the firework explosion effect (based on the firework info metadata)"
+  }
+ },
+ "Living Entity": {
+  "extends": "Entity",
+  "codes": {
+   "3": "Plays the death sound and death animation",
+   "29": "Plays the shield block sound",
+   "30": "Plays the shield break sound",
+   "35": "Plays totem of undying animation and sound",
+   "46": "Spawns portal particles when teleporting due to consumption of a chorus fruit or being an endermen",
+   "47": "Plays the equipment break sound (unless silent) and spawns break particles for the item in the main hand",
+   "48": "Plays the equipment break sound (unless silent) and spawns break particles for the item in the off hand",
+   "49": "Plays the equipment break sound (unless silent) and spawns break particles for the item in the head slot",
+   "50": "Plays the equipment break sound (unless silent) and spawns break particles for the item in the chest slot",
+   "51": "Plays the equipment break sound (unless silent) and spawns break particles for the item in the legs slot",
+   "52": "Plays the equipment break sound (unless silent) and spawns break particles for the item in the feet slot",
+   "54": "Spawns honey block fall particles at the entities feet",
+   "55": "Swaps the hand items of the entity",
+   "60": "Spawns death smoke particles"
+  }
+ },
+ "Player": {
+  "extends": "Living Entity",
+  "codes": {
+   "9": "Marks item use as finished (finished eating, finished drinking, etc) This status is not required if you want more control on the server side, this basically finishes the interaction on the client side to decrease the food quantity, arrow quantity, ... But you can trigger these changes manually through other packets or prevent those changes on the client. Examples: *Create an 'Infinity Bow' without the first arrow in your inventory constantly changing in quantity. *Create a custom food that is infinite, and prevent the stack quantity from decreasing. *... Note: This works together with the 'Hand data' so this will have to be updated accordingly to 'finish' the interaction manually.",
+   "22": "Enables reduced Debug screen information",
+   "23": "Disables reduced Debug screen information",
+   "24": "Set Server.properties#op-permission-level to 0",
+   "25": "Set Server.properties#op-permission-level to 1",
+   "26": "Set Server.properties#op-permission-level to 2",
+   "27": "Set Server.properties#op-permission-level to 3",
+   "28": "Set Server.properties#op-permission-level to 4",
+   "43": "Spawn cloud particles at the player. Sent to a player whose Bad Omen effect is removed to either start a raid or increase its difficulty."
+  }
+ },
+ "Armor Stand": {
+  "extends": "Living Entity",
+  "codes": {
+   "32": "Plays the hit sound, and resets a hit cooldown."
+  }
+ },
+ "Mob": {
+  "extends": "Living Entity",
+  "codes": {
+   "20": "Spawn explosion particle. Used when: *A silverfish enters a block *A silverfish exits a block *A mob spawner (or minecart mob spawner) spawns an entity (only with entities that support this status)"
+  }
+ },
+ "Water Animal": {
+  "extends": "Mob",
+  "codes": {}
+ },
+ "Squid": {
+  "extends": "Water Animal",
+  "codes": {
+   "19": "Resets the squid's rotation to 0 radians. Occurs whenever the server calculates that the squid has rotated more than 2 pi radians."
+  }
+ },
+ "Dolphin": {
+  "extends": "Water Animal",
+  "codes": {
+   "38": "Causes several \"happy villager\" particles to appear; used when the dolphin has been fed and is locating a structure"
+  }
+ },
+ "Creature": {
+  "extends": "Mob",
+  "codes": {}
+ },
+ "Ageable": {
+  "extends": "Creature",
+  "codes": {}
+ },
+ "Animal": {
+  "extends": "Ageable",
+  "codes": {
+   "18": "Spawn \"love mode\" heart particles"
+  }
+ },
+ "Abstract Horse": {
+  "extends": "Animal",
+  "codes": {
+   "6": "Spawn smoke particles (taming failed)",
+   "7": "Spawn heart particles (taming succeeded)"
+  }
+ },
+ "Ocelot": {
+  "extends": "Animal",
+  "codes": {
+   "40": "Spawn smoke particles (taming failed)",
+   "41": "Spawn heart particles (taming succeeded)"
+  }
+ },
+ "Rabbit": {
+  "extends": "Animal",
+  "codes": {
+   "1": "Causes the rabbit to use its rotated jumping animation, and displays jumping particles."
+  }
+ },
+ "Sheep": {
+  "extends": "Animal",
+  "codes": {
+   "10": "Causes the sheep to play the eating grass animation for the next 40 ticks"
+  }
+ },
+ "Fox": {
+  "extends": "Animal",
+  "codes": {
+   "45": "Spawns particles based on the item on the fox's mouth (technically its main hand) to indicate them chewing on it"
+  }
+ },
+ "Goat": {
+  "extends": "Animal",
+  "codes": {
+   "58": "Lower head for ramming",
+   "59": "Stop lowering head"
+  }
+ },
+ "Tameable Animal": {
+  "extends": "Animal",
+  "codes": {
+   "6": "Spawn smoke particles (taming failed)",
+   "7": "Spawn heart particles (taming succeeded)"
+  }
+ },
+ "Wolf": {
+  "extends": "Tameable Animal",
+  "codes": {
+   "8": "Play wolf shaking water animation",
+   "56": "Stop wolf shaking water animation"
+  }
+ },
+ "Villager": {
+  "extends": "Ageable",
+  "codes": {
+   "12": "Spawn villager mating heart particles",
+   "13": "Spawn villager angry particles",
+   "14": "Spawn villager happy particles",
+   "42": "Spawn \"splash\" particles. Triggered with 1% chance each tick while a raid is active."
+  }
+ },
+ "Golem": {
+  "extends": "Creature",
+  "codes": {}
+ },
+ "Iron Golem": {
+  "extends": "Golem",
+  "codes": {
+   "4": "Plays attack animation and attack sound",
+   "11": "Causes golem to hold out a <s>rose</s> poppy for 400 ticks (20 seconds)",
+   "34": "Puts away golem's poppy"
+  }
+ },
+ "Evoker Fangs": {
+  "extends": "Entity",
+  "codes": {
+   "4": "Starts the attack animation, and plays the <code>entity.evocation_fangs.attack</code> sound."
+  }
+ },
+ "Monster": {
+  "extends": "Creature",
+  "codes": {}
+ },
+ "Witch": {
+  "extends": "Monster",
+  "codes": {
+   "15": "Spawns between 10 and 45 <code>witchMagic</code> particles. This status has a .075% chance of happening each tick."
+  }
+ },
+ "Ravager": {
+  "extends": "Monster",
+  "codes": {
+   "39": "Marks the ravager as stunned for the next 40 ticks."
+  }
+ },
+ "Zombie": {
+  "extends": "Monster",
+  "codes": {}
+ },
+ "Zombie Villager": {
+  "extends": "Zombie",
+  "codes": {
+   "16": "Plays the <code>entity.zombie_villager.cure</code> sound effect (unless the entity is silent)"
+  }
+ },
+ "Guardian": {
+  "extends": "Monster",
+  "codes": {
+   "21": "Plays the guardian attack sound effect from this entity."
+  }
+ },
+ "Minecart": {
+  "extends": "Entity",
+  "codes": {}
+ },
+ "Minecart TNT": {
+  "extends": "Minecart",
+  "codes": {
+   "10": "Causes the TNT to ignite. Does not play a sound; the sound must be played separately."
+  }
+ },
+ "Minecart Spawner": {
+  "extends": "Minecart",
+  "codes": {
+   "1": "Resets the delay of the spawner to 200 ticks (the default minimum value)."
+  }
+ },
+ "Hoglin": {
+  "extends": "Animal",
+  "codes": {
+   "4": "Plays the attack animation for 10 ticks and plays the attack sound."
+  }
+ },
+ "Zoglin": {
+  "extends": "Monster",
+  "codes": {
+   "4": "Plays the attack animation for 10 ticks and plays the attack sound."
+  }
+ },
+ "Allay": {
+  "extends": "Creature",
+  "codes": {
+   "18": "Spawns heart particles, used upon Allay duplication."
+  }
+ },
+ "Warden": {
+  "extends": "Monster",
+  "codes": {
+   "4": "Stops the roar animation and performs the attack animation.",
+   "61": "Performs tendril shaking animation for 10 ticks.",
+   "62": "Performs the sonic boom attack animation (Charge and release). Beam and sound are not included."
+  }
+ },
+ "Sniffer": {
+  "extends": "Animal",
+  "codes": {
+   "63": "Plays the digging sound. Only works if the Sniffer has a target, and is in a digging or searching state."
+  }
+ }
+}

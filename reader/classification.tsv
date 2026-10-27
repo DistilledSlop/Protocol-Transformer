@@ -1,0 +1,225 @@
+state	bound	id	name	tier	row_type	review	notes
+handshaking	S	0x00	Handshake	ENGINE	-		Switches state; Next State 1 status, 2 login, 3 transfer
+handshaking	S	0xFE	Legacy Server List Ping	ENGINE	-		Nonstandard framing, no length prefix; answer or ignore
+status	C	0x00	Status Response	BAKED	-		Static JSON (motd, version 767, player counts)
+status	C	0x01	Pong Response (status)	ENGINE	-		Echo the timestamp
+status	S	0x00	Status Request	ENGINE	-		
+status	S	0x01	Ping Request (status)	ENGINE	-		
+login	C	0x00	Disconnect (login)	ENGINE	-		
+login	C	0x01	Encryption Request	ENGINE	-		Skipped in offline mode; Notchian server never encrypts offline as of 1.21
+login	C	0x02	Login Success	ENGINE	-		Has Strict Error Handling field in 1.21.1 (removed in 1.21.2); false makes the client ignore packet processing errors
+login	C	0x03	Set Compression	ENGINE	-		Must precede Login Success
+login	C	0x04	Login Plugin Request	ENGINE	-		Unused
+login	C	0x05	Cookie Request (login)	ENGINE	-		Unused
+login	S	0x00	Login Start	ENGINE	-		Name + UUID; defines player slot 0 identity
+login	S	0x01	Encryption Response	ENGINE	-		
+login	S	0x02	Login Plugin Response	ENGINE	-		
+login	S	0x03	Login Acknowledged	ENGINE	-		Switches to configuration
+login	S	0x04	Cookie Response (login)	ENGINE	-		
+configuration	C	0x00	Cookie Request (configuration)	ENGINE	-		Unused
+configuration	C	0x01	Clientbound Plugin Message (configuration)	BAKED	-		minecraft:brand
+configuration	C	0x02	Disconnect (configuration)	ENGINE	-		
+configuration	C	0x03	Finish Configuration	ENGINE	-		Switches to play after the client acks
+configuration	C	0x04	Clientbound Keep Alive (configuration)	ENGINE	-		Own timer; kick after 15 s without reply, client times out after 20 s without any keep-alive
+configuration	C	0x05	Ping (configuration)	ENGINE	-		Unused by Notchian server
+configuration	C	0x06	Reset Chat	ENGINE	-		Unused at join
+configuration	C	0x07	Registry Data	BAKED	-		One packet per registry; omit entries covered by a pack the client lists in Known Packs; capture the rest (dimension_type, chat_type, damage_type, biomes)
+configuration	C	0x08	Remove Resource Pack (configuration)	ENGINE	-		
+configuration	C	0x09	Add Resource Pack (configuration)	ENGINE	-		
+configuration	C	0x0A	Store Cookie (configuration)	ENGINE	-		
+configuration	C	0x0B	Transfer (configuration)	ENGINE	-		
+configuration	C	0x0C	Feature Flags	BAKED	-		minecraft:vanilla
+configuration	C	0x0D	Update Tags (configuration)	BAKED	-		Block, item, fluid, entity_type, game_event tags
+configuration	C	0x0E	Clientbound Known Packs	ENGINE	-		Client requires minecraft:core version 1.21; send before Registry Data
+configuration	C	0x0F	Custom Report Details (configuration)	ENGINE	-		
+configuration	C	0x10	Server Links (configuration)	BAKED	-		
+configuration	S	0x00	Client Information (configuration)	ENGINE	-		Store view distance; it sizes the chunk window
+configuration	S	0x01	Cookie Response (configuration)	ENGINE	-		
+configuration	S	0x02	Serverbound Plugin Message (configuration)	ENGINE	-		
+configuration	S	0x03	Acknowledge Finish Configuration	ENGINE	-		Switches to play
+configuration	S	0x04	Serverbound Keep Alive (configuration)	ENGINE	-		
+configuration	S	0x05	Pong (configuration)	ENGINE	-		
+configuration	S	0x06	Resource Pack Response (configuration)	ENGINE	-		
+configuration	S	0x07	Serverbound Known Packs	ENGINE	-		
+play	C	0x00	Bundle Delimiter	ENGINE	-		Writer wraps a spawn plus its metadata and equipment in one bundle (max 4096 packets)
+play	C	0x01	Spawn Entity	HYBRID	ENTITY	y	Model: type, position, yaw, pitch, head yaw, velocity. Engine: entity ID, UUID, Data field. Player entities need a matching Player Info entry (observed client behaviour, not stated on this page)
+play	C	0x02	Spawn Experience Orb	HYBRID	ENTITY		Rare
+play	C	0x03	Entity Animation	MODEL	EVENT		Ids 0 swing main, 2 leave bed, 3 swing offhand, 4 crit, 5 magic crit
+play	C	0x04	Award Statistics	DERIVED	-		Reply to Client Status 1; counters from engine
+play	C	0x05	Acknowledge Block Change	ENGINE	-		Sequence from Player Action, Use Item On, Use Item; without it the client reverts its predicted block
+play	C	0x06	Set Block Destroy Stage	HYBRID	EVENT		Model emits dig events; engine times stages 0-9
+play	C	0x07	Block Entity Data	HYBRID	BLOCK	y	Signs, chests; NBT blob behind a template ID
+play	C	0x08	Block Action	HYBRID	EVENT		Uses block ID not block state; mostly deterministic from interaction
+play	C	0x09	Block Update	MODEL	BLOCK		Never send for unloaded chunks; uses block state ID, tokenise as name+properties
+play	C	0x0A	Boss Bar	MODEL	TEXT		Actions add/remove/health/title/style/flags
+play	C	0x0B	Change Difficulty	BAKED	-		
+play	C	0x0C	Chunk Batch Finished	ENGINE	-		Client turns batch timing into chunks per tick as 25 / millisPerChunk
+play	C	0x0D	Chunk Batch Start	ENGINE	-		
+play	C	0x0E	Chunk Biomes	DERIVED	-		Biome-only chunk refresh; rarely needed
+play	C	0x0F	Clear Titles	MODEL	TEXT		
+play	C	0x10	Command Suggestions Response	DERIVED	-	y	Engine for vanilla commands; model only if custom commands matter
+play	C	0x11	Commands	BAKED	-		Command graph
+play	C	0x12	Close Container	HYBRID	SLOT		Engine for rule-based closes; model for server-specific GUIs
+play	C	0x13	Set Container Content	HYBRID	SLOT		Engine for vanilla windows; model fills server GUIs (shops); state ID engine-owned
+play	C	0x14	Set Container Property	DERIVED	-		Furnace progress, enchant seed and levels, beacon, etc.
+play	C	0x15	Set Container Slot	HYBRID	SLOT		Window -1 cursor, -2 any inventory slot; slot data is item ID + count + components
+play	C	0x16	Cookie Request (play)	ENGINE	-		
+play	C	0x17	Set Cooldown	HYBRID	EVENT		Vanilla (ender pearl) in code; custom cooldowns from model
+play	C	0x18	Chat Suggestions	ENGINE	-		Unused by Notchian server
+play	C	0x19	Clientbound Plugin Message (play)	ENGINE	-		
+play	C	0x1A	Damage Event	MODEL	EVENT		Source type from damage_type registry; cause and direct IDs are entity ID + 1, 0 for none
+play	C	0x1B	Debug Sample	DROP	-		Operators only
+play	C	0x1C	Delete Message	DROP	-		Needs signed chat
+play	C	0x1D	Disconnect (play)	ENGINE	-		
+play	C	0x1E	Disguised Chat Message	MODEL	TEXT		Preferred chat route: no signature; chat type from chat_type registry
+play	C	0x1F	Entity Event	MODEL	EVENT		Status byte valid per entity type
+play	C	0x20	Explosion	HYBRID	EVENT		Model: position, strength, block interaction. Engine: Records computed against the world store, player motion
+play	C	0x21	Unload Chunk	DERIVED	-		Z before X on the wire
+play	C	0x22	Game Event	HYBRID	GLOBAL		Model: weather (1, 2, 7, 8), game mode change (3). Engine: event 13 start waiting for level chunks at join
+play	C	0x23	Open Horse Screen	HYBRID	EVENT		Rare
+play	C	0x24	Hurt Animation	MODEL	EVENT		
+play	C	0x25	Initialize World Border	BAKED	-		
+play	C	0x26	Clientbound Keep Alive (play)	ENGINE	-		Own timer independent of the model; 15 s kick, 20 s client timeout
+play	C	0x27	Chunk Data and Update Light	DERIVED	-		Streamed from world store; see chunk design
+play	C	0x28	World Event	MODEL	EVENT		Numeric event codes go in the catalogue
+play	C	0x29	Particle	MODEL	EVENT		
+play	C	0x2A	Update Light	DERIVED	-		
+play	C	0x2B	Login (play)	ENGINE	-		Entity ID, dimension, view and simulation distance; Enforces Secure Chat false when offline
+play	C	0x2C	Map Data	BAKED	-		
+play	C	0x2D	Merchant Offers	HYBRID	SLOT		Trade items carry components
+play	C	0x2E	Update Entity Position	MODEL	ENTITY		Deltas in 1/4096 block; max about 8 blocks, otherwise Teleport Entity
+play	C	0x2F	Update Entity Position and Rotation	MODEL	ENTITY		
+play	C	0x30	Update Entity Rotation	MODEL	ENTITY		
+play	C	0x31	Move Vehicle	DERIVED	-		
+play	C	0x32	Open Book	HYBRID	EVENT		Rare
+play	C	0x33	Open Screen	HYBRID	EVENT		Engine: window ID. Model: window type and title template
+play	C	0x34	Open Sign Editor	DERIVED	-		After a sign placement
+play	C	0x35	Ping (play)	ENGINE	-		Unused by Notchian server
+play	C	0x36	Ping Response (play)	ENGINE	-		
+play	C	0x37	Place Ghost Recipe	DERIVED	-		Reply to Place Recipe
+play	C	0x38	Player Abilities (clientbound)	DERIVED	-	y	From game mode; flying and instant-break flags
+play	C	0x39	Player Chat Message	DROP	-		Signed; model never emits it
+play	C	0x3A	End Combat	DROP	-		Unused by client
+play	C	0x3B	Enter Combat	DROP	-		Unused by client
+play	C	0x3C	Combat Death	HYBRID	TEXT		Engine: respawn screen trigger. Model: death message
+play	C	0x3D	Player Info Remove	DERIVED	-		
+play	C	0x3E	Player Info Update	HYBRID	TEXT	y	Add Player needs name and skin properties (baked); listed, latency, display name from model
+play	C	0x3F	Look At	DERIVED	-		
+play	C	0x40	Synchronize Player Position	ENGINE	-		Teleport ID goes in the pending-ack table; movement ignored until Confirm Teleportation
+play	C	0x41	Update Recipe Book	DERIVED	-		
+play	C	0x42	Remove Entities	HYBRID	ENTITY		Model despawn rows plus engine out-of-range culling
+play	C	0x43	Remove Entity Effect	DERIVED	-		Timer expiry
+play	C	0x44	Reset Score	MODEL	TEXT		
+play	C	0x45	Remove Resource Pack (play)	ENGINE	-		
+play	C	0x46	Add Resource Pack (play)	ENGINE	-		
+play	C	0x47	Respawn	ENGINE	-		Triggered by Client Status 0
+play	C	0x48	Set Head Rotation	MODEL	ENTITY		
+play	C	0x49	Update Section Blocks	MODEL	BLOCK		Writer batches 2+ BLOCK rows in one section; position packed in a long
+play	C	0x4A	Select Advancements Tab	DROP	-		
+play	C	0x4B	Server Data	BAKED	-		
+play	C	0x4C	Set Action Bar Text	MODEL	TEXT		
+play	C	0x4D	Set Border Center	BAKED	-		
+play	C	0x4E	Set Border Lerp Size	BAKED	-		
+play	C	0x4F	Set Border Size	BAKED	-		
+play	C	0x50	Set Border Warning Delay	BAKED	-		
+play	C	0x51	Set Border Warning Distance	BAKED	-		
+play	C	0x52	Set Camera	DERIVED	-		Spectator
+play	C	0x53	Set Held Item (clientbound)	DERIVED	-		
+play	C	0x54	Set Center Chunk	DERIVED	-		Loading area is 2 x view distance + 7 chunks wide; can be skipped for small bounded maps
+play	C	0x55	Set Render Distance	DERIVED	-		
+play	C	0x56	Set Default Spawn Position	BAKED	-		
+play	C	0x57	Display Objective	MODEL	TEXT		
+play	C	0x58	Set Entity Metadata	MODEL	ENTITY		Pose, flags, custom name, health bars; index and serializer tokens
+play	C	0x59	Link Entities	HYBRID	ENTITY		Leash
+play	C	0x5A	Set Entity Velocity	MODEL	ENTITY	y	Knockback; 1/8000 block per tick; may be better as a coded rule
+play	C	0x5B	Set Equipment	MODEL	ENTITY		Slots 0-6; item is a SLOT-style token
+play	C	0x5C	Set Experience	HYBRID	GLOBAL		
+play	C	0x5D	Set Health	HYBRID	GLOBAL		Vanilla damage maths in code; model decides server-specific changes
+play	C	0x5E	Update Objectives	MODEL	TEXT		
+play	C	0x5F	Set Passengers	HYBRID	ENTITY		
+play	C	0x60	Update Teams	MODEL	TEXT		
+play	C	0x61	Update Score	MODEL	TEXT		
+play	C	0x62	Set Simulation Distance	DERIVED	-		
+play	C	0x63	Set Subtitle Text	MODEL	TEXT		
+play	C	0x64	Update Time	DERIVED	GLOBAL	y	Engine clock; model only if the server pauses or sets time
+play	C	0x65	Set Title Text	MODEL	TEXT		
+play	C	0x66	Set Title Animation Times	MODEL	TEXT		
+play	C	0x67	Entity Sound Effect	MODEL	EVENT		Sound ID or inline definition; IDs change between versions
+play	C	0x68	Sound Effect	MODEL	EVENT		Position is x8 fixed point ints
+play	C	0x69	Start Configuration	ENGINE	-		
+play	C	0x6A	Stop Sound	MODEL	EVENT		
+play	C	0x6B	Store Cookie (play)	ENGINE	-		
+play	C	0x6C	System Chat Message	MODEL	TEXT		Overlay true is the action bar
+play	C	0x6D	Set Tab List Header And Footer	MODEL	TEXT		
+play	C	0x6E	Tag Query Response	DROP	-		
+play	C	0x6F	Pickup Item	MODEL	EVENT		Animation only; inventory change is a separate SLOT
+play	C	0x70	Teleport Entity	MODEL	ENTITY		Writer chooses this over 0x2E when delta exceeds 8 blocks
+play	C	0x71	Set Ticking State	BAKED	-		
+play	C	0x72	Step Tick	DROP	-		
+play	C	0x73	Transfer (play)	ENGINE	-		
+play	C	0x74	Update Advancements	BAKED	-	y	
+play	C	0x75	Update Attributes	DERIVED	-		From entity type, effects, equipment. Decided DERIVED after measuring 4,360 packets in 7 captures: 76% arrive with a spawn (initial values), 5% follow sprint, game mode, effect or equipment changes, 19% re-send an unchanged base value, none was a server-specific change. The reader counts initial/unchanged/changed so a hybrid case would show. Decode attribute IDs from raw bytes (the parser mislabels them)
+play	C	0x76	Entity Effect	HYBRID	EVENT		Active effects belong in the S snapshot
+play	C	0x77	Update Recipes	BAKED	-		
+play	C	0x78	Update Tags (play)	BAKED	-		
+play	C	0x79	Projectile Power	DERIVED	-		
+play	C	0x7A	Custom Report Details (play)	ENGINE	-		
+play	C	0x7B	Server Links (play)	BAKED	-		
+play	S	0x00	Confirm Teleportation	ENGINE	-		Clears the pending-ack entry
+play	S	0x01	Query Block Entity Tag	ENGINE	-		Ignore
+play	S	0x02	Change Difficulty (serverbound)	ENGINE	-		Op only; ignore
+play	S	0x03	Acknowledge Message	ENGINE	-		Chat signing bookkeeping
+play	S	0x04	Chat Command	INPUT	EVENT		Command text becomes template or byte tokens
+play	S	0x05	Signed Chat Command	INPUT	EVENT		Same as 0x04; signatures ignored
+play	S	0x06	Chat Message	INPUT	EVENT		Max 256 chars; signature ignored
+play	S	0x07	Player Session	ENGINE	-		Ignore
+play	S	0x08	Chunk Batch Received	ENGINE	-		Sets chunks per tick for the streamer
+play	S	0x09	Client Status	ENGINE	-		0 respawn (also emit an EVENT row), 1 request stats
+play	S	0x0A	Client Information (play)	ENGINE	-		
+play	S	0x0B	Command Suggestions Request	ENGINE	-		Pairs with 0x10
+play	S	0x0C	Acknowledge Configuration	ENGINE	-		
+play	S	0x0D	Click Container Button	INPUT_ACK	EVENT		Enchant, lectern, stonecutter, loom
+play	S	0x0E	Click Container	INPUT_ACK	SLOT		Vanilla click rules in code; engine diffs result and sends Set Container Slot or full Content on state ID mismatch
+play	S	0x0F	Close Container (serverbound)	INPUT	EVENT		
+play	S	0x10	Change Container Slot State	INPUT	EVENT		Crafter; rare
+play	S	0x11	Cookie Response (play)	ENGINE	-		
+play	S	0x12	Serverbound Plugin Message (play)	ENGINE	-		
+play	S	0x13	Debug Sample Subscription	ENGINE	-		Ignore
+play	S	0x14	Edit Book	INPUT	EVENT		Rare
+play	S	0x15	Query Entity Tag	ENGINE	-		Ignore
+play	S	0x16	Interact	INPUT	EVENT		Attack or interact; the main cause for hit reactions; target mapped to slot
+play	S	0x17	Jigsaw Generate	ENGINE	-		Ignore
+play	S	0x18	Serverbound Keep Alive (play)	ENGINE	-		
+play	S	0x19	Lock Difficulty	ENGINE	-		Ignore
+play	S	0x1A	Set Player Position	INPUT	ENTITY		Updates slot 0 directly; engine applies speed and collision checks
+play	S	0x1B	Set Player Position and Rotation	INPUT	ENTITY		
+play	S	0x1C	Set Player Rotation	INPUT	ENTITY		
+play	S	0x1D	Set Player On Ground	INPUT	ENTITY		
+play	S	0x1E	Move Vehicle (serverbound)	INPUT	ENTITY		
+play	S	0x1F	Paddle Boat	INPUT	ENTITY		
+play	S	0x20	Pick Item	INPUT_ACK	SLOT		Engine answers with two Set Container Slot (window -2) plus Set Held Item
+play	S	0x21	Ping Request (play)	ENGINE	-		Reply with 0x36
+play	S	0x22	Place Recipe	INPUT_ACK	SLOT		Reply with Place Ghost Recipe
+play	S	0x23	Player Abilities (serverbound)	INPUT	EVENT		Flying toggle
+play	S	0x24	Player Action	INPUT_ACK	EVENT		Dig start/cancel/finish, drops, swap hand; Sequence must be acked with 0x05
+play	S	0x25	Player Command	INPUT	ENTITY		Sneak, sprint, leave bed, elytra; becomes slot-0 flags
+play	S	0x26	Player Input	INPUT	ENTITY		
+play	S	0x27	Pong (play)	ENGINE	-		
+play	S	0x28	Change Recipe Book Settings	ENGINE	-		
+play	S	0x29	Set Seen Recipe	ENGINE	-		
+play	S	0x2A	Rename Item	INPUT	EVENT		Anvil; rare
+play	S	0x2B	Resource Pack Response (play)	ENGINE	-		
+play	S	0x2C	Seen Advancements	ENGINE	-		
+play	S	0x2D	Select Trade	INPUT	SLOT		Shop selection
+play	S	0x2E	Set Beacon Effect	INPUT	EVENT		Rare
+play	S	0x2F	Set Held Item (serverbound)	INPUT	SLOT		Updates S selected slot
+play	S	0x30	Program Command Block	ENGINE	-		Ignore
+play	S	0x31	Program Command Block Minecart	ENGINE	-		Ignore
+play	S	0x32	Set Creative Mode Slot	INPUT	SLOT		
+play	S	0x33	Program Jigsaw Block	ENGINE	-		Ignore
+play	S	0x34	Program Structure Block	ENGINE	-		Ignore
+play	S	0x35	Update Sign	INPUT	BLOCK		Only valid after Open Sign Editor
+play	S	0x36	Swing Arm	INPUT	EVENT		Cause for clientbound Entity Animation
+play	S	0x37	Teleport To Entity	ENGINE	-		Spectator only; ignore
+play	S	0x38	Use Item On	INPUT_ACK	BLOCK		Block placement or interaction; Sequence must be acked with 0x05
+play	S	0x39	Use Item	INPUT_ACK	EVENT		Sequence must be acked with 0x05

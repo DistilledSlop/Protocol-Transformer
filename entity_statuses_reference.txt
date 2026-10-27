@@ -1,0 +1,798 @@
+This article lists '''entity status codes''', by entity.  These are used in the [[Protocol#Entity_Event|Entity Event packet]].
+
+== Status table ==
+
+The following table links to the appropriate entity for each status.
+
+{| class="wikitable"
+ ! Status code
+ ! Entity(/ies)
+ |-
+ | 0
+ | [[#Arrow|Arrow]]
+ |-
+ | 1
+ | [[#Minecart Spawner|Minecart Spawner]], [[#Rabbit|Rabbit]]
+ |-
+ | 2
+ | None
+ |-
+ | 3
+ | [[#Egg|Egg]], [[#Living Entity|Living Entity]], [[#Snowball|Snowball]]
+ |-
+ | 4
+ | [[#Evoker Fangs|Evoker Fangs]], [[#Hoglin|Hoglin]], [[#Iron Golem|Iron Golem]], [[#Ravager|Ravager]], [[#Warden|Warden]], [[#Zoglin|Zoglin]]
+ |-
+ | 5
+ | None
+ |-
+ | 6
+ | [[#Abstract Horse|Abstract Horse]], [[#Tameable Animal|Tameable Animal]]
+ |-
+ | 7
+ | [[#Abstract Horse|Abstract Horse]], [[#Tameable Animal|Tameable Animal]]
+ |-
+ | 8
+ | [[#Wolf|Wolf]]
+ |-
+ | 9
+ | [[#Player|Player]]
+ |-
+ | 10
+ | [[#Minecart TNT|Minecart TNT]], [[#Sheep|Sheep]]
+ |-
+ | 11
+ | [[#Iron Golem|Iron Golem]]
+ |-
+ | 12
+ | [[#Villager|Villager]]
+ |-
+ | 13
+ | [[#Villager|Villager]]
+ |-
+ | 14
+ | [[#Villager|Villager]]
+ |-
+ | 15
+ | [[#Witch|Witch]]
+ |-
+ | 16
+ | [[#Zombie Villager|Zombie Villager]]
+ |-
+ | 17
+ | [[#Firework Rocket|Firework Rocket]]
+ |-
+ | 18
+ | [[#Allay|Allay]], [[#Animal|Animal]]
+ |-
+ | 19
+ | [[#Squid|Squid]]
+ |-
+ | 20
+ | [[#Mob|Mob]]
+ |-
+ | 21
+ | [[#Guardian|Guardian]]
+ |-
+ | 22
+ | [[#Player|Player]]
+ |-
+ | 23
+ | [[#Player|Player]]
+ |-
+ | 24
+ | [[#Player|Player]]
+ |-
+ | 25
+ | [[#Player|Player]]
+ |-
+ | 26
+ | [[#Player|Player]]
+ |-
+ | 27
+ | [[#Player|Player]]
+ |-
+ | 28
+ | [[#Player|Player]]
+ |-
+ | 29
+ | [[#Living Entity|Living Entity]]
+ |-
+ | 30
+ | [[#Living Entity|Living Entity]]
+ |-
+ | 31
+ | [[#Fishing Hook|Fishing Hook]]
+ |-
+ | 32
+ | [[#Armor Stand|Armor Stand]]
+ |-
+ | 33
+ | None
+ |-
+ | 34
+ | [[#Iron Golem|Iron Golem]]
+ |-
+ | 35
+ | [[#Living Entity|Living Entity]]
+ |-
+ | 36
+ | None
+ |-
+ | 37
+ | None
+ |-
+ | 38
+ | [[#Dolphin|Dolphin]]
+ |-
+ | 39
+ | [[#Ravager|Ravager]]
+ |-
+ | 40
+ | [[#Ocelot|Ocelot]]
+ |-
+ | 41
+ | [[#Ocelot|Ocelot]]
+ |-
+ | 42
+ | [[#Villager|Villager]]
+ |-
+ | 43
+ | [[#Player|Player]]
+ |-
+ | 44
+ | None
+ |-
+ | 45
+ | [[#Fox|Fox]]
+ |-
+ | 46
+ | [[#Living Entity|Living Entity]]
+ |-
+ | 47
+ | [[#Living Entity|Living Entity]]
+ |-
+ | 48
+ | [[#Living Entity|Living Entity]]
+ |-
+ | 49
+ | [[#Living Entity|Living Entity]]
+ |-
+ | 50
+ | [[#Living Entity|Living Entity]]
+ |-
+ | 51
+ | [[#Living Entity|Living Entity]]
+ |-
+ | 52
+ | [[#Living Entity|Living Entity]]
+ |-
+ | 53
+ | [[#Entity|Entity]]
+ |-
+ | 54
+ | [[#Living Entity|Living Entity]]
+ |-
+ | 55
+ | [[#Living Entity|Living Entity]]
+ |-
+ | 56
+ | [[#Wolf|Wolf]]
+ |-
+ | 57
+ | None
+ |-
+ | 58
+ | [[#Goat|Goat]]
+ |-
+ | 59
+ | [[#Goat|Goat]]
+ |-
+ | 60
+ | [[#Living Entity|Living Entity]]
+ |-
+ | 61
+ | [[#Warden|Warden]]
+ |-
+ | 62
+ | [[#Warden|Warden]]
+ |-
+ | 63
+ | [[#Sniffer|Sniffer]]
+ |}
+
+== Entity statuses ==
+
+=== [[Entity metadata#Entity|Entity]] ===
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 53
+ |colspan="2"| Spawns honey block slide particles at the entities feet
+ |}
+
+=== [[Entity metadata#Projectile|Projectile]] ===
+
+Extends [[#Entity|Entity]].
+
+No additional statuses.
+
+=== [[Entity metadata#Snowball|Snowball]] ===
+
+Extends [[#Projectile|Projectile]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 3
+ |colspan="2"| Displays 8 <code>snowballpoof</code> particles at the snowball's location
+ |}
+
+=== [[Entity metadata#Egg|Egg]] ===
+
+Extends [[#Projectile|Projectile]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 3
+ |colspan="2"| Displays 8 <code>iconcrack</code> particles with the egg as a parameter at the egg's location
+ |}
+
+=== [[Entity metadata#Fishing Hook|Fishing Hook]] ===
+
+Extends [[#Entity|Entity]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 31
+ |colspan="2"| If the caught entity is the connected player, then cause them to be pulled toward the caster of the fishing rod.
+ |}
+
+=== [[Entity metadata#Abstract Arrow|Abstract Arrow]] ===
+
+Extends [[#Entity|Entity]].
+
+Abstract base class for [[#Arrow|Arrow]] (which is used for regular arrows as well as tipped ones) and Spectral Arrow.
+
+=== [[Entity metadata#Arrow|Arrow]] ===
+
+Extends [[#Arrow|Arrow]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 0
+ |colspan="2"| Spawns tipped arrow particle effects, if the color is not -1.
+ |}
+
+=== [[Entity metadata#Firework Rocket|Firework Rocket]] ===
+
+Extends [[#Entity|Entity]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 17
+ |colspan="2"| Triggers the firework explosion effect (based on the firework info metadata)
+ |}
+
+=== [[Entity metadata#Living Entity|Living Entity]] ===
+
+Extends [[#Entity|Entity]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 3
+ |colspan="2"| Plays the death sound and death animation
+ |-
+ | 29
+ |colspan="2"| Plays the shield block sound
+ |-
+ | 30
+ |colspan="2"| Plays the shield break sound
+ |-
+ | 35
+ |colspan="2"| Plays totem of undying animation and sound
+ |-
+ | 46
+ |colspan="2"| Spawns portal particles when teleporting due to consumption of a chorus fruit or being an endermen
+ |-
+ | 47
+ |colspan="2"| Plays the equipment break sound (unless silent) and spawns break particles for the item in the main hand
+ |-
+ | 48
+ |colspan="2"| Plays the equipment break sound (unless silent) and spawns break particles for the item in the off hand
+ |-
+ | 49
+ |colspan="2"| Plays the equipment break sound (unless silent) and spawns break particles for the item in the head slot
+ |-
+ | 50
+ |colspan="2"| Plays the equipment break sound (unless silent) and spawns break particles for the item in the chest slot
+ |-
+ | 51
+ |colspan="2"| Plays the equipment break sound (unless silent) and spawns break particles for the item in the legs slot
+ |-
+ | 52
+ |colspan="2"| Plays the equipment break sound (unless silent) and spawns break particles for the item in the feet slot
+ |-
+ | 54
+ |colspan="2"| Spawns honey block fall particles at the entities feet
+ |-
+ | 55
+ |colspan="2"| Swaps the hand items of the entity
+ |-
+ | 60
+ |colspan="2"| Spawns death smoke particles
+ |}
+
+=== [[Entity metadata#Player|Player]] ===
+
+Extends [[#Living Entity|Living Entity]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 9
+ |colspan="2"| Marks item use as finished (finished eating, finished drinking, etc)
+This status is not required if you want more control on the server side, this basically finishes the interaction on the client side to decrease the food quantity, arrow quantity, ...
+
+But you can trigger these changes manually through other packets or prevent those changes on the client.
+
+Examples:
+
+*Create an 'Infinity Bow' without the first arrow in your inventory constantly changing in quantity.
+
+*Create a custom food that is infinite, and prevent the stack quantity from decreasing.
+
+*...
+
+Note: This works together with the 'Hand data' so this will have to be updated accordingly to 'finish' the interaction manually.
+ |-
+ | 22
+ |colspan="2"| Enables reduced {{Minecraft Wiki|Debug screen|debug screen}} information
+ |-
+ | 23
+ |colspan="2"| Disables reduced {{Minecraft Wiki|Debug screen|debug screen}} information
+ |-
+ | 24
+ |colspan="2"| Set {{Minecraft Wiki|Server.properties#op-permission-level|op permission level}} to 0
+ |-
+ | 25
+ |colspan="2"| Set {{Minecraft Wiki|Server.properties#op-permission-level|op permission level}} to 1
+ |-
+ | 26
+ |colspan="2"| Set {{Minecraft Wiki|Server.properties#op-permission-level|op permission level}} to 2
+ |-
+ | 27
+ |colspan="2"| Set {{Minecraft Wiki|Server.properties#op-permission-level|op permission level}} to 3
+ |-
+ | 28
+ |colspan="2"| Set {{Minecraft Wiki|Server.properties#op-permission-level|op permission level}} to 4
+ |-
+ | 43
+ |colspan="2"| Spawn cloud particles at the player. Sent to a player whose Bad Omen effect is removed to either start a raid or increase its difficulty.
+ |}
+
+=== [[Entity metadata#Armor Stand|Armor Stand]] ===
+
+Extends [[#Living Entity|Living Entity]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 32
+ |colspan="2"| Plays the hit sound, and resets a hit cooldown.
+ |}
+
+=== [[Entity metadata#Mob|Mob]] ===
+
+Extends [[#Living Entity|Living Entity]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 20
+ |colspan="2"| Spawn explosion particle. Used when:
+*A silverfish enters a block
+*A silverfish exits a block
+*A mob spawner (or minecart mob spawner) spawns an entity (only with entities that support this status)
+ |}
+
+=== [[Entity metadata#Water Animal|Water Animal]] ===
+
+Extends [[#Mob|Mob]].
+
+No additional statuses.
+
+=== [[Entity metadata#Squid|Squid]] ===
+
+Extends [[#Water Animal|Water Animal]]
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 19
+ |colspan="2"| Resets the squid's rotation to 0 radians.  Occurs whenever the server calculates that the squid has rotated more than 2 pi radians.
+ |}
+
+=== [[Entity metadata#Dolphin|Dolphin]] ===
+
+Extends [[#Water Animal|Water Animal]]
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 38
+ |colspan="2"| Causes several "happy villager" particles to appear; used when the dolphin has been fed and is locating a structure
+ |}
+
+=== [[Entity metadata#Creature|Creature]] ===
+
+Extends [[#Mob|Mob]].
+
+No additional statuses.
+
+=== [[Entity metadata#Ageable|Ageable]] ===
+
+Extends [[#Creature|Creature]].
+
+No additional statuses.
+
+=== [[Entity metadata#Animal|Animal]] ===
+
+Extends [[#Ageable|Ageable]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 18
+ |colspan="2"| Spawn "love mode" heart particles
+ |}
+
+=== [[Entity metadata#Abstract Horse|Abstract Horse]] ===
+
+Extends [[#Animal|Animal]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 6
+ |colspan="2"| Spawn smoke particles (taming failed)
+ |-
+ | 7
+ |colspan="2"| Spawn heart particles (taming succeeded)
+ |}
+
+=== [[Entity metadata#Ocelot|Ocelot]] ===
+
+{{Warning|This is for {{Minecraft Wiki|Ocelot|Ocelot}} not {{Minecraft Wiki|Cat|Cat}}}}
+
+Extends [[#Animal|Animal]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 40
+ |colspan="2"| Spawn smoke particles (taming failed)
+ |-
+ | 41
+ |colspan="2"| Spawn heart particles (taming succeeded)
+ |}
+
+=== [[Entity metadata#Rabbit|Rabbit]] ===
+
+Extends [[#Animal|Animal]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 1
+ |colspan="2"| Causes the rabbit to use its rotated jumping animation, and displays jumping particles.
+ |}
+
+=== [[Entity metadata#Sheep|Sheep]] ===
+
+Extends [[#Animal|Animal]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 10
+ |colspan="2"| Causes the sheep to play the eating grass animation for the next 40 ticks
+ |}
+
+=== [[Entity metadata#Fox|Fox]] ===
+
+Extends [[#Animal|Animal]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 45
+ |colspan="2"| Spawns particles based on the item on the fox's mouth (technically its main hand) to indicate them chewing on it
+ |}
+
+
+=== [[Entity metadata#Goat|Goat]] ===
+
+Extends [[#Animal|Animal]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 58
+ |colspan="2"| Lower head for ramming
+ |-
+ | 59
+ |colspan="2"| Stop lowering head
+ |}
+
+=== [[Entity metadata#Tameable Animal|Tameable Animal]] ===
+
+Extends [[#Animal|Animal]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 6
+ |colspan="2"| Spawn smoke particles (taming failed)
+ |-
+ | 7
+ |colspan="2"| Spawn heart particles (taming succeeded)
+ |}
+
+=== [[Entity metadata#Wolf|Wolf]] ===
+
+Extends [[#Tameable Animal|Tameable Animal]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 8
+ |colspan="2"| Play wolf shaking water animation
+ |-
+ | 56
+ |colspan="2"| Stop wolf shaking water animation
+ |}
+
+=== [[Entity metadata#Villager|Villager]] ===
+
+Extends [[#Ageable|Ageable]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 12
+ |colspan="2"| Spawn villager mating heart particles
+ |-
+ | 13
+ |colspan="2"| Spawn villager angry particles
+ |-
+ | 14
+ |colspan="2"| Spawn villager happy particles
+ |-
+ | 42
+ |colspan="2"| Spawn "splash" particles. Triggered with 1% chance each tick while a raid is active.
+ |}
+
+=== [[Entity metadata#Golem|Golem]] ===
+
+Extends [[#Creature|Creature]].
+
+No additional statuses.
+
+=== [[Entity metadata#Iron Golem|Iron Golem]] ===
+
+Extends [[#Golem|Golem]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 4
+ |colspan="2"| Plays attack animation and attack sound
+ |-
+ | 11
+ |colspan="2"| Causes golem to hold out a <s>rose</s> poppy for 400 ticks (20 seconds)
+ |-
+ | 34
+ |colspan="2"| Puts away golem's poppy
+ |}
+
+=== [[Entity metadata#Evoker Fangs|Evoker Fangs]] ===
+
+Extends [[#Entity|Entity]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 4
+ |colspan="2"| Starts the attack animation, and plays the <code>entity.evocation_fangs.attack</code> sound.
+ |}
+
+=== [[Entity metadata#Monster|Monster]] ===
+
+Extends [[#Creature|Creature]].
+
+No additional statuses.
+
+=== [[Entity metadata#Witch|Witch]] ===
+
+Extends [[#Monster|Monster]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 15
+ |colspan="2"| Spawns between 10 and 45 <code>witchMagic</code> particles.  This status has a .075% chance of happening each tick.
+ |}
+
+=== [[Entity metadata#Ravager|Ravager]] ===
+
+Extends [[#Monster|Monster]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 4
+ | Starts the attack animation.
+ |-
+ | 39
+ |colspan="2"| Marks the ravager as stunned for the next 40 ticks.
+ |}
+
+=== [[Entity metadata#Zombie|Zombie]] ===
+
+Extends [[#Monster|Monster]].
+
+=== [[Entity metadata#Zombie_Villager|Zombie Villager]] ===
+
+Extends [[#Zombie|Zombie]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 16
+ |colspan="2"| Plays the <code>entity.zombie_villager.cure</code> sound effect (unless the entity is silent)
+ |}
+
+=== [[Entity metadata#Guardian|Guardian]] ===
+
+Extends [[#Monster|Monster]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 21
+ |colspan="2"| Plays the guardian attack sound effect from this entity.
+ |}
+
+=== [[Entity metadata#Minecart|Minecart]] ===
+
+Extends [[#Entity|Entity]].
+
+No additional statuses.
+
+=== [[Entity metadata#Minecart TNT|Minecart TNT]] ===
+
+Extends [[#Minecart|Minecart]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 10
+ |colspan="2"| Causes the TNT to ignite. Does not play a sound; the sound must be played separately.
+ |}
+
+=== [[Entity metadata#Minecart Spawner|Minecart Spawner]] ===
+
+Extends [[#Minecart|Minecart]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 1
+ |colspan="2"| Resets the delay of the spawner to 200 ticks (the default minimum value).
+ |}
+
+=== [[Entity metadata#Hoglin|Hoglin]] ===
+
+Extends [[#Animal|Animal]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 4
+ |colspan="2"| Plays the attack animation for 10 ticks and plays the attack sound.
+ |}
+
+=== [[Entity metadata#Zoglin|Zoglin]] ===
+
+Extends [[#Monster|Monster]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 4
+ |colspan="2"| Plays the attack animation for 10 ticks and plays the attack sound.
+ |}
+
+=== [[Entity metadata#Allay|Allay]]===
+
+Extends [[#Creature|Creature]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 18
+ |colspan="2"| Spawns heart particles, used upon Allay duplication.
+ |}
+
+=== [[Entity metadata#Warden|Warden]]===
+
+Extends [[#Monster|Monster]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 4
+ |colspan="2"| Stops the roar animation and performs the attack animation.
+ |-
+ | 61
+ |colspan="2"| Performs tendril shaking animation for 10 ticks.
+ |-
+ | 62
+ |colspan="2"| Performs the sonic boom attack animation (Charge and release). Beam and sound are not included.
+ |}
+
+=== [[Entity metadata#Sniffer|Sniffer]]===
+
+Extends [[#Animal|Animal]].
+
+{| class="wikitable"
+ ! Status
+ !colspan="2"| Description
+ |-
+ | 63
+ |colspan="2"| Plays the digging sound. Only works if the Sniffer has a target, and is in a [[Entity_metadata#Sniffer|digging or searching state]].
+ |}
+
+[[Category:Protocol Details]]
+[[Category:Minecraft Modern]]

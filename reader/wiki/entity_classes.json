@@ -1,0 +1,2370 @@
+{
+    "classes": {
+        "Entity": {
+            "extends": null,
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Is on fire; 0x02: Is pressing sneak key (hides the name tag, but does not make the entity visually sneak.); 0x04: Unused (previously riding); 0x08: Is sprinting (shows sprinting particles when on ground.); 0x10: Is swimming; 0x20: Is invisible; 0x40: has glowing effect; 0x80: Is flying with an elytra",
+                    "index": 0
+                },
+                {
+                    "name": "Air ticks",
+                    "type": "VarInt",
+                    "notes": "default: 300",
+                    "index": 1
+                },
+                {
+                    "name": "Custom name",
+                    "type": "Optional Text Component",
+                    "notes": "default: empty",
+                    "index": 2
+                },
+                {
+                    "name": "Is custom name visible",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 3
+                },
+                {
+                    "name": "Is silent",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 4
+                },
+                {
+                    "name": "Has no gravity",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 5
+                },
+                {
+                    "name": "Pose",
+                    "type": "Pose",
+                    "notes": "default: STANDING",
+                    "index": 6
+                },
+                {
+                    "name": "Ticks frozen in powdered snow",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 7
+                }
+            ]
+        },
+        "Area Effect Cloud": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Radius",
+                    "type": "Float",
+                    "notes": "default: 3.0",
+                    "index": 8
+                },
+                {
+                    "name": "Ignore radius and show effect as single point, not area",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 9
+                },
+                {
+                    "name": "The particle",
+                    "type": "Particle",
+                    "notes": "default: -1",
+                    "index": 10
+                }
+            ]
+        },
+        "Wind Charge": {
+            "extends": "Entity",
+            "fields": []
+        },
+        "Dragon Fireball": {
+            "extends": "Entity",
+            "fields": []
+        },
+        "End Crystal": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Beam target",
+                    "type": "Optional Position",
+                    "notes": "default: Empty",
+                    "index": 8
+                },
+                {
+                    "name": "Show bottom",
+                    "type": "Boolean",
+                    "notes": "default: true",
+                    "index": 9
+                }
+            ]
+        },
+        "Evoker Fangs": {
+            "extends": "Entity",
+            "fields": []
+        },
+        "Experience Orb": {
+            "extends": "Entity",
+            "fields": []
+        },
+        "Eye of Ender": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Item",
+                    "type": "Slot",
+                    "notes": "default: Empty (which behaves as if it were a minecraft:ender_eye)",
+                    "index": 8
+                }
+            ]
+        },
+        "Falling Block": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "spawn position",
+                    "type": "Position",
+                    "notes": "default: (0, 0, 0)",
+                    "index": 8
+                }
+            ]
+        },
+        "Fireball": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Item",
+                    "type": "Slot",
+                    "notes": "default: Empty",
+                    "index": 8
+                }
+            ]
+        },
+        "Firework Rocket": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Firework info",
+                    "type": "Slot",
+                    "notes": "default: Empty",
+                    "index": 8
+                },
+                {
+                    "name": "Entity ID of entity which used firework (for elytra boosting)",
+                    "type": "Optional VarInt",
+                    "notes": "default: Empty",
+                    "index": 9
+                },
+                {
+                    "name": "Is shot at angle (from a crossbow)",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 10
+                }
+            ]
+        },
+        "Interaction": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Width",
+                    "type": "Float",
+                    "notes": "default: 1.0",
+                    "index": 8
+                },
+                {
+                    "name": "Height",
+                    "type": "Float",
+                    "notes": "default: 1.0",
+                    "index": 9
+                },
+                {
+                    "name": "Responsive - can be attacked/interacted with if true",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 10
+                }
+            ]
+        },
+        "Item": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Item",
+                    "type": "Slot",
+                    "notes": "default: Empty",
+                    "index": 8
+                }
+            ]
+        },
+        "Item Frame": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Item",
+                    "type": "Slot",
+                    "notes": "default: Empty",
+                    "index": 8
+                },
+                {
+                    "name": "Rotation",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 9
+                }
+            ]
+        },
+        "Glow Item Frame": {
+            "extends": "Item Frame",
+            "fields": []
+        },
+        "Leash Knot": {
+            "extends": "Entity",
+            "fields": []
+        },
+        "Lightning Bolt": {
+            "extends": "Entity",
+            "fields": []
+        },
+        "Llama Spit": {
+            "extends": "Entity",
+            "fields": []
+        },
+        "Marker": {
+            "extends": "Entity",
+            "fields": []
+        },
+        "Ominous Item Spawner": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Item",
+                    "type": "Slot",
+                    "notes": "default: Empty",
+                    "index": 8
+                }
+            ]
+        },
+        "Painting": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Painting Type",
+                    "type": "Painting Variant",
+                    "notes": "default: KEBAB",
+                    "index": 8
+                }
+            ]
+        },
+        "Shulker Bullet": {
+            "extends": "Entity",
+            "fields": []
+        },
+        "Small Fireball": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Item",
+                    "type": "Slot",
+                    "notes": "default: Empty (which behaves as if it were a minecraft:fire_charge)",
+                    "index": 8
+                }
+            ]
+        },
+        "Primed TNT": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Fuse time",
+                    "type": "VarInt",
+                    "notes": "default: 80",
+                    "index": 8
+                },
+                {
+                    "name": "The block state ID that is exploding",
+                    "type": "Block State",
+                    "notes": "default: TNT",
+                    "index": 9
+                }
+            ]
+        },
+        "Wither Skull": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Is invulnerable",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 8
+                }
+            ]
+        },
+        "Fishing Bobber": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Hooked entity id + 1, or 0 if there is no hooked entity",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 8
+                },
+                {
+                    "name": "Is catchable",
+                    "type": "Boolean",
+                    "notes": "default: False",
+                    "index": 9
+                }
+            ]
+        },
+        "Abstract Arrow": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Is critical; 0x02: Is noclip (used by loyalty tridents when returning)",
+                    "index": 8
+                },
+                {
+                    "name": "Piercing level",
+                    "type": "Byte",
+                    "notes": "default: 0",
+                    "index": 9
+                },
+                {
+                    "name": "Is in ground",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 10
+                }
+            ]
+        },
+        "Arrow": {
+            "extends": "Abstract Arrow",
+            "fields": [
+                {
+                    "name": "Color (-1 for no particles)",
+                    "type": "VarInt",
+                    "notes": "default: -1",
+                    "index": 11
+                }
+            ]
+        },
+        "Spectral Arrow": {
+            "extends": "Abstract Arrow",
+            "fields": []
+        },
+        "Trident": {
+            "extends": "Abstract Arrow",
+            "fields": [
+                {
+                    "name": "Loyalty level (enchantment)",
+                    "type": "Byte",
+                    "notes": "default: 0",
+                    "index": 11
+                },
+                {
+                    "name": "Has enchantment glint",
+                    "type": "Boolean",
+                    "notes": "default: False",
+                    "index": 12
+                }
+            ]
+        },
+        "Display": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Interpolation delay",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 8
+                },
+                {
+                    "name": "Transformation interpolation duration",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 9
+                },
+                {
+                    "name": "Position/Rotation interpolation duration",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 10
+                },
+                {
+                    "name": "Translation",
+                    "type": "Vector3",
+                    "notes": "default: (0.0, 0.0, 0.0)",
+                    "index": 11
+                },
+                {
+                    "name": "Scale",
+                    "type": "Vector3",
+                    "notes": "default: (1.0, 1.0, 1.0)",
+                    "index": 12
+                },
+                {
+                    "name": "Rotation left",
+                    "type": "Quaternion",
+                    "notes": "default: (0.0, 0.0, 0.0, 1.0)",
+                    "index": 13
+                },
+                {
+                    "name": "Rotation right",
+                    "type": "Quaternion",
+                    "notes": "default: (0.0, 0.0, 0.0, 1.0)",
+                    "index": 14
+                },
+                {
+                    "name": "Billboard Constraints (0 = FIXED, 1 = VERTICAL, 2 = HORIZONTAL, 3 = CENTER)",
+                    "type": "Byte",
+                    "notes": "default: 0",
+                    "index": 15
+                },
+                {
+                    "name": "Brightness override (blockLight )",
+                    "type": "VarInt",
+                    "notes": "default: -1",
+                    "index": 16
+                },
+                {
+                    "name": "View range",
+                    "type": "Float",
+                    "notes": "default: 1.0",
+                    "index": 17
+                },
+                {
+                    "name": "Shadow radius",
+                    "type": "Float",
+                    "notes": "default: 0.0",
+                    "index": 18
+                },
+                {
+                    "name": "Shadow strength",
+                    "type": "Float",
+                    "notes": "default: 1.0",
+                    "index": 19
+                },
+                {
+                    "name": "Width",
+                    "type": "Float",
+                    "notes": "default: 0.0",
+                    "index": 20
+                },
+                {
+                    "name": "Height",
+                    "type": "Float",
+                    "notes": "default: 0.0",
+                    "index": 21
+                },
+                {
+                    "name": "Glow color override",
+                    "type": "VarInt",
+                    "notes": "default: -1",
+                    "index": 22
+                }
+            ]
+        },
+        "Block Display": {
+            "extends": "Display",
+            "fields": [
+                {
+                    "name": "Displayed block state",
+                    "type": "Block State",
+                    "notes": "default: 0 (Air)",
+                    "index": 23
+                }
+            ]
+        },
+        "Item Display": {
+            "extends": "Display",
+            "fields": [
+                {
+                    "name": "Displayed item",
+                    "type": "Slot",
+                    "notes": "default: Empty",
+                    "index": 23
+                },
+                {
+                    "name": "Display type:",
+                    "type": "Byte",
+                    "notes": "* 0 = NONE | * 1 = THIRD_PERSON_LEFT_HAND | * 2 = THIRD_PERSON_RIGHT_HAND | * 3 = FIRST_PERSON_LEFT_HAND | * 4 = FIRST_PERSON_RIGHT_HAND | * 5 = HEAD | * 6 = GUI | * 7 = GROUND | * 8 = FIXED | default: 0 (NONE)",
+                    "index": 24
+                }
+            ]
+        },
+        "Text Display": {
+            "extends": "Display",
+            "fields": [
+                {
+                    "name": "Text",
+                    "type": "Text Component",
+                    "notes": "default: Empty",
+                    "index": 23
+                },
+                {
+                    "name": "Line width",
+                    "type": "VarInt",
+                    "notes": "default: 200",
+                    "index": 24
+                },
+                {
+                    "name": "Background color",
+                    "type": "VarInt",
+                    "notes": "default: 1073741824 (0x40000000)",
+                    "index": 25
+                },
+                {
+                    "name": "Text opacity",
+                    "type": "Byte",
+                    "notes": "default: -1 (fully opaque)",
+                    "index": 26
+                },
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Has shadow; 0x02: Is see through; 0x04: Use default background color; 0x08: Alignment:\n* 0 = CENTER\n* 1 or 3 = LEFT\n* 2 = RIGHT",
+                    "index": 27
+                }
+            ]
+        },
+        "Living Entity": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Hand states, used to trigger blocking/eating/drinking animation.",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Is hand active; 0x02: Active hand (0 = main hand, 1 = offhand); 0x04: Is in riptide spin attack",
+                    "index": 8
+                },
+                {
+                    "name": "Health",
+                    "type": "Float",
+                    "notes": "default: 1.0",
+                    "index": 9
+                },
+                {
+                    "name": "Potion effect color (or 0 if there is no effect)",
+                    "type": "Particles",
+                    "notes": "default: 0",
+                    "index": 10
+                },
+                {
+                    "name": "Is potion effect ambient: reduces the number of particles generated by potions to 1/5 the normal amount",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 11
+                },
+                {
+                    "name": "Number of arrows in entity",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 12
+                },
+                {
+                    "name": "Number of bee stingers in entity",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 13
+                },
+                {
+                    "name": "Location of the bed that the entity is currently sleeping in (Empty if it isn't sleeping)",
+                    "type": "Optional Position",
+                    "notes": "default: Empty",
+                    "index": 14
+                }
+            ]
+        },
+        "Armor Stand": {
+            "extends": "Living Entity",
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Is Small; 0x02: Unused; 0x04: Has Arms; 0x08: Has no BasePlate; 0x10: Is Marker",
+                    "index": 15
+                },
+                {
+                    "name": "Head rotation",
+                    "type": "Rotations",
+                    "notes": "default: (0.0, 0.0, 0.0)",
+                    "index": 16
+                },
+                {
+                    "name": "Body rotation",
+                    "type": "Rotations",
+                    "notes": "default: (0.0, 0.0, 0.0)",
+                    "index": 17
+                },
+                {
+                    "name": "Left arm rotation",
+                    "type": "Rotations",
+                    "notes": "default: (-10.0, 0.0, -10.0)",
+                    "index": 18
+                },
+                {
+                    "name": "Right arm rotation",
+                    "type": "Rotations",
+                    "notes": "default: (-15.0, 0.0, 10.0)",
+                    "index": 19
+                },
+                {
+                    "name": "Left leg rotation",
+                    "type": "Rotations",
+                    "notes": "default: (-1.0, 0.0, -1.0)",
+                    "index": 20
+                },
+                {
+                    "name": "Right leg rotation",
+                    "type": "Rotations",
+                    "notes": "default: (1.0, 0.0, 1.0)",
+                    "index": 21
+                }
+            ]
+        },
+        "Player": {
+            "extends": "Living Entity",
+            "fields": [
+                {
+                    "name": "Additional Hearts",
+                    "type": "Float",
+                    "notes": "default: 0.0",
+                    "index": 15
+                },
+                {
+                    "name": "Score",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 16
+                },
+                {
+                    "name": "The Displayed Skin Parts bit mask that is sent in Client Settings",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Cape enabled; 0x02: Jacket enabled; 0x04: Left sleeve enabled; 0x08: Right sleeve enabled; 0x10: Left pants leg enabled; 0x20: Right pants leg enabled; 0x40: Hat enabled; 0x80: Unused",
+                    "index": 17
+                },
+                {
+                    "name": "Main hand (0 : Left, 1 : Right)",
+                    "type": "Byte",
+                    "notes": "default: 1",
+                    "index": 18
+                },
+                {
+                    "name": "Left shoulder entity data (for occupying parrot)",
+                    "type": "NBT",
+                    "notes": "default: Empty",
+                    "index": 19
+                },
+                {
+                    "name": "Right shoulder entity data (for occupying parrot)",
+                    "type": "NBT",
+                    "notes": "default: Empty",
+                    "index": 20
+                }
+            ]
+        },
+        "Mob": {
+            "extends": "Living Entity",
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: NoAI; 0x02: Is left handed; 0x04: Is aggressive",
+                    "index": 15
+                }
+            ]
+        },
+        "Bat": {
+            "extends": "Mob",
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Is hanging",
+                    "index": 16
+                }
+            ]
+        },
+        "Ender Dragon": {
+            "extends": "Mob",
+            "fields": [
+                {
+                    "name": "Dragon phase",
+                    "type": "VarInt",
+                    "notes": "default: 10 (hover)",
+                    "index": 16
+                }
+            ]
+        },
+        "Ghast": {
+            "extends": "Mob",
+            "fields": [
+                {
+                    "name": "Is attacking",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 16
+                }
+            ]
+        },
+        "Phantom": {
+            "extends": "Mob",
+            "fields": [
+                {
+                    "name": "Size",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 16
+                }
+            ]
+        },
+        "Slime": {
+            "extends": "Mob",
+            "fields": [
+                {
+                    "name": "Size",
+                    "type": "VarInt",
+                    "notes": "default: 1",
+                    "index": 16
+                }
+            ]
+        },
+        "Magma Cube": {
+            "extends": "Slime",
+            "fields": []
+        },
+        "Creature": {
+            "extends": "Mob",
+            "fields": []
+        },
+        "Allay": {
+            "extends": "Creature",
+            "fields": [
+                {
+                    "name": "Is dancing",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 16
+                },
+                {
+                    "name": "Can duplicate",
+                    "type": "Boolean",
+                    "notes": "default: true",
+                    "index": 17
+                }
+            ]
+        },
+        "Iron Golem": {
+            "extends": "Creature",
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Is player-created",
+                    "index": 16
+                }
+            ]
+        },
+        "Pufferfish": {
+            "extends": "Creature",
+            "fields": [
+                {
+                    "name": "PuffState (varies from 0 to 2)",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 16
+                }
+            ]
+        },
+        "Shulker": {
+            "extends": "Creature",
+            "fields": [
+                {
+                    "name": "Attach face",
+                    "type": "Direction",
+                    "notes": "default: Down (0)",
+                    "index": 16
+                },
+                {
+                    "name": "Shield height",
+                    "type": "Byte",
+                    "notes": "default: 0",
+                    "index": 17
+                },
+                {
+                    "name": "Color (dye color)",
+                    "type": "Byte",
+                    "notes": "default: 16",
+                    "index": 18
+                }
+            ]
+        },
+        "Snow Golem": {
+            "extends": "Creature",
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0x10 | bits: 0x01: Unused; 0x02: Unused; 0x04: Unused; 0x08: Unused; 0x10: Has pumpkin hat",
+                    "index": 16
+                }
+            ]
+        },
+        "Tadpole": {
+            "extends": "Creature",
+            "fields": [
+                {
+                    "name": "Is from bucket",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 16
+                }
+            ]
+        },
+        "Ageable Mob": {
+            "extends": "Creature",
+            "fields": [
+                {
+                    "name": "Is baby",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 16
+                }
+            ]
+        },
+        "Dolphin": {
+            "extends": "Ageable Mob",
+            "fields": [
+                {
+                    "name": "Treasure position",
+                    "type": "Position",
+                    "notes": "default: (0, 0, 0)",
+                    "index": 17
+                },
+                {
+                    "name": "Has fish",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 18
+                },
+                {
+                    "name": "Moisture level",
+                    "type": "VarInt",
+                    "notes": "default: 2400",
+                    "index": 19
+                }
+            ]
+        },
+        "Squid": {
+            "extends": "Ageable Mob",
+            "fields": []
+        },
+        "Glow Squid": {
+            "extends": "Squid",
+            "fields": [
+                {
+                    "name": "Dark ticks remaining",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 17
+                }
+            ]
+        },
+        "Animal": {
+            "extends": "Ageable Mob",
+            "fields": []
+        },
+        "Armadillo": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Armadillo state",
+                    "type": "Armadillo State",
+                    "notes": "default: IDLE",
+                    "index": 17
+                }
+            ]
+        },
+        "Axolotl": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Variant (0 = lucy, 1 = wild, 2 = gold, 3 = cyan, 4 = blue)",
+                    "type": "VarInt",
+                    "notes": "default: 0 (lucy)",
+                    "index": 17
+                },
+                {
+                    "name": "If it is currently playing dead.",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 18
+                },
+                {
+                    "name": "If it was spawned from a bucket.",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 19
+                }
+            ]
+        },
+        "Bee": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Unused; 0x02: Is angry; 0x04: Has stung; 0x08: Has nectar",
+                    "index": 17
+                },
+                {
+                    "name": "Anger time in ticks",
+                    "type": "VarInt",
+                    "notes": "default: 0 (Not angry)",
+                    "index": 18
+                }
+            ]
+        },
+        "Chicken": {
+            "extends": "Animal",
+            "fields": []
+        },
+        "Cow": {
+            "extends": "Animal",
+            "fields": []
+        },
+        "Mooshroom": {
+            "extends": "Cow",
+            "fields": [
+                {
+                    "name": "Variant (\"red\" or \"brown\")",
+                    "type": "String",
+                    "notes": "default: red",
+                    "index": 17
+                }
+            ]
+        },
+        "Fox": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Type (0: red, 1: snow)",
+                    "type": "VarInt",
+                    "notes": "default: 0 (red)",
+                    "index": 17
+                },
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Is sitting; 0x02: Unused; 0x04: Is crouching; 0x08: Is interested; 0x10: Is pouncing; 0x20: Is sleeping; 0x40: Is faceplanted; 0x80: Is defending",
+                    "index": 18
+                },
+                {
+                    "name": "First UUID (in UUIDs NBT)?",
+                    "type": "Optional UUID",
+                    "notes": "default: Absent",
+                    "index": 19
+                },
+                {
+                    "name": "Second UUID (in UUIDs NBT)?",
+                    "type": "Optional UUID",
+                    "notes": "default: Absent",
+                    "index": 20
+                }
+            ]
+        },
+        "Frog": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Frog Variant",
+                    "type": "Frog Variant",
+                    "notes": "default: TEMPERATE",
+                    "index": 17
+                },
+                {
+                    "name": "Tongue Target",
+                    "type": "Optional VarInt",
+                    "notes": "default: 0",
+                    "index": 18
+                }
+            ]
+        },
+        "Goat": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Is Screaming Goat",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 17
+                },
+                {
+                    "name": "Has Left Horn",
+                    "type": "Boolean",
+                    "notes": "default: true",
+                    "index": 18
+                },
+                {
+                    "name": "Has Right Horn",
+                    "type": "Boolean",
+                    "notes": "default: true",
+                    "index": 19
+                }
+            ]
+        },
+        "Hoglin": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Is immune to zombification",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 17
+                }
+            ]
+        },
+        "Ocelot": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Is trusting",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 17
+                }
+            ]
+        },
+        "Panda": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Breed timer? Set to 32 when something happens, and then counts down to 0 again. At 29 and 14 (before counting down), will play the entity.panda.cant_breed sound event.",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 17
+                },
+                {
+                    "name": "Sneeze timer. Counts up from 0; when it hits 1 the entity.panda.pre_sneeze event plays and when it hits 21 the entity.panda.sneeze event plays (and it is set back to 0 and the sneeze flag is cleared).",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 18
+                },
+                {
+                    "name": "Eat timer. If nonzero, counts upwards.",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 19
+                },
+                {
+                    "name": "Main Gene",
+                    "type": "Byte",
+                    "notes": "default: 0",
+                    "index": 20
+                },
+                {
+                    "name": "Hidden Gene",
+                    "type": "Byte",
+                    "notes": "default: 0",
+                    "index": 21
+                },
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Unused; 0x02: Is sneezing; 0x04: Is rolling; 0x08: Is sitting; 0x10: Is on back",
+                    "index": 22
+                }
+            ]
+        },
+        "Pig": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Has saddle",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 17
+                },
+                {
+                    "name": "Total time to \"boost\" with a carrot on a stick for",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 18
+                }
+            ]
+        },
+        "Polar Bear": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Is standing up",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 17
+                }
+            ]
+        },
+        "Rabbit": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Type",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 17
+                }
+            ]
+        },
+        "Sheep": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x0F: Color ID; 0x10: Is sheared",
+                    "index": 17
+                }
+            ]
+        },
+        "Sniffer": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Sniffer State",
+                    "type": "Sniffer State",
+                    "notes": "default: IDLING",
+                    "index": 17
+                },
+                {
+                    "name": "Drop seed at tick",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 18
+                }
+            ]
+        },
+        "Strider": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Total time to \"boost\" with warped fungus on a stick for",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 17
+                },
+                {
+                    "name": "Is shaking (true unless riding a vehicle or on or in a block tagged with strider_warm_blocks (default: lava))",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 18
+                },
+                {
+                    "name": "Has saddle",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 19
+                }
+            ]
+        },
+        "Turtle": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Home pos",
+                    "type": "Position",
+                    "notes": "default: (0, 0, 0)",
+                    "index": 17
+                },
+                {
+                    "name": "Has egg",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 18
+                },
+                {
+                    "name": "Is laying egg",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 19
+                },
+                {
+                    "name": "Travel pos",
+                    "type": "Position",
+                    "notes": "default: (0, 0, 0)",
+                    "index": 20
+                },
+                {
+                    "name": "Is going home",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 21
+                },
+                {
+                    "name": "Is traveling",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 22
+                }
+            ]
+        },
+        "Abstract Horse": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Unused; 0x02: Is Tame; 0x04: Is saddled; 0x08: Has bred; 0x10: Is eating; 0x20: Is rearing (on hind legs); 0x40: Is mouth open",
+                    "index": 17
+                }
+            ]
+        },
+        "Camel": {
+            "extends": "Abstract Horse",
+            "fields": [
+                {
+                    "name": "Is dashing",
+                    "type": "Boolean",
+                    "notes": "default: False",
+                    "index": 18
+                },
+                {
+                    "name": "Last pose change tick",
+                    "type": "VarLong",
+                    "notes": "default: 0",
+                    "index": 19
+                }
+            ]
+        },
+        "Horse": {
+            "extends": "Abstract Horse",
+            "fields": [
+                {
+                    "name": "Variant (Color & Style)",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 18
+                }
+            ]
+        },
+        "Skeleton Horse": {
+            "extends": "Abstract Horse",
+            "fields": []
+        },
+        "Zombie Horse": {
+            "extends": "Abstract Horse",
+            "fields": []
+        },
+        "Chested Horse": {
+            "extends": "Abstract Horse",
+            "fields": [
+                {
+                    "name": "Has Chest",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 18
+                }
+            ]
+        },
+        "Donkey": {
+            "extends": "Chested Horse",
+            "fields": []
+        },
+        "Llama": {
+            "extends": "Chested Horse",
+            "fields": [
+                {
+                    "name": "Strength (number of columns of 3 slots in the llama's inventory once a chest is equipped)",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 19
+                },
+                {
+                    "name": "Variant (0: llama_creamy.png, 1: llama_white.png, 2: llama_brown.png, 3: llama_gray.png)",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 20
+                }
+            ]
+        },
+        "Trader Llama": {
+            "extends": "Llama",
+            "fields": []
+        },
+        "Mule": {
+            "extends": "Chested Horse",
+            "fields": []
+        },
+        "Tameable Animal": {
+            "extends": "Animal",
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Is sitting; 0x02: Unused; 0x04: Is tamed",
+                    "index": 17
+                },
+                {
+                    "name": "Owner",
+                    "type": "Optional UUID",
+                    "notes": "default: Absent",
+                    "index": 18
+                }
+            ]
+        },
+        "Cat": {
+            "extends": "Tameable Animal",
+            "fields": [
+                {
+                    "name": "Cat Variant",
+                    "type": "Cat Variant",
+                    "notes": "default: BLACK",
+                    "index": 19
+                },
+                {
+                    "name": "Is lying",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 20
+                },
+                {
+                    "name": "Is relaxed? (This makes their head go slightly upwards, unknown when used)",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 21
+                },
+                {
+                    "name": "Collar color (values are those used with dyes)",
+                    "type": "VarInt",
+                    "notes": "default: 14 (Red)",
+                    "index": 22
+                }
+            ]
+        },
+        "Parrot": {
+            "extends": "Tameable Animal",
+            "fields": [
+                {
+                    "name": "Variant (0: red/blue, 1: blue, 2: green, 3: yellow/blue, 4: grey)",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 19
+                }
+            ]
+        },
+        "Wolf": {
+            "extends": "Tameable Animal",
+            "fields": [
+                {
+                    "name": "Is begging",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 19
+                },
+                {
+                    "name": "Collar color (values are those used with dyes)",
+                    "type": "VarInt",
+                    "notes": "default: 14 (Red)",
+                    "index": 20
+                },
+                {
+                    "name": "Anger time",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 21
+                },
+                {
+                    "name": "Variant",
+                    "type": "Wolf Variant",
+                    "notes": "default: PALE",
+                    "index": 22
+                }
+            ]
+        },
+        "Abstract Villager": {
+            "extends": "Ageable Mob",
+            "fields": [
+                {
+                    "name": "Head shake timer (starts at 40, decrements each tick)",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 17
+                }
+            ]
+        },
+        "Villager": {
+            "extends": "Abstract Villager",
+            "fields": [
+                {
+                    "name": "Villager Data",
+                    "type": "Villager Data",
+                    "notes": "default: Plains/None/1",
+                    "index": 18
+                }
+            ]
+        },
+        "Wandering Trader": {
+            "extends": "Abstract Villager",
+            "fields": []
+        },
+        "Abstract Fish": {
+            "extends": "Creature",
+            "fields": [
+                {
+                    "name": "From bucket",
+                    "type": "Boolean",
+                    "notes": "default: False",
+                    "index": 16
+                }
+            ]
+        },
+        "Cod": {
+            "extends": "Abstract Fish",
+            "fields": []
+        },
+        "Salmon": {
+            "extends": "Abstract Fish",
+            "fields": [
+                {
+                    "name": "Type (0 = SMALL, 1 = MEDIUM, 2 = LARGE)",
+                    "type": "VarInt",
+                    "notes": "default: 1",
+                    "index": 17
+                }
+            ]
+        },
+        "Tropical Fish": {
+            "extends": "Abstract Fish",
+            "fields": [
+                {
+                    "name": "Variant",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 17
+                }
+            ]
+        },
+        "Monster": {
+            "extends": "Creature",
+            "fields": []
+        },
+        "Blaze": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Is on fire",
+                    "index": 16
+                }
+            ]
+        },
+        "Bogged": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Is sheared",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 16
+                }
+            ]
+        },
+        "Breeze": {
+            "extends": "Monster",
+            "fields": []
+        },
+        "Creaking": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Can move",
+                    "type": "Boolean",
+                    "notes": "default: true",
+                    "index": 16
+                },
+                {
+                    "name": "Is active",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 17
+                },
+                {
+                    "name": "Is tearing down",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 18
+                },
+                {
+                    "name": "Home position",
+                    "type": "Optional Position",
+                    "notes": "default: Empty",
+                    "index": 19
+                }
+            ]
+        },
+        "Creeper": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "State (-1 = idle, 1 = fuse)",
+                    "type": "VarInt",
+                    "notes": "default: -1",
+                    "index": 16
+                },
+                {
+                    "name": "Is charged",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 17
+                },
+                {
+                    "name": "Is ignited",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 18
+                }
+            ]
+        },
+        "Enderman": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Carried block",
+                    "type": "Optional Block State",
+                    "notes": "default: Absent",
+                    "index": 16
+                },
+                {
+                    "name": "Is screaming",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 17
+                },
+                {
+                    "name": "Is staring",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 18
+                }
+            ]
+        },
+        "Endermite": {
+            "extends": "Monster",
+            "fields": []
+        },
+        "Giant": {
+            "extends": "Monster",
+            "fields": []
+        },
+        "Guardian": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Is retracting spikes",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 16
+                },
+                {
+                    "name": "Target EID",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 17
+                }
+            ]
+        },
+        "Elder Guardian": {
+            "extends": "Guardian",
+            "fields": []
+        },
+        "Silverfish": {
+            "extends": "Monster",
+            "fields": []
+        },
+        "Skeleton": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Is being converted into a Stray",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 16
+                }
+            ]
+        },
+        "Spider": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Is climbing",
+                    "index": 16
+                }
+            ]
+        },
+        "Cave Spider": {
+            "extends": "Spider",
+            "fields": []
+        },
+        "Stray": {
+            "extends": "Monster",
+            "fields": []
+        },
+        "Vex": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Bit mask",
+                    "type": "Byte",
+                    "notes": "default: 0 | bits: 0x01: Is attacking",
+                    "index": 16
+                }
+            ]
+        },
+        "Warden": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Anger Level",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 16
+                }
+            ]
+        },
+        "Wither": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Center head's target (entity ID, or 0 if no target)",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 16
+                },
+                {
+                    "name": "Left head's target (entity ID, or 0 if no target)",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 17
+                },
+                {
+                    "name": "Right head's target (entity ID, or 0 if no target)",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 18
+                },
+                {
+                    "name": "Invulnerable time",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 19
+                }
+            ]
+        },
+        "Wither Skeleton": {
+            "extends": "Monster",
+            "fields": []
+        },
+        "Zoglin": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Is baby",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 16
+                }
+            ]
+        },
+        "Zombie": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Is baby",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 16
+                },
+                {
+                    "name": "Unused (previously type)",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 17
+                },
+                {
+                    "name": "Is becoming a drowned",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 18
+                }
+            ]
+        },
+        "Drowned": {
+            "extends": "Zombie",
+            "fields": []
+        },
+        "Husk": {
+            "extends": "Zombie",
+            "fields": []
+        },
+        "Zombie Villager": {
+            "extends": "Zombie",
+            "fields": [
+                {
+                    "name": "Is converting",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 19
+                },
+                {
+                    "name": "Villager Data",
+                    "type": "Villager Data",
+                    "notes": "default: Plains/None/1",
+                    "index": 20
+                }
+            ]
+        },
+        "Zombified Piglin": {
+            "extends": "Zombie",
+            "fields": []
+        },
+        "Base Piglin": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Is immune to zombification",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 16
+                }
+            ]
+        },
+        "Piglin": {
+            "extends": "Base Piglin",
+            "fields": [
+                {
+                    "name": "Is baby",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 17
+                },
+                {
+                    "name": "Is charging crossbow",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 18
+                },
+                {
+                    "name": "Is dancing",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 19
+                }
+            ]
+        },
+        "Piglin Brute": {
+            "extends": "Base Piglin",
+            "fields": []
+        },
+        "Raider": {
+            "extends": "Monster",
+            "fields": [
+                {
+                    "name": "Is celebrating",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 16
+                }
+            ]
+        },
+        "Pillager": {
+            "extends": "Raider",
+            "fields": [
+                {
+                    "name": "Is charging",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 17
+                }
+            ]
+        },
+        "Ravager": {
+            "extends": "Raider",
+            "fields": []
+        },
+        "Vindicator": {
+            "extends": "Raider",
+            "fields": []
+        },
+        "Witch": {
+            "extends": "Raider",
+            "fields": [
+                {
+                    "name": "Is drinking potion",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 17
+                }
+            ]
+        },
+        "Spellcaster Illager": {
+            "extends": "Raider",
+            "fields": [
+                {
+                    "name": "Spell (0: none, 1: summon vex, 2: attack, 3: wololo, 4: disappear, 5: blindness)",
+                    "type": "Byte",
+                    "notes": "default: 0",
+                    "index": 17
+                }
+            ]
+        },
+        "Evoker": {
+            "extends": "Spellcaster Illager",
+            "fields": []
+        },
+        "Illusioner": {
+            "extends": "Spellcaster Illager",
+            "fields": []
+        },
+        "Thrown Item Projectile": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Item",
+                    "type": "Slot",
+                    "notes": "default: Empty (which behaves as the default)",
+                    "index": 8
+                }
+            ]
+        },
+        "Thrown Egg": {
+            "extends": "Thrown Item Projectile",
+            "fields": []
+        },
+        "Thrown Ender Pearl": {
+            "extends": "Thrown Item Projectile",
+            "fields": []
+        },
+        "Thrown Bottle o' Enchanting": {
+            "extends": "Thrown Item Projectile",
+            "fields": []
+        },
+        "Potion": {
+            "extends": "Thrown Item Projectile",
+            "fields": []
+        },
+        "Snowball": {
+            "extends": "Thrown Item Projectile",
+            "fields": []
+        },
+        "Abstract Vehicle": {
+            "extends": "Entity",
+            "fields": [
+                {
+                    "name": "Shaking power",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 8
+                },
+                {
+                    "name": "Shaking direction",
+                    "type": "VarInt",
+                    "notes": "default: 1",
+                    "index": 9
+                },
+                {
+                    "name": "Shaking multiplier",
+                    "type": "Float",
+                    "notes": "default: 0.0",
+                    "index": 10
+                }
+            ]
+        },
+        "Boat": {
+            "extends": "Abstract Vehicle",
+            "fields": [
+                {
+                    "name": "Is left paddle turning",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 11
+                },
+                {
+                    "name": "Is right paddle turning",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 12
+                },
+                {
+                    "name": "Splash timer",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 13
+                }
+            ]
+        },
+        "Acacia Boat": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Acacia Boat with Chest": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Bamboo Raft with Chest": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Bamboo Raft": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Birch Boat": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Birch Boat with Chest": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Cherry Boat": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Cherry Boat with Chest": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Dark Oak Boat": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Dark Oak Boat with Chest": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Jungle Boat": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Jungle Boat with Chest": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Mangrove Boat": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Mangrove Boat with Chest": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Oak Boat": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Oak Boat with Chest": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Pale Oak Boat": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Pale Oak Boat with Chest": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Spruce Boat": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Spruce Boat with Chest": {
+            "extends": "Boat",
+            "fields": []
+        },
+        "Abstract Minecart": {
+            "extends": "Abstract Vehicle",
+            "fields": [
+                {
+                    "name": "Custom block state ID",
+                    "type": "VarInt",
+                    "notes": "default: 0",
+                    "index": 11
+                },
+                {
+                    "name": "Custom block Y position (in 16ths of a block)",
+                    "type": "VarInt",
+                    "notes": "default: 6",
+                    "index": 12
+                },
+                {
+                    "name": "Show custom block",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 13
+                }
+            ]
+        },
+        "Minecart with Chest": {
+            "extends": "Abstract Minecart",
+            "fields": []
+        },
+        "Minecart with Command Block": {
+            "extends": "Abstract Minecart",
+            "fields": [
+                {
+                    "name": "Command",
+                    "type": "String",
+                    "notes": "default: ",
+                    "index": 14
+                },
+                {
+                    "name": "Last output",
+                    "type": "Text Component",
+                    "notes": "default: {\"text\":\"\"}",
+                    "index": 15
+                }
+            ]
+        },
+        "Minecart with Furnace": {
+            "extends": "Abstract Minecart",
+            "fields": [
+                {
+                    "name": "Has fuel",
+                    "type": "Boolean",
+                    "notes": "default: false",
+                    "index": 14
+                }
+            ]
+        },
+        "Minecart with Hopper": {
+            "extends": "Abstract Minecart",
+            "fields": []
+        },
+        "Minecart": {
+            "extends": "Abstract Minecart",
+            "fields": []
+        },
+        "Minecart with Monster Spawner": {
+            "extends": "Abstract Minecart",
+            "fields": []
+        },
+        "Minecart with TNT": {
+            "extends": "Abstract Minecart",
+            "fields": []
+        }
+    },
+    "entities": {
+        "acacia_boat": "Acacia Boat",
+        "acacia_chest_boat": "Acacia Boat with Chest",
+        "allay": "Allay",
+        "area_effect_cloud": "Area Effect Cloud",
+        "armadillo": "Armadillo",
+        "armor_stand": "Armor Stand",
+        "arrow": "Arrow",
+        "axolotl": "Axolotl",
+        "bamboo_chest_raft": "Bamboo Raft with Chest",
+        "bamboo_raft": "Bamboo Raft",
+        "bat": "Bat",
+        "bee": "Bee",
+        "birch_boat": "Birch Boat",
+        "birch_chest_boat": "Birch Boat with Chest",
+        "blaze": "Blaze",
+        "block_display": "Block Display",
+        "bogged": "Bogged",
+        "breeze": "Breeze",
+        "breeze_wind_charge": "Wind Charge",
+        "camel": "Camel",
+        "cat": "Cat",
+        "cave_spider": "Cave Spider",
+        "cherry_boat": "Cherry Boat",
+        "cherry_chest_boat": "Cherry Boat with Chest",
+        "chest_minecart": "Minecart with Chest",
+        "chicken": "Chicken",
+        "cod": "Cod",
+        "command_block_minecart": "Minecart with Command Block",
+        "cow": "Cow",
+        "creaking": "Creaking",
+        "creeper": "Creeper",
+        "dark_oak_boat": "Dark Oak Boat",
+        "dark_oak_chest_boat": "Dark Oak Boat with Chest",
+        "dolphin": "Dolphin",
+        "donkey": "Donkey",
+        "dragon_fireball": "Dragon Fireball",
+        "drowned": "Drowned",
+        "egg": "Thrown Egg",
+        "elder_guardian": "Elder Guardian",
+        "enderman": "Enderman",
+        "endermite": "Endermite",
+        "ender_dragon": "Ender Dragon",
+        "ender_pearl": "Thrown Ender Pearl",
+        "end_crystal": "End Crystal",
+        "evoker": "Evoker",
+        "evoker_fangs": "Evoker Fangs",
+        "experience_bottle": "Thrown Bottle o' Enchanting",
+        "experience_orb": "Experience Orb",
+        "eye_of_ender": "Eye of Ender",
+        "falling_block": "Falling Block",
+        "fireball": "Fireball",
+        "firework_rocket": "Firework Rocket",
+        "fox": "Fox",
+        "frog": "Frog",
+        "furnace_minecart": "Minecart with Furnace",
+        "ghast": "Ghast",
+        "giant": "Giant",
+        "glow_item_frame": "Glow Item Frame",
+        "glow_squid": "Glow Squid",
+        "goat": "Goat",
+        "guardian": "Guardian",
+        "hoglin": "Hoglin",
+        "hopper_minecart": "Minecart with Hopper",
+        "horse": "Horse",
+        "husk": "Husk",
+        "illusioner": "Illusioner",
+        "interaction": "Interaction",
+        "iron_golem": "Iron Golem",
+        "item": "Item",
+        "item_display": "Item Display",
+        "item_frame": "Item Frame",
+        "jungle_boat": "Jungle Boat",
+        "jungle_chest_boat": "Jungle Boat with Chest",
+        "leash_knot": "Leash Knot",
+        "lightning_bolt": "Lightning Bolt",
+        "llama": "Llama",
+        "llama_spit": "Llama Spit",
+        "magma_cube": "Magma Cube",
+        "mangrove_boat": "Mangrove Boat",
+        "mangrove_chest_boat": "Mangrove Boat with Chest",
+        "marker": "Marker",
+        "minecart": "Minecart",
+        "mooshroom": "Mooshroom",
+        "mule": "Mule",
+        "oak_boat": "Oak Boat",
+        "oak_chest_boat": "Oak Boat with Chest",
+        "ocelot": "Ocelot",
+        "ominous_item_spawner": "Ominous Item Spawner",
+        "painting": "Painting",
+        "pale_oak_boat": "Pale Oak Boat",
+        "pale_oak_chest_boat": "Pale Oak Boat with Chest",
+        "panda": "Panda",
+        "parrot": "Parrot",
+        "phantom": "Phantom",
+        "pig": "Pig",
+        "piglin": "Piglin",
+        "piglin_brute": "Piglin Brute",
+        "pillager": "Pillager",
+        "polar_bear": "Polar Bear",
+        "potion": "Potion",
+        "pufferfish": "Pufferfish",
+        "rabbit": "Rabbit",
+        "ravager": "Ravager",
+        "salmon": "Salmon",
+        "sheep": "Sheep",
+        "shulker": "Shulker",
+        "shulker_bullet": "Shulker Bullet",
+        "silverfish": "Silverfish",
+        "skeleton": "Skeleton",
+        "skeleton_horse": "Skeleton Horse",
+        "slime": "Slime",
+        "small_fireball": "Small Fireball",
+        "sniffer": "Sniffer",
+        "snowball": "Snowball",
+        "snow_golem": "Snow Golem",
+        "spawner_minecart": "Minecart with Monster Spawner",
+        "spectral_arrow": "Spectral Arrow",
+        "spider": "Spider",
+        "spruce_boat": "Spruce Boat",
+        "spruce_chest_boat": "Spruce Boat with Chest",
+        "squid": "Squid",
+        "stray": "Stray",
+        "strider": "Strider",
+        "tadpole": "Tadpole",
+        "text_display": "Text Display",
+        "tnt": "Primed TNT",
+        "tnt_minecart": "Minecart with TNT",
+        "trader_llama": "Trader Llama",
+        "trident": "Trident",
+        "tropical_fish": "Tropical Fish",
+        "turtle": "Turtle",
+        "vex": "Vex",
+        "villager": "Villager",
+        "vindicator": "Vindicator",
+        "wandering_trader": "Wandering Trader",
+        "warden": "Warden",
+        "wind_charge": "Wind Charge",
+        "witch": "Witch",
+        "wither": "Wither",
+        "wither_skeleton": "Wither Skeleton",
+        "wither_skull": "Wither Skull",
+        "wolf": "Wolf",
+        "zoglin": "Zoglin",
+        "zombie": "Zombie",
+        "zombie_horse": "Zombie Horse",
+        "zombie_villager": "Zombie Villager",
+        "zombified_piglin": "Zombified Piglin",
+        "player": "Player",
+        "fishing_bobber": "Fishing Bobber"
+    },
+    "serializers": [
+        {
+            "id": 0,
+            "name": "Byte",
+            "notes": ""
+        },
+        {
+            "id": 1,
+            "name": "VarInt",
+            "notes": ""
+        },
+        {
+            "id": 2,
+            "name": "VarLong",
+            "notes": ""
+        },
+        {
+            "id": 3,
+            "name": "Float",
+            "notes": ""
+        },
+        {
+            "id": 4,
+            "name": "String",
+            "notes": ""
+        },
+        {
+            "id": 5,
+            "name": "Text Component",
+            "notes": ""
+        },
+        {
+            "id": 6,
+            "name": "Optional Text Component",
+            "notes": "Text Component is present if the Boolean is set to true."
+        },
+        {
+            "id": 7,
+            "name": "Slot",
+            "notes": ""
+        },
+        {
+            "id": 8,
+            "name": "Boolean",
+            "notes": ""
+        },
+        {
+            "id": 9,
+            "name": "Rotations",
+            "notes": "rotation on x, rotation on y, rotation on z"
+        },
+        {
+            "id": 10,
+            "name": "Position",
+            "notes": ""
+        },
+        {
+            "id": 11,
+            "name": "Optional Position",
+            "notes": "Position is present if the Boolean is set to true."
+        },
+        {
+            "id": 12,
+            "name": "Direction",
+            "notes": "Down = 0, Up = 1, North = 2, South = 3, West = 4, East = 5"
+        },
+        {
+            "id": 13,
+            "name": "Optional UUID",
+            "notes": "UUID is present if the Boolean is set to true."
+        },
+        {
+            "id": 14,
+            "name": "Block State",
+            "notes": "An ID in the block state registry."
+        },
+        {
+            "id": 15,
+            "name": "Optional Block State",
+            "notes": "0 for absent (air is unrepresentable); otherwise, an ID in the block state registry."
+        },
+        {
+            "id": 16,
+            "name": "NBT",
+            "notes": ""
+        },
+        {
+            "id": 17,
+            "name": "Particle",
+            "notes": "particle type (an ID in the minecraft:particle_type registry), particle data (See Particles.)"
+        },
+        {
+            "id": 18,
+            "name": "Particles",
+            "notes": "length-prefixed list of particle defintions (as above)."
+        },
+        {
+            "id": 19,
+            "name": "Villager Data",
+            "notes": "villager type, villager profession, level (See below.)"
+        },
+        {
+            "id": 20,
+            "name": "Optional VarInt",
+            "notes": "0 for absent; 1 + actual value otherwise. Used for entity IDs."
+        },
+        {
+            "id": 21,
+            "name": "Pose",
+            "notes": "STANDING = 0, FALL_FLYING = 1, SLEEPING = 2, SWIMMING = 3, SPIN_ATTACK = 4, SNEAKING = 5, LONG_JUMPING = 6, DYING = 7, CROAKING = 8, USING_TONGUE = 9, SITTING = 10, ROARING = 11, SNIFFING = 12, EMERGING = 13, DIGGING = 14, (1.21.3: SLIDING = 15, SHOOTING = 16, INHALING = 17)"
+        },
+        {
+            "id": 22,
+            "name": "Cat Variant",
+            "notes": "An ID in the minecraft:cat_variant registry."
+        },
+        {
+            "id": 23,
+            "name": "Wolf Variant",
+            "notes": "An ID in the minecraft:wolf_variant registry, or an inline definition."
+        },
+        {
+            "id": 24,
+            "name": "Frog Variant",
+            "notes": "An ID in the minecraft:frog_variant registry."
+        },
+        {
+            "id": 25,
+            "name": "Optional Global Position",
+            "notes": "dimension identifier, position; only if the Boolean is set to true."
+        },
+        {
+            "id": 26,
+            "name": "Painting Variant",
+            "notes": "An ID in the minecraft:painting_variant registry, or an inline definition."
+        },
+        {
+            "id": 27,
+            "name": "Sniffer State",
+            "notes": "IDLING = 0, FEELING_HAPPY = 1, SCENTING = 2, SNIFFING = 3, SEARCHING = 4, DIGGING = 5, RISING = 6"
+        },
+        {
+            "id": 28,
+            "name": "Armadillo State",
+            "notes": "IDLE = 0, ROLLING = 1, SCARED = 2, UNROLLING = 3"
+        },
+        {
+            "id": 29,
+            "name": "Vector3",
+            "notes": "x, y, z"
+        },
+        {
+            "id": 30,
+            "name": "Quaternion",
+            "notes": "x, y, z, w"
+        }
+    ]
+}

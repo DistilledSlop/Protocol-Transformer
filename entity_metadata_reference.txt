@@ -1,0 +1,4058 @@
+Various '''Entities''' have different metadata fields and [[Minecraft Wiki:Projects/wiki.vg merge/Entity statuses|status codes]]. 
+
+These are the valid codes for Minecraft Java Edition 1.21.4; for upcoming snapshots, see [[Minecraft Wiki:Projects/wiki.vg merge/Pre-release protocol#Entity Metadata|Pre-release protocol#Entity Metadata]].
+
+This page is maintained semi-automatically using a work-in-progress script made by mat, so it should update fairly quickly to new Minecraft versions. Regardless, it's not recommended that you parse it programmatically. Instead, consider using Bixilon's [https://gitlab.bixilon.de/bixilon/pixlyzer PixLyzer] or [https://github.com/Pokechu22/Burger Burger] (or [https://github.com/mat-1/Burger mat's Burger fork], which the script for updating this page depends on).
+
+== Entities ==
+
+{{warning|These entity IDs are up to date for 1.21.4. Use [[Minecraft Wiki:Projects/wiki.vg merge/Data Generators|Data Generators]] or [https://pokechu22.github.io/Burger/ Burger] to get older IDs. If using Burger just replace the version number to what you want to see.}}
+
+Most entities are spawned via [[Minecraft Wiki:Projects/wiki.vg merge/Protocol#Spawn Entity|Protocol#Spawn Entity]], however, care should be taken for the following cases:
+
+Entities marked in <span style="border: solid 1px black; background: #aaaaff; color: #aaaaff;">__</span> blue must be spawned in their own special ways:
+* <code>Experience Orb</code>, should be spawned using [[Minecraft Wiki:Projects/wiki.vg merge/Protocol#Spawn_Experience_Orb|Spawn Experience Orb]]
+
+Entities marked in <span style="border: solid 1px black; background: #ffaaaa; color: #ffaaaa;">__</span> red must not be spawned at all, as they're server-side only:
+* <code>Marker</code>, more info can be found [[Marker|here]].
+
+{| class="wikitable"
+|- 
+! Type
+! Name
+! bounding box x and z
+! bounding box y
+! ID
+|-
+| 0
+| Acacia Boat
+| 1.375
+| 0.5625
+| <code>minecraft:acacia_boat</code>
+|-
+| 1
+| Acacia Boat with Chest
+| 1.375
+| 0.5625
+| <code>minecraft:acacia_chest_boat</code>
+|-
+| 2
+| Allay
+| 0.35
+| 0.6
+| <code>minecraft:allay</code>
+|-
+| 3
+| Area Effect Cloud
+| 2.0 * Radius
+| 0.5
+| <code>minecraft:area_effect_cloud</code>
+|-
+| 4
+| Armadillo
+| 0.7
+| 0.65
+| <code>minecraft:armadillo</code>
+|-
+| 5
+| Armor Stand
+| normal: 0.5 marker: 0.0 small: 0.25
+| normal: 1.975 marker: 0.0 small: 0.9875
+| <code>minecraft:armor_stand</code>
+|-
+| 6
+| Arrow
+| 0.5
+| 0.5
+| <code>minecraft:arrow</code>
+|-
+| 7
+| Axolotl
+| 0.75
+| 0.42
+| <code>minecraft:axolotl</code>
+|-
+| 8
+| Bamboo Raft with Chest
+| 1.375
+| 0.5625
+| <code>minecraft:bamboo_chest_raft</code>
+|-
+| 9
+| Bamboo Raft
+| 1.375
+| 0.5625
+| <code>minecraft:bamboo_raft</code>
+|-
+| 10
+| Bat
+| 0.5
+| 0.9
+| <code>minecraft:bat</code>
+|-
+| 11
+| Bee
+| 0.7
+| 0.6
+| <code>minecraft:bee</code>
+|-
+| 12
+| Birch Boat
+| 1.375
+| 0.5625
+| <code>minecraft:birch_boat</code>
+|-
+| 13
+| Birch Boat with Chest
+| 1.375
+| 0.5625
+| <code>minecraft:birch_chest_boat</code>
+|-
+| 14
+| Blaze
+| 0.6
+| 1.8
+| <code>minecraft:blaze</code>
+|-
+| 15
+| Block Display
+| 0.0
+| 0.0
+| <code>minecraft:block_display</code>
+|-
+| 16
+| Bogged
+| 0.6
+| 1.99
+| <code>minecraft:bogged</code>
+|-
+| 17
+| Breeze
+| 0.6
+| 1.77
+| <code>minecraft:breeze</code>
+|-
+| 18
+| Wind Charge
+| 0.3125
+| 0.3125
+| <code>minecraft:breeze_wind_charge</code>
+|-
+| 19
+| Camel
+| 1.7
+| 2.375
+| <code>minecraft:camel</code>
+|-
+| 20
+| Cat
+| 0.6
+| 0.7
+| <code>minecraft:cat</code>
+|-
+| 21
+| Cave Spider
+| 0.7
+| 0.5
+| <code>minecraft:cave_spider</code>
+|-
+| 22
+| Cherry Boat
+| 1.375
+| 0.5625
+| <code>minecraft:cherry_boat</code>
+|-
+| 23
+| Cherry Boat with Chest
+| 1.375
+| 0.5625
+| <code>minecraft:cherry_chest_boat</code>
+|-
+| 24
+| Minecart with Chest
+| 0.98
+| 0.7
+| <code>minecraft:chest_minecart</code>
+|-
+| 25
+| Chicken
+| 0.4
+| 0.7
+| <code>minecraft:chicken</code>
+|-
+| 26
+| Cod
+| 0.5
+| 0.3
+| <code>minecraft:cod</code>
+|-
+| 27
+| Minecart with Command Block
+| 0.98
+| 0.7
+| <code>minecraft:command_block_minecart</code>
+|-
+| 28
+| Cow
+| 0.9
+| 1.4
+| <code>minecraft:cow</code>
+|-
+| 29
+| Creaking
+| 0.9
+| 2.7
+| <code>minecraft:creaking</code>
+|-
+| 30
+| Creeper
+| 0.6
+| 1.7
+| <code>minecraft:creeper</code>
+|-
+| 31
+| Dark Oak Boat
+| 1.375
+| 0.5625
+| <code>minecraft:dark_oak_boat</code>
+|-
+| 32
+| Dark Oak Boat with Chest
+| 1.375
+| 0.5625
+| <code>minecraft:dark_oak_chest_boat</code>
+|-
+| 33
+| Dolphin
+| 0.9
+| 0.6
+| <code>minecraft:dolphin</code>
+|-
+| 34
+| Donkey
+| 1.3964844
+| 1.5
+| <code>minecraft:donkey</code>
+|-
+| 35
+| Dragon Fireball
+| 1.0
+| 1.0
+| <code>minecraft:dragon_fireball</code>
+|-
+| 36
+| Drowned
+| 0.6
+| 1.95
+| <code>minecraft:drowned</code>
+|-
+| 37
+| Thrown Egg
+| 0.25
+| 0.25
+| <code>minecraft:egg</code>
+|-
+| 38
+| Elder Guardian
+| 1.9975 (2.35 * guardian) 
+| 1.9975 (2.35 * guardian) 
+| <code>minecraft:elder_guardian</code>
+|-
+| 39
+| Enderman
+| 0.6
+| 2.9
+| <code>minecraft:enderman</code>
+|-
+| 40
+| Endermite
+| 0.4
+| 0.3
+| <code>minecraft:endermite</code>
+|-
+| 41
+| Ender Dragon
+| 16.0
+| 8.0
+| <code>minecraft:ender_dragon</code>
+|-
+| 42
+| Thrown Ender Pearl
+| 0.25
+| 0.25
+| <code>minecraft:ender_pearl</code>
+|-
+| 43
+| End Crystal
+| 2.0
+| 2.0
+| <code>minecraft:end_crystal</code>
+|-
+| 44
+| Evoker
+| 0.6
+| 1.95
+| <code>minecraft:evoker</code>
+|-
+| 45
+| Evoker Fangs
+| 0.5
+| 0.8
+| <code>minecraft:evoker_fangs</code>
+|-
+| 46
+| Thrown Bottle o' Enchanting
+| 0.25
+| 0.25
+| <code>minecraft:experience_bottle</code>
+|- style="background: #aaaaff;"
+| 47
+| Experience Orb
+| 0.5
+| 0.5
+| <code>minecraft:experience_orb</code>
+|-
+| 48
+| Eye of Ender
+| 0.25
+| 0.25
+| <code>minecraft:eye_of_ender</code>
+|-
+| 49
+| Falling Block
+| 0.98
+| 0.98
+| <code>minecraft:falling_block</code>
+|-
+| 50
+| Fireball
+| 1.0
+| 1.0
+| <code>minecraft:fireball</code>
+|-
+| 51
+| Firework Rocket
+| 0.25
+| 0.25
+| <code>minecraft:firework_rocket</code>
+|-
+| 52
+| Fox
+| 0.6
+| 0.7
+| <code>minecraft:fox</code>
+|-
+| 53
+| Frog
+| 0.5
+| 0.5
+| <code>minecraft:frog</code>
+|-
+| 54
+| Minecart with Furnace
+| 0.98
+| 0.7
+| <code>minecraft:furnace_minecart</code>
+|-
+| 55
+| Ghast
+| 4.0
+| 4.0
+| <code>minecraft:ghast</code>
+|-
+| 56
+| Giant
+| 3.6
+| 12.0
+| <code>minecraft:giant</code>
+|-
+| 57
+| Glow Item Frame
+| 0.75 or 0.0625 (depth)
+| 0.75
+| <code>minecraft:glow_item_frame</code>
+|-
+| 58
+| Glow Squid
+| 0.8
+| 0.8
+| <code>minecraft:glow_squid</code>
+|-
+| 59
+| Goat
+| 1.3
+| 0.9
+| <code>minecraft:goat</code>
+|-
+| 60
+| Guardian
+| 0.85
+| 0.85
+| <code>minecraft:guardian</code>
+|-
+| 61
+| Hoglin
+| 1.3964844
+| 1.4
+| <code>minecraft:hoglin</code>
+|-
+| 62
+| Minecart with Hopper
+| 0.98
+| 0.7
+| <code>minecraft:hopper_minecart</code>
+|-
+| 63
+| Horse
+| 1.3964844
+| 1.6
+| <code>minecraft:horse</code>
+|-
+| 64
+| Husk
+| 0.6
+| 1.95
+| <code>minecraft:husk</code>
+|-
+| 65
+| Illusioner
+| 0.6
+| 1.95
+| <code>minecraft:illusioner</code>
+|-
+| 66
+| Interaction
+| 0.0
+| 0.0
+| <code>minecraft:interaction</code>
+|-
+| 67
+| Iron Golem
+| 1.4
+| 2.7
+| <code>minecraft:iron_golem</code>
+|-
+| 68
+| Item
+| 0.25
+| 0.25
+| <code>minecraft:item</code>
+|-
+| 69
+| Item Display
+| 0.0
+| 0.0
+| <code>minecraft:item_display</code>
+|-
+| 70
+| Item Frame
+| 0.75 or 0.0625 (depth)
+| 0.75
+| <code>minecraft:item_frame</code>
+|-
+| 71
+| Jungle Boat
+| 1.375
+| 0.5625
+| <code>minecraft:jungle_boat</code>
+|-
+| 72
+| Jungle Boat with Chest
+| 1.375
+| 0.5625
+| <code>minecraft:jungle_chest_boat</code>
+|-
+| 73
+| Leash Knot
+| 0.375
+| 0.5
+| <code>minecraft:leash_knot</code>
+|-
+| 74
+| Lightning Bolt
+| 0.0
+| 0.0
+| <code>minecraft:lightning_bolt</code>
+|-
+| 75
+| Llama
+| 0.9
+| 1.87
+| <code>minecraft:llama</code>
+|-
+| 76
+| Llama Spit
+| 0.25
+| 0.25
+| <code>minecraft:llama_spit</code>
+|-
+| 77
+| Magma Cube
+| 0.5202 * size
+| 0.5202 * size
+| <code>minecraft:magma_cube</code>
+|-
+| 78
+| Mangrove Boat
+| 1.375
+| 0.5625
+| <code>minecraft:mangrove_boat</code>
+|-
+| 79
+| Mangrove Boat with Chest
+| 1.375
+| 0.5625
+| <code>minecraft:mangrove_chest_boat</code>
+|- style="background: #ffaaaa;"
+| 80
+| Marker
+| 0.0
+| 0.0
+| <code>minecraft:marker</code>
+|-
+| 81
+| Minecart
+| 0.98
+| 0.7
+| <code>minecraft:minecart</code>
+|-
+| 82
+| Mooshroom
+| 0.9
+| 1.4
+| <code>minecraft:mooshroom</code>
+|-
+| 83
+| Mule
+| 1.3964844
+| 1.6
+| <code>minecraft:mule</code>
+|-
+| 84
+| Oak Boat
+| 1.375
+| 0.5625
+| <code>minecraft:oak_boat</code>
+|-
+| 85
+| Oak Boat with Chest
+| 1.375
+| 0.5625
+| <code>minecraft:oak_chest_boat</code>
+|-
+| 86
+| Ocelot
+| 0.6
+| 0.7
+| <code>minecraft:ocelot</code>
+|-
+| 87
+| Ominous Item Spawner
+| 0.25
+| 0.25
+| <code>minecraft:ominous_item_spawner</code>
+|-
+| 88
+| Painting
+| type width or 0.0625 (depth)
+| type height
+| <code>minecraft:painting</code>
+|-
+| 89
+| Pale Oak Boat
+| 1.375
+| 0.5625
+| <code>minecraft:pale_oak_boat</code>
+|-
+| 90
+| Pale Oak Boat with Chest
+| 1.375
+| 0.5625
+| <code>minecraft:pale_oak_chest_boat</code>
+|-
+| 91
+| Panda
+| 1.3
+| 1.25
+| <code>minecraft:panda</code>
+|-
+| 92
+| Parrot
+| 0.5
+| 0.9
+| <code>minecraft:parrot</code>
+|-
+| 93
+| Phantom
+| 0.9
+| 0.5
+| <code>minecraft:phantom</code>
+|-
+| 94
+| Pig
+| 0.9
+| 0.9
+| <code>minecraft:pig</code>
+|-
+| 95
+| Piglin
+| 0.6
+| 1.95
+| <code>minecraft:piglin</code>
+|-
+| 96
+| Piglin Brute
+| 0.6
+| 1.95
+| <code>minecraft:piglin_brute</code>
+|-
+| 97
+| Pillager
+| 0.6
+| 1.95
+| <code>minecraft:pillager</code>
+|-
+| 98
+| Polar Bear
+| 1.4
+| 1.4
+| <code>minecraft:polar_bear</code>
+|-
+| 99
+| Potion
+| 0.25
+| 0.25
+| <code>minecraft:potion</code>
+|-
+| 100
+| Pufferfish
+| 0.7
+| 0.7
+| <code>minecraft:pufferfish</code>
+|-
+| 101
+| Rabbit
+| 0.4
+| 0.5
+| <code>minecraft:rabbit</code>
+|-
+| 102
+| Ravager
+| 1.95
+| 2.2
+| <code>minecraft:ravager</code>
+|-
+| 103
+| Salmon
+| 0.7
+| 0.4
+| <code>minecraft:salmon</code>
+|-
+| 104
+| Sheep
+| 0.9
+| 1.3
+| <code>minecraft:sheep</code>
+|-
+| 105
+| Shulker
+| 1.0
+| 1.0-2.0 (depending on peek)
+| <code>minecraft:shulker</code>
+|-
+| 106
+| Shulker Bullet
+| 0.3125
+| 0.3125
+| <code>minecraft:shulker_bullet</code>
+|-
+| 107
+| Silverfish
+| 0.4
+| 0.3
+| <code>minecraft:silverfish</code>
+|-
+| 108
+| Skeleton
+| 0.6
+| 1.99
+| <code>minecraft:skeleton</code>
+|-
+| 109
+| Skeleton Horse
+| 1.3964844
+| 1.6
+| <code>minecraft:skeleton_horse</code>
+|-
+| 110
+| Slime
+| 0.5202 * size
+| 0.5202 * size
+| <code>minecraft:slime</code>
+|-
+| 111
+| Small Fireball
+| 0.3125
+| 0.3125
+| <code>minecraft:small_fireball</code>
+|-
+| 112
+| Sniffer
+| 1.9
+| 1.75
+| <code>minecraft:sniffer</code>
+|-
+| 113
+| Snowball
+| 0.25
+| 0.25
+| <code>minecraft:snowball</code>
+|-
+| 114
+| Snow Golem
+| 0.7
+| 1.9
+| <code>minecraft:snow_golem</code>
+|-
+| 115
+| Minecart with Monster Spawner
+| 0.98
+| 0.7
+| <code>minecraft:spawner_minecart</code>
+|-
+| 116
+| Spectral Arrow
+| 0.5
+| 0.5
+| <code>minecraft:spectral_arrow</code>
+|-
+| 117
+| Spider
+| 1.4
+| 0.9
+| <code>minecraft:spider</code>
+|-
+| 118
+| Spruce Boat
+| 1.375
+| 0.5625
+| <code>minecraft:spruce_boat</code>
+|-
+| 119
+| Spruce Boat with Chest
+| 1.375
+| 0.5625
+| <code>minecraft:spruce_chest_boat</code>
+|-
+| 120
+| Squid
+| 0.8
+| 0.8
+| <code>minecraft:squid</code>
+|-
+| 121
+| Stray
+| 0.6
+| 1.99
+| <code>minecraft:stray</code>
+|-
+| 122
+| Strider
+| 0.9
+| 1.7
+| <code>minecraft:strider</code>
+|-
+| 123
+| Tadpole
+| 0.4
+| 0.3
+| <code>minecraft:tadpole</code>
+|-
+| 124
+| Text Display
+| 0.0
+| 0.0
+| <code>minecraft:text_display</code>
+|-
+| 125
+| Primed TNT
+| 0.98
+| 0.98
+| <code>minecraft:tnt</code>
+|-
+| 126
+| Minecart with TNT
+| 0.98
+| 0.7
+| <code>minecraft:tnt_minecart</code>
+|-
+| 127
+| Trader Llama
+| 0.9
+| 1.87
+| <code>minecraft:trader_llama</code>
+|-
+| 128
+| Trident
+| 0.5
+| 0.5
+| <code>minecraft:trident</code>
+|-
+| 129
+| Tropical Fish
+| 0.5
+| 0.4
+| <code>minecraft:tropical_fish</code>
+|-
+| 130
+| Turtle
+| 1.2
+| 0.4
+| <code>minecraft:turtle</code>
+|-
+| 131
+| Vex
+| 0.4
+| 0.8
+| <code>minecraft:vex</code>
+|-
+| 132
+| Villager
+| 0.6
+| 1.95
+| <code>minecraft:villager</code>
+|-
+| 133
+| Vindicator
+| 0.6
+| 1.95
+| <code>minecraft:vindicator</code>
+|-
+| 134
+| Wandering Trader
+| 0.6
+| 1.95
+| <code>minecraft:wandering_trader</code>
+|-
+| 135
+| Warden
+| 0.9
+| 2.9
+| <code>minecraft:warden</code>
+|-
+| 136
+| Wind Charge
+| 0.3125
+| 0.3125
+| <code>minecraft:wind_charge</code>
+|-
+| 137
+| Witch
+| 0.6
+| 1.95
+| <code>minecraft:witch</code>
+|-
+| 138
+| Wither
+| 0.9
+| 3.5
+| <code>minecraft:wither</code>
+|-
+| 139
+| Wither Skeleton
+| 0.7
+| 2.4
+| <code>minecraft:wither_skeleton</code>
+|-
+| 140
+| Wither Skull
+| 0.3125
+| 0.3125
+| <code>minecraft:wither_skull</code>
+|-
+| 141
+| Wolf
+| 0.6
+| 0.85
+| <code>minecraft:wolf</code>
+|-
+| 142
+| Zoglin
+| 1.3964844
+| 1.4
+| <code>minecraft:zoglin</code>
+|-
+| 143
+| Zombie
+| 0.6
+| 1.95
+| <code>minecraft:zombie</code>
+|-
+| 144
+| Zombie Horse
+| 1.3964844
+| 1.6
+| <code>minecraft:zombie_horse</code>
+|-
+| 145
+| Zombie Villager
+| 0.6
+| 1.95
+| <code>minecraft:zombie_villager</code>
+|-
+| 146
+| Zombified Piglin
+| 0.6
+| 1.95
+| <code>minecraft:zombified_piglin</code>
+|-
+| 147
+| Player
+| 0.6
+| 1.8
+| <code>minecraft:player</code>
+|-
+| 148
+| Fishing Bobber
+| 0.25
+| 0.25
+| <code>minecraft:fishing_bobber</code>
+|}
+
+== Entity Metadata Format ==
+
+Note that entity metadata is a totally distinct concept from block metadata.  It is not required to send all metadata fields, or even any metadata fields, so long as the terminating entry is correctly sent.
+
+Entity Metadata is an array of entries, each of which looks like the following:
+
+{| class="wikitable"
+ ! Name
+ ! Type
+ ! Meaning
+ |-
+ | Index
+ | {{Type|Unsigned Byte}}
+ | Unique index key determining the meaning of the following value, see the table below. If this is <code>0xff</code> then the it is the end of the Entity Metadata array and no more is read.
+ |-
+ | Type
+ | {{Type|VarInt}} {{Type|Enum}}
+ | Only if Index is not <code>0xff</code>; the type of the index, see the table below
+ |-
+ | Value
+ | Varies
+ | Only if Index is not <code>0xff</code>: the value of the metadata field, see the table below
+ |}
+
+{{Metadata type definition/begin}}
+ ! Value
+ ! Notes
+{{Metadata type definition|Byte}}
+ | {{Type|Byte}}
+ |
+{{Metadata type definition|VarInt}}
+ | {{Type|VarInt}}
+ |
+{{Metadata type definition|VarLong}}
+ | {{Type|VarLong}}
+ |
+{{Metadata type definition|Float}}
+ | {{Type|Float}}
+ |
+{{Metadata type definition|String}}
+ | {{Type|String}} (32767)
+ |
+{{Metadata type definition|Text Component}}
+ | {{Type|Text Component}}
+ |
+{{Metadata type definition|Optional Text Component}}
+ | ({{Type|Boolean}}, {{Type|Optional}} {{Type|Text Component}})
+ | Text Component is present if the Boolean is set to true.
+{{Metadata type definition|Slot}}
+ | {{Type|Slot}}
+ |
+{{Metadata type definition|Boolean}}
+ | {{Type|Boolean}}
+ |
+{{Metadata type definition|Rotations}}
+ | ({{Type|Float}}, {{Type|Float}}, {{Type|Float}})
+ | rotation on x, rotation on y, rotation on z
+{{Metadata type definition|Position}}
+ | {{Type|Position}}
+ |
+{{Metadata type definition|Optional Position}}
+ | ({{Type|Boolean}}, {{Type|Optional}} {{Type|Position}})
+ | Position is present if the Boolean is set to true.
+{{Metadata type definition|Direction}}
+ | {{Type|VarInt}} {{Type|Enum}}
+ | Down = 0, Up = 1, North = 2, South = 3, West = 4, East = 5
+{{Metadata type definition|Optional UUID}}
+ | ({{Type|Boolean}}, {{Type|Optional}} {{Type|UUID}})
+ | UUID is present if the Boolean is set to true.
+{{Metadata type definition|Block State}}
+ | {{Type|VarInt}}
+ | An ID in the block state registry.
+{{Metadata type definition|Optional Block State}}
+ | {{Type|VarInt}}
+ | 0 for absent (air is unrepresentable); otherwise, an ID in the block state registry.
+{{Metadata type definition|NBT}}
+ | {{Type|NBT}}
+ |
+{{Metadata type definition|Particle}}
+ | ({{Type|VarInt}}, Varies)
+ | particle type (an ID in the <code>minecraft:particle_type</code> registry), particle data (See [[Minecraft Wiki:Projects/wiki.vg merge/Particles|Particles]].)
+{{Metadata type definition|Particles}}
+ | ({{Type|VarInt}}, {{Type|Array}} of ({{Type|VarInt}}, Varies))
+ | length-prefixed list of particle defintions (as above).
+{{Metadata type definition|Villager Data}}
+ | ({{Type|VarInt}}, {{Type|VarInt}}, {{Type|VarInt}})
+ | villager type, villager profession, level (See below.)
+{{Metadata type definition|Optional VarInt}}
+ | {{Type|VarInt}}
+ | 0 for absent; 1 + actual value otherwise. Used for entity IDs.
+{{Metadata type definition|Pose}}
+ | {{Type|VarInt}} {{Type|Enum}}
+ | STANDING = 0, FALL_FLYING = 1, SLEEPING = 2, SWIMMING = 3, SPIN_ATTACK = 4, SNEAKING = 5, LONG_JUMPING = 6, DYING = 7, CROAKING = 8, USING_TONGUE = 9, SITTING = 10, ROARING = 11, SNIFFING = 12, EMERGING = 13, DIGGING = 14, (1.21.3: SLIDING = 15, SHOOTING = 16, INHALING = 17)
+{{Metadata type definition|Cat Variant}}
+ | {{Type|VarInt}}
+ | An ID in the <code>minecraft:cat_variant</code> registry.
+{{Metadata type definition|Wolf Variant}}
+ | {{Type|ID or}} [[#Wolf Variant|Wolf Variant]]
+ | An ID in the <code>minecraft:wolf_variant</code> registry, or an inline definition.
+{{Metadata type definition|Frog Variant}}
+ | {{Type|VarInt}}
+ | An ID in the <code>minecraft:frog_variant</code> registry.
+{{Metadata type definition|Optional Global Position}}
+ | ({{Type|Boolean}}, {{Type|Optional}} {{Type|Identifier}}, {{Type|Optional}} {{Type|Position}})
+ | dimension identifier, position; only if the Boolean is set to true.
+{{Metadata type definition|Painting Variant}}
+ | {{Type|ID or}} [[#Painting Variant|Painting Variant]]
+ | An ID in the <code>minecraft:painting_variant</code> registry, or an inline definition.
+{{Metadata type definition|Sniffer State}}
+ | {{Type|VarInt}} {{Type|Enum}}
+ | IDLING = 0, FEELING_HAPPY = 1, SCENTING = 2, SNIFFING = 3, SEARCHING = 4, DIGGING = 5, RISING = 6
+{{Metadata type definition|Armadillo State}}
+ | {{Type|VarInt}} {{Type|Enum}}
+ | IDLE = 0, ROLLING = 1, SCARED = 2, UNROLLING = 3
+{{Metadata type definition|Vector3}}
+ | ({{Type|Float}}, {{Type|Float}}, {{Type|Float}})
+ | x, y, z
+{{Metadata type definition|Quaternion}}
+ | ({{Type|Float}}, {{Type|Float}}, {{Type|Float}}, {{Type|Float}})
+ | x, y, z, w
+ |}
+
+Villager types (<code>minecraft:villager_type</code> registry):
+
+{| class="wikitable"
+ ! Name !! ID
+ |-
+ | <code>minecraft:desert</code> || 0
+ |-
+ | <code>minecraft:jungle</code> || 1
+ |-
+ | <code>minecraft:plains</code> || 2
+ |-
+ | <code>minecraft:savanna</code> || 3
+ |-
+ | <code>minecraft:snow</code> || 4
+ |-
+ | <code>minecraft:swamp</code> || 5
+ |-
+ | <code>minecraft:taiga</code> || 6
+ |}
+
+Villager professions (<code>minecraft:villager_profession</code> registry):
+
+{| class="wikitable"
+ ! Name !! ID
+ |-
+ | <code>minecraft:none</code> || 0
+ |-
+ | <code>minecraft:armorer</code> || 1
+ |-
+ | <code>minecraft:butcher</code> || 2
+ |-
+ | <code>minecraft:cartographer</code> || 3
+ |-
+ | <code>minecraft:cleric</code> || 4
+ |-
+ | <code>minecraft:farmer</code> || 5
+ |-
+ | <code>minecraft:fisherman</code> || 6
+ |-
+ | <code>minecraft:fletcher</code> || 7
+ |-
+ | <code>minecraft:leatherworker</code> || 8
+ |-
+ | <code>minecraft:librarian</code> || 9
+ |-
+ | <code>minecraft:mason</code> || 10
+ |-
+ | <code>minecraft:nitwit</code> || 11
+ |-
+ | <code>minecraft:shepherd</code> || 12
+ |-
+ | <code>minecraft:toolsmith</code> || 13
+ |-
+ | <code>minecraft:weaponsmith</code> || 14
+ |}
+
+=== Wolf Variant ===
+
+{{See also|Minecraft Wiki:Projects/wiki.vg merge/Registry Data#Wolf Variant}}
+
+{| class="wikitable"
+ ! Name
+ ! Type
+ ! Meaning
+ |-
+ | Wild texture
+ | {{Type|Identifier}}
+ | The texture for the wild version of this wolf.
+The Notchian client uses the corresponding asset located at <code>textures</code>.
+ |-
+ | Tame texture
+ | {{Type|Identifier}}
+ | The texture for the tamed version of this wolf.
+The Notchian client uses the corresponding asset located at <code>textures</code>.
+ |-
+ | Angry texture
+ | {{Type|Identifier}}
+ | The texture for the angry version of this wolf.
+The Notchian client uses the corresponding asset located at <code>textures</code>.
+ |-
+ | Biomes
+ | {{Type|ID Set}}
+ | Biomes in which this wolf can spawn in (IDs in the <code>minecraft:biome</code> registry).
+ |}
+
+=== Painting Variant ===
+
+{{See also|Minecraft Wiki:Projects/wiki.vg merge/Registry Data#Painting Variant}}
+
+{| class="wikitable"
+ ! Name
+ ! Type
+ ! Meaning
+ |-
+ | Width
+ | {{Type|Int}}
+ | The width of the painting, in blocks. 
+ |-
+ | Height
+ | {{Type|Int}}
+ | The height of the painting, in blocks. 
+ |-
+ | Asset ID
+ | {{Type|Identifier}}
+ | The texture for the painting.
+The Notchian client uses the corresponding asset located at 
+<code>textures/painting</code>.
+ |-
+ | Has title
+ | {{Type|Boolean}}
+ |
+ |-
+ | Title
+ | {{Type|Optional}} {{Type|Text Component}}
+ | The displayed title of the painting. Only present if Has title is true.
+ |-
+ | Has author
+ | {{Type|Boolean}}
+ |
+ |-
+ | Author
+ | {{Type|Optional}} {{Type|Text Component}}
+ | The displayed author of the painting. Only present if Has author is true.
+  |}
+
+Entity classes also recursively inherit fields from classes they extend.
+
+== Entity Metadata ==
+
+=== Entity ===
+
+{{Metadata inherit|Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="9"| {{Metadata id|}}
+ |rowspan="9"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="9"| 0
+ |-
+ | 0x01
+ | Is on fire
+ |-
+ | 0x02
+ | Is pressing sneak key (hides the name tag, but does not make the entity visually sneak.)
+ |-
+ | 0x04
+ | Unused (previously riding)
+ |-
+ | 0x08
+ | Is sprinting (shows sprinting particles when on ground.)
+ |-
+ | 0x10
+ | Is swimming
+ |-
+ | 0x20
+ | Is invisible
+ |-
+ | 0x40
+ | has glowing effect
+ |-
+ | 0x80
+ | Is flying with an [[elytra]]
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Air ticks
+ | 300
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Optional Text Component}}
+ |colspan="2"| Custom name
+ | empty
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is custom name visible
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is silent
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Has no gravity
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Pose}}
+ |colspan="2"| Pose
+ | STANDING
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Ticks frozen in powdered snow
+ | 0
+|}
+
+On the Notchan server Is pressing sneak key reflects the sneak key state indicated by the client rather than the entity's pose, and can thus be set while swimming, flying or crawling, or unset while stuck sneaking under a block.
+
+Freezing ticks cap at 140 in the client for the player's snow overlay when stuck in powder snow. If the entity extends LivingEntity and freezing ticks reaches the cap, the mob will start shaking (this excludes the skeleton, which has its own indicator).
+
+=== Area Effect Cloud ===
+
+{{Metadata inherit|Area Effect Cloud|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Float}}
+ |colspan="2"| Radius
+ | 3.0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Ignore radius and show effect as single point, not area
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Particle}}
+ |colspan="2"| The particle
+ | -1
+|}
+
+=== Wind Charge ===
+
+{{Metadata inherit|Wind Charge|inherits=Entity}}
+
+No additional metadata.
+
+=== Dragon Fireball ===
+
+{{Metadata inherit|Dragon Fireball|inherits=Entity}}
+
+No additional metadata.
+
+=== End Crystal ===
+
+{{Metadata inherit|End Crystal|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Optional Position}}
+ |colspan="2"| Beam target
+ | Empty
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Show bottom
+ | true
+|}
+
+=== Evoker Fangs ===
+
+{{Metadata inherit|Evoker Fangs|inherits=Entity}}
+
+No additional metadata.
+
+=== Experience Orb ===
+
+{{Metadata inherit|Experience Orb|inherits=Entity}}
+
+No additional metadata.
+
+=== Eye of Ender ===
+
+{{Metadata inherit|Eye of Ender|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Slot}}
+ |colspan="2"| Item
+ | Empty (which behaves as if it were a <code>minecraft:ender_eye</code>)
+|}
+
+=== Falling Block ===
+
+{{Metadata inherit|Falling Block|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Position}}
+ |colspan="2"| spawn position
+ | (0, 0, 0)
+|}
+
+=== Fireball ===
+
+{{Metadata inherit|Fireball|inherits=Entity}}
+
+This is the large fireball shot by ghasts.
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Slot}}
+ |colspan="2"| Item
+ | Empty
+|}
+
+=== Firework Rocket ===
+
+{{Metadata inherit|Firework Rocket|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Slot}}
+ |colspan="2"| Firework info
+ | Empty
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Optional VarInt}}
+ |colspan="2"| Entity ID of entity which used firework (for elytra boosting)
+ | Empty
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is shot at angle (from a crossbow)
+ | false
+|}
+
+=== Interaction ===
+
+{{Metadata inherit|Interaction|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Float}}
+ |colspan="2"| Width
+ | 1.0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Float}}
+ |colspan="2"| Height
+ | 1.0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Responsive - can be attacked/interacted with if true
+ | false
+|}
+
+=== Item ===
+
+{{Metadata inherit|Item|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Slot}}
+ |colspan="2"| Item
+ | Empty
+|}
+
+=== Item Frame ===
+
+{{Metadata inherit|Item Frame|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Slot}}
+ |colspan="2"| Item
+ | Empty
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Rotation
+ | 0
+|}
+
+=== Glow Item Frame ===
+
+{{Metadata inherit|Glow Item Frame|inherits=Item Frame}}
+
+No additional metadata.
+
+=== Leash Knot ===
+
+{{Metadata inherit|Leash Knot|inherits=Entity}}
+
+No additional metadata.
+
+=== Lightning Bolt ===
+
+{{Metadata inherit|Lightning Bolt|inherits=Entity}}
+
+No additional metadata.
+
+=== Llama Spit ===
+
+{{Metadata inherit|Llama Spit|inherits=Entity}}
+
+No additional metadata.
+
+=== Marker ===
+
+{{Metadata inherit|Marker|inherits=Entity}}
+
+No additional metadata.
+
+=== Ominous Item Spawner ===
+
+{{Metadata inherit|Ominous Item Spawner|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Slot}}
+ |colspan="2"| Item
+ | Empty
+|}
+
+=== Painting ===
+
+{{Metadata inherit|Painting|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Painting Variant}}
+ |colspan="2"| Painting Type
+ | KEBAB
+|}
+
+=== Shulker Bullet ===
+
+{{Metadata inherit|Shulker Bullet|inherits=Entity}}
+
+No additional metadata.
+
+=== Small Fireball ===
+
+{{Metadata inherit|Small Fireball|inherits=Entity}}
+
+This is the fireball shot by blazes and dispensers with fire charges.
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Slot}}
+ |colspan="2"| Item
+ | Empty (which behaves as if it were a <code>minecraft:fire_charge</code>)
+|}
+
+=== Primed TNT ===
+
+{{Metadata inherit|Primed TNT|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Fuse time
+ | 80
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Block State}}
+ |colspan="2"| The block state ID that is exploding
+ | TNT
+|}
+
+=== Wind Charge ===
+
+{{Metadata inherit|Wind Charge|inherits=Entity}}
+
+No additional metadata.
+
+=== Wither Skull ===
+
+{{Metadata inherit|Wither Skull|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is invulnerable
+ | false
+|}
+
+=== Fishing Bobber ===
+
+{{Metadata inherit|Fishing Bobber|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Hooked entity id + 1, or 0 if there is no hooked entity
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is catchable
+ | False
+|}
+
+=== Abstract Arrow ===
+
+{{Metadata inherit|Abstract Arrow|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="3"| {{Metadata id|}}
+ |rowspan="3"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="3"| 0
+ |-
+ | 0x01
+ | Is critical
+ |-
+ | 0x02
+ | Is noclip (used by loyalty tridents when returning)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Byte}}
+ |colspan="2"| Piercing level
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is in ground
+ | false
+|}
+
+=== Arrow ===
+
+{{Metadata inherit|Arrow|inherits=Abstract Arrow}}
+
+Used for both tipped and regular arrows.  If not tipped, then color is set to -1 and no tipped arrow particles are used.
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Color (-1 for no particles)
+ | -1
+|}
+
+=== Spectral Arrow ===
+
+{{Metadata inherit|Spectral Arrow|inherits=Abstract Arrow}}
+
+No additional metadata.
+
+=== Trident ===
+
+{{Metadata inherit|Trident|inherits=Abstract Arrow}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Byte}}
+ |colspan="2"| Loyalty level (enchantment)
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Has enchantment glint
+ | False
+|}
+
+=== Display ===
+
+{{Metadata inherit|Display|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Interpolation delay
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Transformation interpolation duration
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Position/Rotation interpolation duration
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Vector3}}
+ |colspan="2"| Translation
+ | (0.0, 0.0, 0.0)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Vector3}}
+ |colspan="2"| Scale
+ | (1.0, 1.0, 1.0)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Quaternion}}
+ |colspan="2"| Rotation left
+ | (0.0, 0.0, 0.0, 1.0)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Quaternion}}
+ |colspan="2"| Rotation right
+ | (0.0, 0.0, 0.0, 1.0)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Byte}}
+ |colspan="2"| Billboard Constraints (0 = FIXED, 1 = VERTICAL, 2 = HORIZONTAL, 3 = CENTER)
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Brightness override (<code>blockLight << 4 | skyLight << 20</code>)
+ | -1
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Float}}
+ |colspan="2"| View range
+ | 1.0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Float}}
+ |colspan="2"| Shadow radius
+ | 0.0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Float}}
+ |colspan="2"| Shadow strength
+ | 1.0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Float}}
+ |colspan="2"| Width
+ | 0.0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Float}}
+ |colspan="2"| Height
+ | 0.0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Glow color override
+ | -1
+|}
+
+=== Block Display ===
+
+{{Metadata inherit|Block Display|inherits=Display}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Block State}}
+ |colspan="2"| Displayed block state
+ | 0 (Air)
+|}
+
+=== Item Display ===
+
+{{Metadata inherit|Item Display|inherits=Display}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Slot}}
+ |colspan="2"| Displayed item
+ | Empty
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Byte}}
+ |colspan="2"| Display type:
+* 0 = NONE
+* 1 = THIRD_PERSON_LEFT_HAND
+* 2 = THIRD_PERSON_RIGHT_HAND
+* 3 = FIRST_PERSON_LEFT_HAND
+* 4 = FIRST_PERSON_RIGHT_HAND
+* 5 = HEAD
+* 6 = GUI
+* 7 = GROUND
+* 8 = FIXED
+ | 0 (NONE)
+|}
+
+=== Text Display ===
+
+{{Metadata inherit|Text Display|inherits=Display}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Text Component}}
+ |colspan="2"| Text
+ | Empty
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Line width
+ | 200
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Background color
+ | 1073741824 (0x40000000)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Byte}}
+ |colspan="2"| Text opacity
+ | -1 (fully opaque)
+ |-
+ |rowspan="5"| {{Metadata id|}}
+ |rowspan="5"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="5"| 0
+ |-
+ | 0x01
+ | Has shadow
+ |-
+ | 0x02
+ | Is see through
+ |-
+ | 0x04
+ | Use default background color
+ |-
+ | 0x08
+ | Alignment:
+* 0 = CENTER
+* 1 or 3 = LEFT
+* 2 = RIGHT
+|}
+
+=== Living Entity ===
+
+{{Metadata inherit|Living Entity|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="5"| {{Metadata id|}}
+ |rowspan="5"| {{Metadata type|Byte}}
+ |colspan="2"| Hand states, used to trigger blocking/eating/drinking animation.
+ |rowspan="5"| 0
+ |-
+ ! Bit mask
+ ! Meaning
+ |-
+ | 0x01
+ | Is hand active
+ |-
+ | 0x02
+ | Active hand (0 = main hand, 1 = offhand)
+ |-
+ | 0x04
+ | Is in riptide spin attack
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Float}}
+ |colspan="2"| Health
+ | 1.0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Particles}}
+ |colspan="2"| Potion effect color (or 0 if there is no effect)
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is potion effect ambient: reduces the number of particles generated by potions to 1/5 the normal amount
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Number of arrows in entity
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Number of bee stingers in entity
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Optional Position}}
+ |colspan="2"| Location of the bed that the entity is currently sleeping in (Empty if it isn't sleeping)
+ | Empty
+|}
+
+=== Armor Stand ===
+
+{{Metadata inherit|Armor Stand|inherits=Living Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="6"| {{Metadata id|}}
+ |rowspan="6"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="6"| 0
+ |-
+ | 0x01
+ | Is Small
+ |-
+ | 0x02
+ | ''Unused''
+ |-
+ | 0x04
+ | Has Arms
+ |-
+ | 0x08
+ | Has no BasePlate
+ |-
+ | 0x10
+ | Is Marker
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Rotations}}
+ |colspan="2"| Head rotation
+ | (0.0, 0.0, 0.0)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Rotations}}
+ |colspan="2"| Body rotation
+ | (0.0, 0.0, 0.0)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Rotations}}
+ |colspan="2"| Left arm rotation
+ | (-10.0, 0.0, -10.0)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Rotations}}
+ |colspan="2"| Right arm rotation
+ | (-15.0, 0.0, 10.0)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Rotations}}
+ |colspan="2"| Left leg rotation
+ | (-1.0, 0.0, -1.0)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Rotations}}
+ |colspan="2"| Right leg rotation
+ | (1.0, 0.0, 1.0)
+|}
+
+Note that armor stands with the [[#Entity|invisible flag from the base entity class]] set also cannot be attacked or damaged, except for by the void.
+
+=== Player ===
+
+{{Metadata inherit|Player|inherits=Living Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Float}}
+ |colspan="2"| Additional Hearts
+ | 0.0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Score
+ | 0
+ |-
+ |rowspan="10"| {{Metadata id|}}
+ |rowspan="10"| {{Metadata type|Byte}}
+ |colspan="2"| The Displayed Skin Parts bit mask that is sent in [[Minecraft Wiki:Projects/wiki.vg merge/Protocol#Client Settings|Client Settings]]
+ |rowspan="10"| 0
+ |-
+ ! Bit mask
+ ! Meaning
+ |-
+ | 0x01
+ | Cape enabled
+ |-
+ | 0x02
+ | Jacket enabled
+ |-
+ | 0x04
+ | Left sleeve enabled
+ |-
+ | 0x08
+ | Right sleeve enabled
+ |-
+ | 0x10
+ | Left pants leg enabled
+ |-
+ | 0x20
+ | Right pants leg enabled
+ |-
+ | 0x40
+ | Hat enabled
+ |-
+ | 0x80
+ | ''Unused''
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Byte}}
+ |colspan="2"| Main hand (0 : Left, 1 : Right)
+ | 1
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|NBT}}
+ |colspan="2"| Left shoulder entity data (for occupying parrot)
+ | Empty
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|NBT}}
+ |colspan="2"| Right shoulder entity data (for occupying parrot)
+ | Empty
+|}
+
+=== Mob ===
+
+{{Metadata inherit|Mob|inherits=Living Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="4"| {{Metadata id|}}
+ |rowspan="4"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="4"| 0
+ |-
+ | 0x01
+ | NoAI
+ |-
+ | 0x02
+ | Is left handed
+ |-
+ | 0x04
+ | Is aggressive
+|}
+
+=== Bat ===
+
+{{Metadata inherit|Bat|inherits=Mob}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="2"| {{Metadata id|}}
+ |rowspan="2"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="2"| 0
+ |-
+ | 0x01
+ | Is hanging
+|}
+
+=== Ender Dragon ===
+
+{{Metadata inherit|Ender Dragon|inherits=Mob}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Dragon phase
+ | 10 (hover)
+|}
+
+Phases (according to [[Ender Dragon#Data_values|the wiki page on dragon data values]]) are:
+
+* 0: circling
+* 1: strafing (preparing to shoot a fireball)
+* 2: flying to the portal to land (part of transition to landed state)
+* 3: landing on the portal (part of transition to landed state)
+* 4: taking off from the portal (part of transition out of landed state)
+* 5: landed, performing breath attack
+* 6: landed, looking for a player for breath attack
+* 7: landed, roar before beginning breath attack
+* 8: charging player
+* 9: flying to portal to die
+* 10: hovering with no AI (default when using the /summon command).
+
+=== Ghast ===
+
+{{Metadata inherit|Ghast|inherits=Mob}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is attacking
+ | false
+|}
+
+=== Phantom ===
+
+{{Metadata inherit|Phantom|inherits=Mob}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Size
+ | 0
+|}
+
+Hitbox size is determined by horizontal=0.9 + 0.2*size and vertical=0.5 + 0.1 * i
+
+=== Slime ===
+
+{{Metadata inherit|Slime|inherits=Mob}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Size
+ | 1
+|}
+
+=== Magma Cube ===
+
+{{Metadata inherit|Magma Cube|inherits=Slime}}
+
+No additional metadata.
+
+=== Creature ===
+
+{{Metadata inherit|Creature|inherits=Mob}}
+
+No additional metadata.
+
+=== Allay ===
+
+{{Metadata inherit|Allay|inherits=Creature}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is dancing
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Can duplicate
+ | true
+|}
+
+=== Iron Golem ===
+
+{{Metadata inherit|Iron Golem|inherits=Creature}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="2"| {{Metadata id|}}
+ |rowspan="2"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="2"| 0
+ |-
+ | 0x01
+ | Is player-created
+|}
+
+=== Pufferfish ===
+
+{{Metadata inherit|Pufferfish|inherits=Creature}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| PuffState (varies from 0 to 2)
+ | 0
+|}
+
+=== Shulker ===
+
+{{Metadata inherit|Shulker|inherits=Creature}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Direction}}
+ |colspan="2"| Attach face
+ | Down (0)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Byte}}
+ |colspan="2"| Shield height
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Byte}}
+ |colspan="2"| Color (dye color)
+ | 16
+|}
+
+=== Snow Golem ===
+
+{{Metadata inherit|Snow Golem|inherits=Creature}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="6"| {{Metadata id|}}
+ |rowspan="6"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="6"| 0x10
+ |-
+ | 0x01
+ | ''Unused''
+ |-
+ | 0x02
+ | ''Unused''
+ |-
+ | 0x04
+ | ''Unused''
+ |-
+ | 0x08
+ | ''Unused''
+ |-
+ | 0x10
+ | Has pumpkin hat
+|}
+
+=== Tadpole ===
+
+{{Metadata inherit|Tadpole|inherits=Creature}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is from bucket
+ | false
+|}
+
+=== Ageable Mob ===
+
+{{Metadata inherit|Ageable Mob|inherits=Creature}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is baby
+ | false
+|}
+
+=== Dolphin ===
+
+{{Metadata inherit|Dolphin|inherits=Ageable Mob}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Position}}
+ |colspan="2"| Treasure position
+ | (0, 0, 0)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Has fish
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Moisture level
+ | 2400
+|}
+
+=== Squid ===
+
+{{Metadata inherit|Squid|inherits=Ageable Mob}}
+
+No additional metadata.
+
+=== Glow Squid ===
+
+{{Metadata inherit|Glow Squid|inherits=Squid}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Dark ticks remaining
+ | 0
+|}
+
+=== Animal ===
+
+{{Metadata inherit|Animal|inherits=Ageable Mob}}
+
+No additional metadata.
+
+=== Armadillo ===
+
+{{Metadata inherit|Armadillo|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Armadillo State}}
+ |colspan="2"| Armadillo state
+ | IDLE
+|}
+
+=== Axolotl ===
+
+{{Metadata inherit|Axolotl|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Variant (0 = lucy, 1 = wild, 2 = gold, 3 = cyan, 4 = blue)
+ | 0 (lucy)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| If it is currently playing dead.
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| If it was spawned from a bucket.
+ | false
+|}
+
+=== Bee ===
+
+{{Metadata inherit|Bee|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="5"| {{Metadata id|}}
+ |rowspan="5"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="5"| 0
+ |-
+ | 0x01
+ | ''Unused''
+ |-
+ | 0x02
+ | Is angry
+ |-
+ | 0x04
+ | Has stung
+ |-
+ | 0x08
+ | Has nectar
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Anger time in ticks
+ | 0 (Not angry)
+|}
+
+=== Chicken ===
+
+{{Metadata inherit|Chicken|inherits=Animal}}
+
+No additional metadata.
+
+=== Cow ===
+
+{{Metadata inherit|Cow|inherits=Animal}}
+
+No additional metadata.
+
+=== Mooshroom ===
+
+{{Metadata inherit|Mooshroom|inherits=Cow}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|String}}
+ |colspan="2"| Variant ("red" or "brown")
+ | red
+|}
+
+=== Fox ===
+
+{{Metadata inherit|Fox|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Type (0: red, 1: snow)
+ | 0 (red)
+ |-
+ |rowspan="9"| {{Metadata id|}}
+ |rowspan="9"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="9"| 0
+ |-
+ | 0x01
+ | Is sitting
+ |-
+ | 0x02
+ | ''Unused''
+ |-
+ | 0x04
+ | Is crouching
+ |-
+ | 0x08
+ | Is interested
+ |-
+ | 0x10
+ | Is pouncing
+ |-
+ | 0x20
+ | Is sleeping
+ |-
+ | 0x40
+ | Is faceplanted
+ |-
+ | 0x80
+ | Is defending
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Optional UUID}}
+ |colspan="2"| First UUID (in <code>UUIDs</code> NBT)?
+ | Absent
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Optional UUID}}
+ |colspan="2"| Second UUID (in <code>UUIDs</code> NBT)?
+ | Absent
+|}
+
+=== Frog ===
+
+{{Metadata inherit|Frog|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Frog Variant}}
+ |colspan="2"| Frog Variant
+ | TEMPERATE
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Optional VarInt}}
+ |colspan="2"| Tongue Target
+ | 0
+|}
+
+=== Goat ===
+
+{{Metadata inherit|Goat|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is Screaming Goat
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Has Left Horn
+ | true
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Has Right Horn
+ | true
+|}
+
+=== Hoglin ===
+
+{{Metadata inherit|Hoglin|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is immune to zombification
+ | false
+|}
+
+=== Ocelot ===
+
+{{Metadata inherit|Ocelot|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is trusting
+ | false
+|}
+
+=== Panda ===
+
+{{Metadata inherit|Panda|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Breed timer?  Set to 32 when something happens, and then counts down to 0 again.  At 29 and 14 (before counting down), will play the <code>entity.panda.cant_breed</code> sound event.
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Sneeze timer.  Counts up from 0; when it hits 1 the <code>entity.panda.pre_sneeze</code> event plays and when it hits 21 the <code>entity.panda.sneeze</code> event plays (and it is set back to 0 and the sneeze flag is cleared).
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Eat timer.  If nonzero, counts upwards.
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Byte}}
+ |colspan="2"| Main Gene
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Byte}}
+ |colspan="2"| Hidden Gene
+ | 0
+ |-
+ |rowspan="6"| {{Metadata id|}}
+ |rowspan="6"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="6"| 0
+ |-
+ | 0x01
+ | Unused
+ |-
+ | 0x02
+ | Is sneezing
+ |-
+ | 0x04
+ | Is rolling
+ |-
+ | 0x08
+ | Is sitting
+ |-
+ | 0x10
+ | Is on back
+|}
+
+=== Pig ===
+
+{{Metadata inherit|Pig|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Has saddle
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Total time to "boost" with a carrot on a stick for
+ | 0
+|}
+
+Whenever a carrot on a stick is used, if the pig is not currently boosting it will start to boost for 140 to 980 (inclusive) ticks.  When boost time is changed, a counter is reset which counts up to the boost time, after which boosting will stop.  The value remains set at its modified value even after boosting is stopped.
+
+=== Polar Bear ===
+
+{{Metadata inherit|Polar Bear|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is standing up
+ | false
+|}
+
+=== Rabbit ===
+
+{{Metadata inherit|Rabbit|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Type
+ | 0
+|}
+
+=== Sheep ===
+
+{{Metadata inherit|Sheep|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="3"| {{Metadata id|}}
+ |rowspan="3"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="3"| 0
+ |-
+ | 0x0F
+ | Color ID
+ |-
+ | 0x10
+ | Is sheared
+|}
+
+=== Sniffer ===
+
+{{Metadata inherit|Sniffer|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Sniffer State}}
+ |colspan="2"| Sniffer State
+ | IDLING
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Drop seed at tick
+ | 0
+|}
+
+=== Strider ===
+
+{{Metadata inherit|Strider|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Total time to "boost" with warped fungus on a stick for
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is shaking (true unless riding a vehicle or on or in a block tagged with strider_warm_blocks (default: lava))
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Has saddle
+ | false
+|}
+
+=== Turtle ===
+
+{{Metadata inherit|Turtle|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Position}}
+ |colspan="2"| Home pos
+ | (0, 0, 0)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Has egg
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is laying egg
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Position}}
+ |colspan="2"| Travel pos
+ | (0, 0, 0)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is going home
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is traveling
+ | false
+|}
+
+=== Abstract Horse ===
+
+{{Metadata inherit|Abstract Horse|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="8"| {{Metadata id|}}
+ |rowspan="8"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="8"| 0
+ |-
+ | 0x01
+ | ''Unused''
+ |-
+ | 0x02
+ | Is Tame
+ |-
+ | 0x04
+ | Is saddled
+ |-
+ | 0x08
+ | Has bred
+ |-
+ | 0x10
+ | Is eating
+ |-
+ | 0x20
+ | Is rearing (on hind legs)
+ |-
+ | 0x40
+ | Is mouth open
+|}
+
+=== Camel ===
+
+{{Metadata inherit|Camel|inherits=Abstract Horse}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is dashing
+ | False
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarLong}}
+ |colspan="2"| Last pose change tick
+ | 0
+|}
+
+=== Horse ===
+
+{{Metadata inherit|Horse|inherits=Abstract Horse}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Variant (Color & Style)
+ | 0
+|}
+
+=== Skeleton Horse ===
+
+{{Metadata inherit|Skeleton Horse|inherits=Abstract Horse}}
+
+No additional metadata.
+
+=== Zombie Horse ===
+
+{{Metadata inherit|Zombie Horse|inherits=Abstract Horse}}
+
+No additional metadata.
+
+=== Chested Horse ===
+
+{{Metadata inherit|Chested Horse|inherits=Abstract Horse}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Has Chest
+ | false
+|}
+
+=== Donkey ===
+
+{{Metadata inherit|Donkey|inherits=Chested Horse}}
+
+No additional metadata.
+
+=== Llama ===
+
+{{Metadata inherit|Llama|inherits=Chested Horse}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Strength (number of columns of 3 slots in the llama's inventory once a chest is equipped)
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Variant (0: <code>llama_creamy.png</code>, 1: <code>llama_white.png</code>, 2: <code>llama_brown.png</code>, 3: <code>llama_gray.png</code>)
+ | 0
+|}
+
+=== Trader Llama ===
+
+{{Metadata inherit|Trader Llama|inherits=Llama}}
+
+No additional metadata.
+
+=== Mule ===
+
+{{Metadata inherit|Mule|inherits=Chested Horse}}
+
+No additional metadata.
+
+=== Tameable Animal ===
+
+{{Metadata inherit|Tameable Animal|inherits=Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="4"| {{Metadata id|}}
+ |rowspan="4"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="4"| 0
+ |-
+ | 0x01
+ | Is sitting
+ |-
+ | 0x02
+ | ''Unused''
+ |-
+ | 0x04
+ | Is tamed
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Optional UUID}}
+ |colspan="2"| Owner
+ | Absent
+|}
+
+=== Cat ===
+
+{{Metadata inherit|Cat|inherits=Tameable Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Cat Variant}}
+ |colspan="2"| Cat Variant
+ | BLACK
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is lying
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is relaxed? (This makes their head go slightly upwards, unknown when used)
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Collar color (values are those [[Data_values#Dyes|used with dyes]])
+ | 14 (Red)
+|}
+
+=== Parrot ===
+
+{{Metadata inherit|Parrot|inherits=Tameable Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Variant (0: red/blue, 1: blue, 2: green, 3: yellow/blue, 4: grey)
+ | 0
+|}
+
+=== Wolf ===
+
+{{Metadata inherit|Wolf|inherits=Tameable Animal}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is begging
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Collar color (values are those [[Data_values#Dyes|used with dyes]])
+ | 14 (Red)
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Anger time
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Wolf Variant}}
+ |colspan="2"| Variant
+ | PALE
+|}
+
+=== Abstract Villager ===
+
+{{Metadata inherit|Abstract Villager|inherits=Ageable Mob}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Head shake timer (starts at 40, decrements each tick)
+ | 0
+|}
+
+=== Villager ===
+
+{{Metadata inherit|Villager|inherits=Abstract Villager}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Villager Data}}
+ |colspan="2"| Villager Data
+ | Plains/None/1
+|}
+
+=== Wandering Trader ===
+
+{{Metadata inherit|Wandering Trader|inherits=Abstract Villager}}
+
+No additional metadata.
+
+=== Abstract Fish ===
+
+{{Metadata inherit|Abstract Fish|inherits=Creature}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| From bucket
+ | False
+|}
+
+=== Cod ===
+
+{{Metadata inherit|Cod|inherits=Abstract Fish}}
+
+No additional metadata.
+
+=== Salmon ===
+
+{{Metadata inherit|Salmon|inherits=Abstract Fish}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Type (0 = SMALL, 1 = MEDIUM, 2 = LARGE)
+ | 1
+|}
+
+=== Tropical Fish ===
+
+{{Metadata inherit|Tropical Fish|inherits=Abstract Fish}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Variant
+ | 0
+|}
+
+=== Monster ===
+
+{{Metadata inherit|Monster|inherits=Creature}}
+
+No additional metadata.
+
+=== Blaze ===
+
+{{Metadata inherit|Blaze|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="2"| {{Metadata id|}}
+ |rowspan="2"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="2"| 0
+ |-
+ | 0x01
+ | Is on fire
+|}
+
+=== Bogged ===
+
+{{Metadata inherit|Bogged|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is sheared
+ | false
+|}
+
+=== Breeze ===
+
+{{Metadata inherit|Breeze|inherits=Monster}}
+
+No additional metadata.
+
+=== Creaking ===
+
+{{Metadata inherit|Creaking|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Can move
+ | true
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is active
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is tearing down
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Optional Position}}
+ |colspan="2"| Home position
+ | Empty
+|}
+
+=== Creeper ===
+
+{{Metadata inherit|Creeper|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| State (-1 = idle, 1 = fuse)
+ | -1
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is [[Creeper#Charged Creeper|charged]]
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is ignited
+ | false
+|}
+
+=== Enderman ===
+
+{{Metadata inherit|Enderman|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Optional Block State}}
+ |colspan="2"| Carried block
+ | Absent
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is screaming
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is staring
+ | false
+|}
+
+=== Endermite ===
+
+{{Metadata inherit|Endermite|inherits=Monster}}
+
+No additional metadata.
+
+=== Giant ===
+
+{{Metadata inherit|Giant|inherits=Monster}}
+
+No additional metadata.
+
+=== Guardian ===
+
+{{Metadata inherit|Guardian|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is retracting spikes
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Target EID
+ | 0
+|}
+
+=== Elder Guardian ===
+
+{{Metadata inherit|Elder Guardian|inherits=Guardian}}
+
+No additional metadata.
+
+=== Silverfish ===
+
+{{Metadata inherit|Silverfish|inherits=Monster}}
+
+No additional metadata.
+
+=== Skeleton ===
+
+{{Metadata inherit|Skeleton|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is being converted into a Stray
+ | false
+|}
+
+=== Spider ===
+
+{{Metadata inherit|Spider|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="2"| {{Metadata id|}}
+ |rowspan="2"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="2"| 0
+ |-
+ | 0x01
+ | Is climbing
+|}
+
+=== Cave Spider ===
+
+{{Metadata inherit|Cave Spider|inherits=Spider}}
+
+No additional metadata.
+
+=== Stray ===
+
+{{Metadata inherit|Stray|inherits=Monster}}
+
+No additional metadata.
+
+=== Vex ===
+
+{{Metadata inherit|Vex|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ |rowspan="2"| {{Metadata id|}}
+ |rowspan="2"| {{Metadata type|Byte}}
+ ! Bit mask
+ ! Meaning
+ |rowspan="2"| 0
+ |-
+ | 0x01
+ | Is attacking
+|}
+
+=== Warden ===
+
+{{Metadata inherit|Warden|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Anger Level
+ | 0
+|}
+
+=== Wither ===
+
+{{Metadata inherit|Wither|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Center head's target (entity ID, or 0 if no target)
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Left head's target (entity ID, or 0 if no target)
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Right head's target (entity ID, or 0 if no target)
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Invulnerable time
+ | 0
+|}
+
+=== Wither Skeleton ===
+
+{{Metadata inherit|Wither Skeleton|inherits=Monster}}
+
+No additional metadata.
+
+=== Zoglin ===
+
+{{Metadata inherit|Zoglin|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is baby
+ | false
+|}
+
+=== Zombie ===
+
+{{Metadata inherit|Zombie|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is baby
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Unused (previously type)
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is becoming a drowned
+ | false
+|}
+
+=== Drowned ===
+
+{{Metadata inherit|Drowned|inherits=Zombie}}
+
+No additional metadata.
+
+=== Husk ===
+
+{{Metadata inherit|Husk|inherits=Zombie}}
+
+No additional metadata.
+
+=== Zombie Villager ===
+
+{{Metadata inherit|Zombie Villager|inherits=Zombie}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is converting
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Villager Data}}
+ |colspan="2"| Villager Data
+ | Plains/None/1
+|}
+
+=== Zombified Piglin ===
+
+{{Metadata inherit|Zombified Piglin|inherits=Zombie}}
+
+No additional metadata.
+
+=== Base Piglin ===
+
+{{Metadata inherit|Base Piglin|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is immune to zombification
+ | false
+|}
+
+=== Piglin ===
+
+{{Metadata inherit|Piglin|inherits=Base Piglin}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is baby
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is charging crossbow
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is dancing
+ | false
+|}
+
+=== Piglin Brute ===
+
+{{Metadata inherit|Piglin Brute|inherits=Base Piglin}}
+
+No additional metadata.
+
+=== Raider ===
+
+{{Metadata inherit|Raider|inherits=Monster}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is celebrating
+ | false
+|}
+
+"Is celebrating" appears to control the pose for vindicators and does not appear to be used by other types.
+
+=== Pillager ===
+
+{{Metadata inherit|Pillager|inherits=Raider}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is charging
+ | false
+|}
+
+=== Ravager ===
+
+{{Metadata inherit|Ravager|inherits=Raider}}
+
+No additional metadata.
+
+=== Vindicator ===
+
+{{Metadata inherit|Vindicator|inherits=Raider}}
+
+No additional metadata.
+
+=== Witch ===
+
+{{Metadata inherit|Witch|inherits=Raider}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is drinking potion
+ | false
+|}
+
+=== Spellcaster Illager ===
+
+{{Metadata inherit|Spellcaster Illager|inherits=Raider}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Byte}}
+ |colspan="2"| Spell (0: none, 1: summon vex, 2: attack, 3: wololo, 4: disappear, 5: blindness)
+ | 0
+|}
+
+=== Evoker ===
+
+{{Metadata inherit|Evoker|inherits=Spellcaster Illager}}
+
+No additional metadata.
+
+=== Illusioner ===
+
+{{Metadata inherit|Illusioner|inherits=Spellcaster Illager}}
+
+No additional metadata.
+
+=== Thrown Item Projectile ===
+
+{{Metadata inherit|Thrown Item Projectile|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Slot}}
+ |colspan="2"| Item
+ | Empty (which behaves as the default)
+|}
+
+=== Thrown Egg ===
+
+{{Metadata inherit|Thrown Egg|inherits=Thrown Item Projectile}}
+
+Default item is <code>minecraft:egg</code>.
+
+No additional metadata.
+
+=== Thrown Ender Pearl ===
+
+{{Metadata inherit|Thrown Ender Pearl|inherits=Thrown Item Projectile}}
+
+Default item is <code>minecraft:ender_pearl</code>.
+
+No additional metadata.
+
+=== Thrown Bottle o' Enchanting ===
+
+{{Metadata inherit|Thrown Bottle o' Enchanting|inherits=Thrown Item Projectile}}
+
+Default item is <code>minecraft:experience_bottle</code>.
+
+No additional metadata.
+
+=== Potion ===
+
+{{Metadata inherit|Potion|inherits=Thrown Item Projectile}}
+
+Default item is <code>minecraft:splash_potion</code>.
+
+No additional metadata.
+
+=== Snowball ===
+
+{{Metadata inherit|Snowball|inherits=Thrown Item Projectile}}
+
+Default item is <code>minecraft:snowball</code>.
+
+No additional metadata.
+
+=== Abstract Vehicle ===
+
+{{Metadata inherit|Abstract Vehicle|inherits=Entity}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Shaking power
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Shaking direction
+ | 1
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Float}}
+ |colspan="2"| Shaking multiplier
+ | 0.0
+|}
+
+=== Boat ===
+
+{{Metadata inherit|Boat|inherits=Abstract Vehicle}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is left paddle turning
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Is right paddle turning
+ | false
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Splash timer
+ | 0
+|}
+
+=== Acacia Boat ===
+
+{{Metadata inherit|Acacia Boat|inherits=Boat}}
+
+No additional metadata.
+
+=== Acacia Boat with Chest ===
+
+{{Metadata inherit|Acacia Boat with Chest|inherits=Boat}}
+
+No additional metadata.
+
+=== Bamboo Raft with Chest ===
+
+{{Metadata inherit|Bamboo Raft with Chest|inherits=Boat}}
+
+No additional metadata.
+
+=== Bamboo Raft ===
+
+{{Metadata inherit|Bamboo Raft|inherits=Boat}}
+
+No additional metadata.
+
+=== Birch Boat ===
+
+{{Metadata inherit|Birch Boat|inherits=Boat}}
+
+No additional metadata.
+
+=== Birch Boat with Chest ===
+
+{{Metadata inherit|Birch Boat with Chest|inherits=Boat}}
+
+No additional metadata.
+
+=== Cherry Boat ===
+
+{{Metadata inherit|Cherry Boat|inherits=Boat}}
+
+No additional metadata.
+
+=== Cherry Boat with Chest ===
+
+{{Metadata inherit|Cherry Boat with Chest|inherits=Boat}}
+
+No additional metadata.
+
+=== Dark Oak Boat ===
+
+{{Metadata inherit|Dark Oak Boat|inherits=Boat}}
+
+No additional metadata.
+
+=== Dark Oak Boat with Chest ===
+
+{{Metadata inherit|Dark Oak Boat with Chest|inherits=Boat}}
+
+No additional metadata.
+
+=== Jungle Boat ===
+
+{{Metadata inherit|Jungle Boat|inherits=Boat}}
+
+No additional metadata.
+
+=== Jungle Boat with Chest ===
+
+{{Metadata inherit|Jungle Boat with Chest|inherits=Boat}}
+
+No additional metadata.
+
+=== Mangrove Boat ===
+
+{{Metadata inherit|Mangrove Boat|inherits=Boat}}
+
+No additional metadata.
+
+=== Mangrove Boat with Chest ===
+
+{{Metadata inherit|Mangrove Boat with Chest|inherits=Boat}}
+
+No additional metadata.
+
+=== Oak Boat ===
+
+{{Metadata inherit|Oak Boat|inherits=Boat}}
+
+No additional metadata.
+
+=== Oak Boat with Chest ===
+
+{{Metadata inherit|Oak Boat with Chest|inherits=Boat}}
+
+No additional metadata.
+
+=== Pale Oak Boat ===
+
+{{Metadata inherit|Pale Oak Boat|inherits=Boat}}
+
+No additional metadata.
+
+=== Pale Oak Boat with Chest ===
+
+{{Metadata inherit|Pale Oak Boat with Chest|inherits=Boat}}
+
+No additional metadata.
+
+=== Spruce Boat ===
+
+{{Metadata inherit|Spruce Boat|inherits=Boat}}
+
+No additional metadata.
+
+=== Spruce Boat with Chest ===
+
+{{Metadata inherit|Spruce Boat with Chest|inherits=Boat}}
+
+No additional metadata.
+
+=== Abstract Minecart ===
+
+{{Metadata inherit|Abstract Minecart|inherits=Abstract Vehicle}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Custom block state ID
+ | 0
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|VarInt}}
+ |colspan="2"| Custom block Y position (in 16ths of a block)
+ | 6
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Show custom block
+ | false
+|}
+
+If show custom block is false, then each type of Minecart will render its own type of block with its own properties.  Note that one does ''not'' need to send these values for the metadata fields, as the client will automatically select them if show custom block is false.  They are only provided for reference to help with swapping out other blocks.
+
+* Rideable Minecarts contain air (<code>minecraft:air</code>) and have a y position of 6
+* Chest Minecarts contain chests facing north (<code>minecraft:chest[facing=north]</code>) and have a y position of 8
+* Furnace Minecarts contain a normal furnace facing north when unpowered (<code>minecraft:furnace[facing=north]</code>) and a lit furnace facing north when powered (<code>minecraft:furnace[facing=north, lit=true]</code>) and have a y position of 6 in both cases
+* Hopper Minecarts contain a hopper (<code>minecraft:hopper</code>) and have a y position of 1
+* TNT Minecarts contain TNT (<code>minecraft:tnt</code>) and have a y position of 6
+* Command block minecarts contain a Command Block (<code>minecraft:command_block</code>) and have a y position of 6
+* Spawner Minecarts contain a spawner (<code>minecraft:spawner</code>) and have a y position of 6
+
+=== Minecart with Chest ===
+
+{{Metadata inherit|Minecart with Chest|inherits=Abstract Minecart}}
+
+No additional metadata.
+
+=== Minecart with Command Block ===
+
+{{Metadata inherit|Minecart with Command Block|inherits=Abstract Minecart}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|String}}
+ |colspan="2"| Command
+ | <code></code>
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Text Component}}
+ |colspan="2"| Last output
+ | <code>{"text":""}</code>
+|}
+
+=== Minecart with Furnace ===
+
+{{Metadata inherit|Minecart with Furnace|inherits=Abstract Minecart}}
+
+{| class="wikitable"
+ ! Index
+ ! Type
+ !style="width: 250px;" colspan="2"| Meaning
+ ! Default
+ |-
+ | {{Metadata id|}}
+ | {{Metadata type|Boolean}}
+ |colspan="2"| Has fuel
+ | false
+|}
+
+=== Minecart with Hopper ===
+
+{{Metadata inherit|Minecart with Hopper|inherits=Abstract Minecart}}
+
+No additional metadata.
+
+=== Minecart ===
+
+{{Metadata inherit|Minecart|inherits=Abstract Minecart}}
+
+No additional metadata.
+
+=== Minecart with Monster Spawner ===
+
+{{Metadata inherit|Minecart with Monster Spawner|inherits=Abstract Minecart}}
+
+No additional metadata.
+
+=== Minecart with TNT ===
+
+{{Metadata inherit|Minecart with TNT|inherits=Abstract Minecart}}
+
+No additional metadata.
+
+[[Category:Protocol Details]]
+[[Category:Java Edition protocol]]
+{{license wiki.vg}}

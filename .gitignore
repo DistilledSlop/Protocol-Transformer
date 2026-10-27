@@ -1,0 +1,14 @@
+node_modules/
+__pycache__/
+.venv/
+proxy/data/
+data/
+*.bin
+*.parsed.jsonl
+proxy/packets.jsonl
+train/checkpoints/
+train/runs/
+*.pt
+*.pth
+*.safetensors
+.DS_Store

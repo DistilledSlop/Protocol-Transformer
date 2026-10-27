@@ -1,0 +1,1168 @@
+{
+ "inventory": [
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "entity_head_rotation",
+   "count": 11382,
+   "bytes": 43611
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "entity_move_look",
+   "count": 7436,
+   "bytes": 88299
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "entity_velocity",
+   "count": 6166,
+   "bytes": 55216
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "rel_entity_move",
+   "count": 5530,
+   "bytes": 54458
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "entity_metadata",
+   "count": 1993,
+   "bytes": 19231
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "multi_block_change",
+   "count": 1571,
+   "bytes": 75628
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "entity_teleport",
+   "count": 1443,
+   "bytes": 43145
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "entity_update_attributes",
+   "count": 1412,
+   "bytes": 23291
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "map_chunk",
+   "count": 1337,
+   "bytes": 47551912
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "bundle_delimiter",
+   "count": 1334,
+   "bytes": 1334
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "update_light",
+   "count": 1058,
+   "bytes": 4475650
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "block_change",
+   "count": 925,
+   "bytes": 9401
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "unload_chunk",
+   "count": 884,
+   "bytes": 7956
+  },
+  {
+   "dir": "C2S",
+   "state": "play",
+   "name": "position_look",
+   "count": 738,
+   "bytes": 25092
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "spawn_entity",
+   "count": 667,
+   "bytes": 35929
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "entity_destroy",
+   "count": 547,
+   "bytes": 2091
+  },
+  {
+   "dir": "C2S",
+   "state": "play",
+   "name": "position",
+   "count": 293,
+   "bytes": 7618
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "entity_look",
+   "count": 232,
+   "bytes": 1390
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "entity_status",
+   "count": 207,
+   "bytes": 1242
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "entity_equipment",
+   "count": 159,
+   "bytes": 1420
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "update_time",
+   "count": 60,
+   "bytes": 1020
+  },
+  {
+   "dir": "C2S",
+   "state": "play",
+   "name": "entity_action",
+   "count": 58,
+   "bytes": 290
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "update_view_position",
+   "count": 46,
+   "bytes": 294
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "sound_effect",
+   "count": 26,
+   "bytes": 831
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "damage_event",
+   "count": 20,
+   "bytes": 140
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "set_slot",
+   "count": 19,
+   "bytes": 122
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "window_items",
+   "count": 17,
+   "bytes": 995
+  },
+  {
+   "dir": "C2S",
+   "state": "play",
+   "name": "use_item",
+   "count": 17,
+   "bytes": 187
+  },
+  {
+   "dir": "C2S",
+   "state": "play",
+   "name": "arm_animation",
+   "count": 17,
+   "bytes": 34
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "acknowledge_player_digging",
+   "count": 17,
+   "bytes": 34
+  },
+  {
+   "dir": "C2S",
+   "state": "play",
+   "name": "look",
+   "count": 13,
+   "bytes": 130
+  },
+  {
+   "dir": "S2C",
+   "state": "configuration",
+   "name": "registry_data",
+   "count": 11,
+   "bytes": 7118
+  },
+  {
+   "dir": "C2S",
+   "state": "play",
+   "name": "set_creative_slot",
+   "count": 11,
+   "bytes": 52
+  },
+  {
+   "dir": "C2S",
+   "state": "play",
+   "name": "held_item_slot",
+   "count": 11,
+   "bytes": 33
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "unlock_recipes",
+   "count": 10,
+   "bytes": 359
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "world_event",
+   "count": 8,
+   "bytes": 144
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "player_info",
+   "count": 4,
+   "bytes": 100
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "abilities",
+   "count": 3,
+   "bytes": 30
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "position",
+   "count": 3,
+   "bytes": 105
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "system_chat",
+   "count": 3,
+   "bytes": 987
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "advancements",
+   "count": 3,
+   "bytes": 3068
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "experience",
+   "count": 3,
+   "bytes": 21
+  },
+  {
+   "dir": "C2S",
+   "state": "play",
+   "name": "teleport_confirm",
+   "count": 3,
+   "bytes": 6
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "keep_alive",
+   "count": 3,
+   "bytes": 27
+  },
+  {
+   "dir": "C2S",
+   "state": "play",
+   "name": "keep_alive",
+   "count": 3,
+   "bytes": 27
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "game_state_change",
+   "count": 2,
+   "bytes": 12
+  },
+  {
+   "dir": "C2S",
+   "state": "play",
+   "name": "flying",
+   "count": 2,
+   "bytes": 4
+  },
+  {
+   "dir": "C2S",
+   "state": "login",
+   "name": "login_start",
+   "count": 1,
+   "bytes": 32
+  },
+  {
+   "dir": "C2S",
+   "state": "login",
+   "name": "login_acknowledged",
+   "count": 1,
+   "bytes": 1
+  },
+  {
+   "dir": "C2S",
+   "state": "configuration",
+   "name": "custom_payload",
+   "count": 1,
+   "bytes": 25
+  },
+  {
+   "dir": "C2S",
+   "state": "configuration",
+   "name": "settings",
+   "count": 1,
+   "bytes": 14
+  },
+  {
+   "dir": "S2C",
+   "state": "login",
+   "name": "compress",
+   "count": 1,
+   "bytes": 3
+  },
+  {
+   "dir": "S2C",
+   "state": "login",
+   "name": "success",
+   "count": 1,
+   "bytes": 34
+  },
+  {
+   "dir": "S2C",
+   "state": "configuration",
+   "name": "custom_payload",
+   "count": 1,
+   "bytes": 23
+  },
+  {
+   "dir": "S2C",
+   "state": "configuration",
+   "name": "feature_flags",
+   "count": 1,
+   "bytes": 20
+  },
+  {
+   "dir": "S2C",
+   "state": "configuration",
+   "name": "select_known_packs",
+   "count": 1,
+   "bytes": 24
+  },
+  {
+   "dir": "C2S",
+   "state": "configuration",
+   "name": "select_known_packs",
+   "count": 1,
+   "bytes": 24
+  },
+  {
+   "dir": "S2C",
+   "state": "configuration",
+   "name": "tags",
+   "count": 1,
+   "bytes": 25201
+  },
+  {
+   "dir": "S2C",
+   "state": "configuration",
+   "name": "finish_configuration",
+   "count": 1,
+   "bytes": 1
+  },
+  {
+   "dir": "C2S",
+   "state": "configuration",
+   "name": "finish_configuration",
+   "count": 1,
+   "bytes": 1
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "login",
+   "count": 1,
+   "bytes": 108
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "difficulty",
+   "count": 1,
+   "bytes": 3
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "held_item_slot",
+   "count": 1,
+   "bytes": 2
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "server_data",
+   "count": 1,
+   "bytes": 23
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "update_view_distance",
+   "count": 1,
+   "bytes": 2
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "simulation_distance",
+   "count": 1,
+   "bytes": 2
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "initialize_world_border",
+   "count": 1,
+   "bytes": 40
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "spawn_position",
+   "count": 1,
+   "bytes": 13
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "set_ticking_state",
+   "count": 1,
+   "bytes": 6
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "step_tick",
+   "count": 1,
+   "bytes": 2
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "update_health",
+   "count": 1,
+   "bytes": 10
+  },
+  {
+   "dir": "S2C",
+   "state": "play",
+   "name": "declare_commands",
+   "count": 1,
+   "bytes": 27941
+  },
+  {
+   "dir": "C2S",
+   "state": "play",
+   "name": "chat_command",
+   "count": 1,
+   "bytes": 19
+  },
+  {
+   "dir": "C2S",
+   "state": "play",
+   "name": "close_window",
+   "count": 1,
+   "bytes": 2
+  }
+ ],
+ "markers": [
+  [
+   "session_EmeraldIngot64_1793047664217.jsonl",
+   43.56934,
+   "login",
+   "configuration",
+   "login_acknowledged"
+  ],
+  [
+   "session_EmeraldIngot64_1793047664217.jsonl",
+   319.093267,
+   "configuration",
+   "play",
+   "finish_configuration"
+  ]
+ ],
+ "tick_phase": [
+  {
+   "file": "session_EmeraldIngot64_1793047664217.parsed.jsonl",
+   "n": 32189,
+   "phase_ms": 24.990762259708916,
+   "concentration": 0.9204038927619924,
+   "window_phase_min": 24.734438889569475,
+   "window_phase_max": 25.17068368481868
+  }
+ ],
+ "distributions": {
+  "move_xz": {
+   "n": 25932,
+   "zero_fraction": 0.18926422952336885,
+   "unit_per_block": 4096,
+   "p1": 4,
+   "p5": 30,
+   "p25": 303,
+   "p50": 890,
+   "p75": 1847,
+   "p95": 3223,
+   "p99": 4533,
+   "max": 6986
+  },
+  "move_y": {
+   "n": 12966,
+   "zero_fraction": 0.3402745642449483,
+   "unit_per_block": 4096,
+   "p1": 6,
+   "p5": 37,
+   "p25": 170,
+   "p50": 698,
+   "p75": 798,
+   "p95": 2928,
+   "p99": 6256,
+   "max": 6833
+  },
+  "velocity": {
+   "n": 18498,
+   "zero_fraction": 0.11979673478213859,
+   "unit_per_block": 8000,
+   "p1": 2,
+   "p5": 10,
+   "p25": 112,
+   "p50": 345,
+   "p75": 627,
+   "p95": 3900,
+   "p99": 12143,
+   "max": 13524
+  }
+ },
+ "schemes": {
+  "move_all": [
+   {
+    "scheme": "linear64",
+    "median_rel_err": 0.08597350230414746,
+    "p95_rel_err": 1.0,
+    "p95_abs_err_blocks": 0.0230255126953125,
+    "collapsed_to_zero": 0.18931513688940668
+   },
+   {
+    "scheme": "log64",
+    "median_rel_err": 0.07124270728644684,
+    "p95_rel_err": 0.14279944012380164,
+    "p95_abs_err_blocks": 0.07263050847651464,
+    "collapsed_to_zero": 0.0
+   },
+   {
+    "scheme": "quantile64",
+    "median_rel_err": 0.03914590747330961,
+    "p95_rel_err": 0.42857142857142855,
+    "p95_abs_err_blocks": 0.024169921875,
+    "collapsed_to_zero": 0.0
+   },
+   {
+    "scheme": "hybrid64",
+    "median_rel_err": 0.0499597099113618,
+    "p95_rel_err": 0.36363636363636365,
+    "p95_abs_err_blocks": 0.08543936116901185,
+    "collapsed_to_zero": 0.0
+   },
+   {
+    "scheme": "linear1024",
+    "median_rel_err": 0.004427420660621762,
+    "p95_rel_err": 0.126953125,
+    "p95_abs_err_blocks": 0.0014519691467285156,
+    "collapsed_to_zero": 0.01839061329782808
+   },
+   {
+    "scheme": "log1024",
+    "median_rel_err": 0.0045855018745398785,
+    "p95_rel_err": 0.00835588779462019,
+    "p95_abs_err_blocks": 0.004309294226257143,
+    "collapsed_to_zero": 0.0
+   },
+   {
+    "scheme": "quantile1024",
+    "median_rel_err": 0.0017953321364452424,
+    "p95_rel_err": 0.02702702702702703,
+    "p95_abs_err_blocks": 0.001953125,
+    "collapsed_to_zero": 0.0
+   },
+   {
+    "scheme": "hybrid1024",
+    "median_rel_err": 0.002824858757062147,
+    "p95_rel_err": 0.023255813953488372,
+    "p95_abs_err_blocks": 0.002685546875,
+    "collapsed_to_zero": 0.0
+   }
+  ],
+  "velocity": [
+   {
+    "scheme": "linear64",
+    "median_rel_err": 0.31567622950819674,
+    "p95_rel_err": 1.0,
+    "p95_abs_err_blocks": 0.02340234375,
+    "collapsed_to_zero": 0.373769024171889
+   },
+   {
+    "scheme": "log64",
+    "median_rel_err": 0.08843318190514297,
+    "p95_rel_err": 0.15106164775263292,
+    "p95_abs_err_blocks": 0.05226910471006852,
+    "collapsed_to_zero": 0.0
+   },
+   {
+    "scheme": "quantile64",
+    "median_rel_err": 0.041666666666666664,
+    "p95_rel_err": 0.4066416040100251,
+    "p95_abs_err_blocks": 0.27,
+    "collapsed_to_zero": 0.0
+   },
+   {
+    "scheme": "hybrid64",
+    "median_rel_err": 0.048628428927680795,
+    "p95_rel_err": 0.36363636363636365,
+    "p95_abs_err_blocks": 0.09192445178531193,
+    "collapsed_to_zero": 0.0
+   },
+   {
+    "scheme": "linear1024",
+    "median_rel_err": 0.018605638586956522,
+    "p95_rel_err": 1.0,
+    "p95_abs_err_blocks": 0.001494873046875,
+    "collapsed_to_zero": 0.06789018203521337
+   },
+   {
+    "scheme": "log1024",
+    "median_rel_err": 0.0042988702513089465,
+    "p95_rel_err": 0.008828271998131498,
+    "p95_abs_err_blocks": 0.003151495192762809,
+    "collapsed_to_zero": 0.0
+   },
+   {
+    "scheme": "quantile1024",
+    "median_rel_err": 0.0,
+    "p95_rel_err": 0.03179143510951291,
+    "p95_abs_err_blocks": 0.017375,
+    "collapsed_to_zero": 0.0
+   },
+   {
+    "scheme": "hybrid1024",
+    "median_rel_err": 0.0,
+    "p95_rel_err": 0.02,
+    "p95_abs_err_blocks": 0.006093566048907633,
+    "collapsed_to_zero": 0.0
+   }
+  ]
+ },
+ "dictionary_candidates": {
+  "S2C abilities.flyingSpeed": [
+   0.05000000074505806
+  ],
+  "S2C abilities.walkingSpeed": [
+   0.10000000149011612
+  ],
+  "S2C entity_update_attributes.properties[generic.step_height].value": [
+   0.10000000149011612,
+   0.20000000298023224,
+   0.23000000417232513,
+   0.25,
+   0.30000001192092896,
+   0.7
+  ],
+  "S2C position.pitch": [
+   13.832853317260742
+  ],
+  "S2C position.x": [
+   45.422394459551526
+  ],
+  "S2C position.yaw": [
+   -67.03697204589844
+  ],
+  "S2C position.z": [
+   -1.2898045426137628
+  ],
+  "S2C sound_effect.pitch": [
+   0.8063002824783325,
+   0.8704205751419067,
+   0.8849623203277588,
+   0.898777961730957,
+   0.9624338746070862,
+   1
+  ],
+  "S2C sound_effect.volume": [
+   0.15000000596046448,
+   0.20761564373970032,
+   0.2959291636943817,
+   0.33123740553855896,
+   0.3315461575984955,
+   0.3321641981601715,
+   1,
+   3
+  ]
+ },
+ "continuous_fields": [
+  "C2S look.pitch",
+  "C2S look.yaw",
+  "C2S position.x",
+  "C2S position.y",
+  "C2S position.z",
+  "C2S position_look.pitch",
+  "C2S position_look.x",
+  "C2S position_look.y",
+  "C2S position_look.yaw",
+  "C2S position_look.z",
+  "C2S use_item.rotation.x",
+  "C2S use_item.rotation.y",
+  "S2C entity_teleport.x",
+  "S2C entity_teleport.y",
+  "S2C entity_teleport.z",
+  "S2C entity_update_attributes.properties[player.block_interaction_range].value",
+  "S2C spawn_entity.x",
+  "S2C spawn_entity.y",
+  "S2C spawn_entity.z"
+ ],
+ "metadata_table": [
+  {
+   "entity_type": "self",
+   "index": 9,
+   "serializers": {
+    "float": 1
+   }
+  },
+  {
+   "entity_type": "self",
+   "index": 17,
+   "serializers": {
+    "byte": 1
+   }
+  },
+  {
+   "entity_type": "77",
+   "index": 9,
+   "serializers": {
+    "float": 25
+   }
+  },
+  {
+   "entity_type": "33",
+   "index": 9,
+   "serializers": {
+    "float": 10
+   }
+  },
+  {
+   "entity_type": "124",
+   "index": 9,
+   "serializers": {
+    "float": 179
+   }
+  },
+  {
+   "entity_type": "124",
+   "index": 15,
+   "serializers": {
+    "byte": 9
+   }
+  },
+  {
+   "entity_type": "23",
+   "index": 9,
+   "serializers": {
+    "float": 169
+   }
+  },
+  {
+   "entity_type": "48",
+   "index": 9,
+   "serializers": {
+    "float": 47
+   }
+  },
+  {
+   "entity_type": "48",
+   "index": 15,
+   "serializers": {
+    "byte": 3
+   }
+  },
+  {
+   "entity_type": "100",
+   "index": 9,
+   "serializers": {
+    "float": 79
+   }
+  },
+  {
+   "entity_type": "23",
+   "index": 15,
+   "serializers": {
+    "byte": 16
+   }
+  },
+  {
+   "entity_type": "58",
+   "index": 8,
+   "serializers": {
+    "item_stack": 21
+   }
+  },
+  {
+   "entity_type": "101",
+   "index": 9,
+   "serializers": {
+    "float": 20
+   }
+  },
+  {
+   "entity_type": "7",
+   "index": 5,
+   "serializers": {
+    "boolean": 14
+   }
+  },
+  {
+   "entity_type": "7",
+   "index": 9,
+   "serializers": {
+    "float": 14
+   }
+  },
+  {
+   "entity_type": "6",
+   "index": 9,
+   "serializers": {
+    "float": 170
+   }
+  },
+  {
+   "entity_type": "6",
+   "index": 16,
+   "serializers": {
+    "byte": 231
+   }
+  },
+  {
+   "entity_type": "91",
+   "index": 9,
+   "serializers": {
+    "float": 159
+   }
+  },
+  {
+   "entity_type": "91",
+   "index": 15,
+   "serializers": {
+    "byte": 8
+   }
+  },
+  {
+   "entity_type": "86",
+   "index": 9,
+   "serializers": {
+    "float": 13
+   }
+  },
+  {
+   "entity_type": "101",
+   "index": 15,
+   "serializers": {
+    "byte": 3
+   }
+  },
+  {
+   "entity_type": "100",
+   "index": 15,
+   "serializers": {
+    "byte": 5
+   }
+  },
+  {
+   "entity_type": "48",
+   "index": 1,
+   "serializers": {
+    "int": 586
+   }
+  },
+  {
+   "entity_type": "124",
+   "index": 16,
+   "serializers": {
+    "boolean": 6
+   }
+  },
+  {
+   "entity_type": "6",
+   "index": 15,
+   "serializers": {
+    "byte": 11
+   }
+  },
+  {
+   "entity_type": "118",
+   "index": 9,
+   "serializers": {
+    "float": 5
+   }
+  },
+  {
+   "entity_type": "100",
+   "index": 16,
+   "serializers": {
+    "byte": 15
+   }
+  },
+  {
+   "entity_type": "111",
+   "index": 9,
+   "serializers": {
+    "float": 11
+   }
+  },
+  {
+   "entity_type": "111",
+   "index": 17,
+   "serializers": {
+    "block_pos": 11
+   }
+  },
+  {
+   "entity_type": "19",
+   "index": 9,
+   "serializers": {
+    "float": 31
+   }
+  },
+  {
+   "entity_type": "19",
+   "index": 16,
+   "serializers": {
+    "boolean": 4
+   }
+  },
+  {
+   "entity_type": "124",
+   "index": 0,
+   "serializers": {
+    "byte": 1
+   }
+  },
+  {
+   "entity_type": "self",
+   "index": 0,
+   "serializers": {
+    "byte": 69
+   }
+  },
+  {
+   "entity_type": "86",
+   "index": 1,
+   "serializers": {
+    "int": 3
+   }
+  },
+  {
+   "entity_type": "124",
+   "index": 6,
+   "serializers": {
+    "pose": 1
+   }
+  },
+  {
+   "entity_type": "48",
+   "index": 6,
+   "serializers": {
+    "pose": 2
+   }
+  },
+  {
+   "entity_type": "6",
+   "index": 0,
+   "serializers": {
+    "byte": 1
+   }
+  },
+  {
+   "entity_type": "self",
+   "index": 6,
+   "serializers": {
+    "pose": 10
+   }
+  },
+  {
+   "entity_type": "41",
+   "index": 8,
+   "serializers": {
+    "item_stack": 32
+   }
+  },
+  {
+   "entity_type": "41",
+   "index": 9,
+   "serializers": {
+    "optional_unsigned_int": 32
+   }
+  },
+  {
+   "entity_type": "22",
+   "index": 9,
+   "serializers": {
+    "float": 7
+   }
+  },
+  {
+   "entity_type": "126",
+   "index": 9,
+   "serializers": {
+    "float": 2
+   }
+  },
+  {
+   "entity_type": "126",
+   "index": 20,
+   "serializers": {
+    "villager_data": 2
+   }
+  },
+  {
+   "entity_type": "27",
+   "index": 9,
+   "serializers": {
+    "float": 2
+   }
+  },
+  {
+   "entity_type": "87",
+   "index": 9,
+   "serializers": {
+    "float": 5
+   }
+  },
+  {
+   "entity_type": "118",
+   "index": 15,
+   "serializers": {
+    "byte": 2
+   }
+  },
+  {
+   "entity_type": "77",
+   "index": 15,
+   "serializers": {
+    "byte": 1
+   }
+  },
+  {
+   "entity_type": "7",
+   "index": 17,
+   "serializers": {
+    "byte": 3
+   }
+  },
+  {
+   "entity_type": "6",
+   "index": 1,
+   "serializers": {
+    "int": 174
+   }
+  },
+  {
+   "entity_type": "87",
+   "index": 17,
+   "serializers": {
+    "byte": 1
+   }
+  },
+  {
+   "entity_type": "20",
+   "index": 9,
+   "serializers": {
+    "float": 68
+   }
+  },
+  {
+   "entity_type": "122",
+   "index": 9,
+   "serializers": {
+    "float": 4
+   }
+  },
+  {
+   "entity_type": "122",
+   "index": 22,
+   "serializers": {
+    "wolf_variant": 4
+   }
+  }
+ ],
+ "update_time": [
+  {
+   "file": "session_EmeraldIngot64_1793047664217.parsed.jsonl",
+   "packets": 60,
+   "median_gap_ms": 1000.0885600000001,
+   "age_delta_top": [
+    [
+     20,
+     58
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   "regular": 59,
+   "locked": 0,
+   "jumps": 0,
+   "jump_examples": []
+  }
+ ]
+}
