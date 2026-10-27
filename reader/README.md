@@ -29,6 +29,17 @@ for example range culling).
     TEXT    chat actionbar title subtitle titletimes tab death bossbar objective score team
     GLOBAL  health food xp_bar xp_level rain thunder gamemode timeset timelock
 
+The reader also emits engine conditioning rows for the actual player's mode and permissions:
+`GLOBAL g:gamemode v0|v1|v2|v3` (Survival, Creative, Adventure, Spectator),
+`GLOBAL g:abilities v<wire flags> fly:<float32 speed> walk:<float32 speed>`, and
+`GLOBAL g:op_level v0..v4`. Login/respawn supply mode, server abilities supply flags and speeds,
+and player entity statuses 24..28 supply permission level. Missing information stays unknown.
+These snapshots wait for the first known player position and repeat every 40 ticks or on change,
+so initial context survives dataset filtering and later context windows. They carry `io: 'eng'`
+and no prediction loss. Engine mode snapshots compile to no packets; abilities and permission
+rows never compile to packets even if produced by a model. Later observed `change_game_mode`
+events retain their existing model output rows and packet compiler.
+
 Handlers live in `handlers/` by family (entity, world, inventory, text) and are mixed into `Reader`. Text is
 never English tokens: strings become templates with numbers and player names cut out (`component.js`), and open
 text the model only repeats is an opaque span.

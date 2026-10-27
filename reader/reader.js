@@ -14,7 +14,7 @@ const { createCodec } = require('./parse');
 const { createCatalog } = require('./catalog');
 const Q = require('./quant');
 const crypto = require('crypto');
-const { intTokens, clampStr } = require('./tokens');
+const { intTokens, floatToken, clampStr } = require('./tokens');
 const { flatten, template, simplify } = require('./component');
 const { dataTokens } = require('./objectdata');
 const { WorldStore } = require('./world');
@@ -108,7 +108,8 @@ class Reader {
             globals: { health: null, food: null },
             clock: { age: 0n, time: 0n },
             viewDistance: null,
-            opLevel: 0,
+            opLevel: null, // unknown until the server sends player status 24..28
+            playerContextAt: null,
             selectedSlot: 0,
             center: null,
             loadedChunks: new Set(),
@@ -138,6 +139,7 @@ class Reader {
             metaTouched: new Set(), // entity ids whose metadata or equipment changed
             spans: [], // open text copied from input, indexed by span token
             globals: {},
+            contextChanged: false,
             sync: null, // {from:[x,y,z]} when the server moved the player
             playerStart: { ...this.S.player },
         };
@@ -233,10 +235,24 @@ class Reader {
         const S = this.S;
         S.playerId = d.entityId;
         S.viewDistance = d.viewDistance;
+        this._observeGameMode(d.worldState?.gamemode ?? d.gameMode);
         const e = this._newEntity(d.entityId, 'player', null, 0, 0, 0, 0, 0);
         e.isPlayer = true;
         e.slot = 0;
         S.slotToId[0] = e.id;
+    }
+
+    // Login/respawn context is supplied by the real engine, rather than a model target.
+    _observeGameMode(value) {
+        const modes = ['survival', 'creative', 'adventure', 'spectator'];
+        const mode = typeof value === 'string' ? modes.indexOf(value) : value;
+        if (!Number.isInteger(mode) || mode < 0 || mode > 3) return;
+        if (this.S.globals.gamemode !== mode) this.T.contextChanged = true;
+        this.S.globals.gamemode = mode;
+    }
+
+    s2c_respawn(d) {
+        this._observeGameMode(d.worldState?.gamemode ?? d.gameMode);
     }
 
     _newEntity(id, type, uuid, x, y, z, yaw, pitch) {
@@ -764,6 +780,19 @@ class Reader {
             this.clockNext = null;
         }
 
+        // Hold initial context until position is known: dataset export omits pre-position ticks.
+        // Repeat it within the context window, and whenever authoritative engine state changes.
+        if (P.known && (S.playerContextAt === null || this.tick - S.playerContextAt >= 40 || T.contextChanged)) {
+            const context = (field, tokens) => push({ row: 'GLOBAL', io: 'eng', field, tokens: ['GLOBAL', `g:${field}`, ...tokens] });
+            if (S.globals.gamemode !== undefined) context('gamemode', intTokens('v', S.globals.gamemode));
+            if (S.opLevel !== null) context('op_level', intTokens('v', S.opLevel));
+            if (S.abilities) {
+                const a = S.abilities;
+                context('abilities', [...intTokens('v', a.flags), ...floatToken('fly', a.flyingSpeed), ...floatToken('walk', a.walkingSpeed)]);
+            }
+            S.playerContextAt = this.tick;
+        }
+
         // Context rows (engine rows): the neighbors of what changed, and of what the player dug or placed. What a
         // change leaves around it is what decides the next one (leaves after a log, wire after a lever).
         if (P.known) {
@@ -840,6 +869,8 @@ class Reader {
         // Globals.
         for (const [field, v] of Object.entries(T.globals)) {
             S.globals[field] = v;
+            // A model-owned game mode change becomes engine context on the following tick.
+            if (field === 'gamemode') S.playerContextAt = null;
             push({ row: 'GLOBAL', io: 'out', field, value: v, tokens: ['GLOBAL', `g:${field}`, ...intTokens('v', v)] });
         }
 

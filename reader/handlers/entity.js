@@ -147,7 +147,12 @@ module.exports = {
     s2c_entity_status(d) {
         if (d.entityId === this.S.playerId) {
             // Player-only statuses that are the engine's: permission level (24-28) and reduced debug info (22, 23)
-            if (d.entityStatus >= 24 && d.entityStatus <= 28) return void (this.S.opLevel = d.entityStatus - 24);
+            if (d.entityStatus >= 24 && d.entityStatus <= 28) {
+                const level = d.entityStatus - 24;
+                if (this.S.opLevel !== level) this.T.contextChanged = true;
+                this.S.opLevel = level;
+                return;
+            }
             if (d.entityStatus === 22 || d.entityStatus === 23) return void (this.S.reducedDebug = d.entityStatus === 22);
         }
         const kind = { 2: 'HURT', 3: 'DEATH' }[d.entityStatus];
@@ -177,7 +182,9 @@ module.exports = {
     },
 
     s2c_abilities(d) {
-        this.S.abilities = d;
+        const old = this.S.abilities;
+        if (!old || ['flags', 'flyingSpeed', 'walkingSpeed'].some((key) => old[key] !== d[key])) this.T.contextChanged = true;
+        this.S.abilities = { ...d };
     },
 
     s2c_held_item_slot(d) {

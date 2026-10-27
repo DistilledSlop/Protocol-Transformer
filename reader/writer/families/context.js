@@ -12,7 +12,8 @@ const rest = (c) => {
 const none = () => {};
 
 module.exports = {
-    parse: { 'BLOCK NEAR': (c) => ({ near: rest(c) }), 'GLOBAL ground': (c) => ({ heights: rest(c) }), 'GLOBAL clock': (c) => ({ clock: rest(c) }) },
-    compile: { 'BLOCK NEAR': none, 'GLOBAL ground': none, 'GLOBAL clock': none },
+    parse: { 'BLOCK NEAR': (c) => ({ near: rest(c) }), 'GLOBAL ground': (c) => ({ heights: rest(c) }), 'GLOBAL clock': (c) => ({ clock: rest(c) }),
+        'GLOBAL abilities': (c) => ({ abilities: rest(c) }), 'GLOBAL op_level': (c) => ({ level: rest(c) }) },
+    compile: { 'BLOCK NEAR': none, 'GLOBAL ground': none, 'GLOBAL clock': none, 'GLOBAL abilities': none, 'GLOBAL op_level': none },
     finish: [],
 };

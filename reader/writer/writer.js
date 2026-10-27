@@ -95,6 +95,9 @@ class Writer {
                 this._reject(e.message.replace(/ -?\d+.*$/, '').slice(0, 60));
                 continue;
             }
+            // Initial/periodic mode snapshots condition the model; replaying one must never change mode.
+            // Model-owned OUT gamemode changes retain their existing packet compiler.
+            if (r.io === 'eng' && p.row === 'GLOBAL' && p.field === 'gamemode') continue;
             const key = `${p.row} ${p.kind}`;
             const fn = COMPILE.get(key) ?? COMPILE.get(`${p.row} *`);
             if (!fn) {
