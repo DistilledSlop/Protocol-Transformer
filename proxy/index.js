@@ -1,6 +1,7 @@
 const mc = require('minecraft-protocol');
 const fs = require('fs');
 const path = require('path');
+const { randomUUID } = require('crypto');
 const { createRecorder } = require('./recorder');
 const sanitize = require('./sanitize');
 const states = mc.states;
@@ -18,19 +19,37 @@ const SHOW_PARSE_ERRORS = process.env.SHOW_PARSE_ERRORS === '1';
 // Packet names whose parsed JSON is huge and already covered by the raw bytes. Adjust to the names in your logs.
 const SKIP_PARSED = new Set(['map_chunk', 'update_light']);
 
-const DATA_DIR = path.join(__dirname, 'data');
-if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR);
-}
+const DATA_DIR = path.resolve(process.env.CAPTURE_DIR || path.join(__dirname, 'data'));
+fs.mkdirSync(DATA_DIR, { recursive: true });
+const positiveLimit = (name, fallback) => {
+    const n = Number(process.env[name] || fallback);
+    if (!Number.isSafeInteger(n) || n < 1) throw new Error(`${name} must be a positive safe integer`);
+    return n;
+};
+const MAX_QUEUED_BYTES = positiveLimit('RECORDER_MAX_QUEUED_BYTES', 8 * 1024 * 1024);
+const MAX_CAPTURE_BYTES = positiveLimit('RECORDER_MAX_BYTES', 1024 * 1024 * 1024);
+const MAX_FORWARD_QUEUE = positiveLimit('PROXY_MAX_QUEUE_BYTES', 8 * 1024 * 1024);
 
-// Flush all open sessions on Ctrl+C so the tail of a capture is not lost.
+// Container termination must drain recorders after closing both network legs.
 const openRecorders = new Set();
-process.on('SIGINT', () => {
-    Promise.all([...openRecorders].map((r) => r.close())).then(() => process.exit(0));
-});
+const sessions = new Set();
+let shuttingDown = false;
+async function shutdown(code = 0) {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    const deadline = setTimeout(() => process.exit(1), 10000);
+    server.close();
+    for (const stop of sessions) stop();
+    const results = await Promise.allSettled([...openRecorders].map((r) => r.close()));
+    clearTimeout(deadline);
+    process.exit(results.some((r) => r.status === 'rejected') ? 1 : code);
+}
+process.on('SIGINT', () => shutdown());
+process.on('SIGTERM', () => shutdown());
 
 const server = mc.createServer({
     'online-mode': false,
+    host: process.env.PROXY_HOST || '127.0.0.1',
     port: PROXY_PORT,
     version: VERSION,
     keepAlive: false,
@@ -40,13 +59,23 @@ const server = mc.createServer({
 console.log(`Offline Proxy (${VERSION}) listening on port ${PROXY_PORT} -> ${TARGET_HOST}:${TARGET_PORT}`);
 
 server.on('login', (incomingClient) => {
+    if (shuttingDown) return incomingClient.end('Proxy shutting down');
     console.log(`[Proxy] ${incomingClient.username} logging in...`);
 
-    const base = path.join(DATA_DIR, `session_${incomingClient.username}_${Date.now()}`);
-    const rec = createRecorder(base, { logParsed: LOG_PARSED, skipParsed: SKIP_PARSED });
+    const base = path.join(DATA_DIR, `session_${incomingClient.username.replace(/[^A-Za-z0-9_-]/g, '_')}_${Date.now()}_${randomUUID()}`);
+    const rec = createRecorder(base, {
+        logParsed: LOG_PARSED, skipParsed: SKIP_PARSED,
+        maxQueuedBytes: MAX_QUEUED_BYTES, maxBytes: MAX_CAPTURE_BYTES,
+        onError: (error) => {
+            console.error('[Recorder Error]', error.message);
+            shutdown(1);
+        },
+    });
     openRecorders.add(rec);
     rec.header({
         version: VERSION,
+        runId: process.env.CAPTURE_RUN_ID || null,
+        captureScope: 'login terminated on each leg; configuration and play forwarded; handshake/status not recorded',
         target: `${TARGET_HOST}:${TARGET_PORT}`,
         username: incomingClient.username,
     });
@@ -59,9 +88,13 @@ server.on('login', (incomingClient) => {
         closing = true;
         rec.close().then(({ bytes, summary }) => {
             openRecorders.delete(rec);
+            sessions.delete(stopSession);
             if (repairs.size) console.log(`[Proxy] repaired malformed server packets for the client: ${JSON.stringify([...repairs])} (the reader repairs the same in a capture)`);
             console.log(`[Recorder] Closed ${base} (${bytes} raw bytes). Packets by direction/state/name:`);
             for (const [key, n] of summary) console.log(`  ${String(n).padStart(8)}  ${key}`);
+        }).catch((error) => {
+            console.error('[Recorder close failed]', error.message);
+            shutdown(1);
         });
     };
 
@@ -104,6 +137,20 @@ server.on('login', (incomingClient) => {
         }
     };
 
+    const stopSession = () => {
+        incomingClient.end('Proxy stopping');
+        targetClient.end('Proxy stopping');
+        closeRecorder();
+    };
+    sessions.add(stopSession);
+    // Configuration queues must not grow without bound if one leg never becomes ready.
+    const enqueue = (queue, buffer) => {
+        const bytes = [...toTargetQueue, ...toIncomingQueue].reduce((n, b) => n + b.length, 0);
+        if (bytes + buffer.length > MAX_FORWARD_QUEUE) {
+            rec.count('forward queue overflow');
+            shutdown(1);
+        } else queue.push(buffer);
+    };
     stripTargetAutoResponders();
     targetClient.on('success', stripTargetAutoResponders);
 
@@ -124,7 +171,7 @@ server.on('login', (incomingClient) => {
     //    target leg's login packets show up here.
     // ==========================================================================
     incomingClient.on('raw', (buffer, meta) => {
-        rec.raw('C2S', meta, buffer);
+        if (!rec.raw('C2S', meta, buffer)) return;
         if (endedTarget) return;
 
         if (meta.state === states.CONFIGURATION || meta.state === states.PLAY) {
@@ -133,7 +180,7 @@ server.on('login', (incomingClient) => {
             if (targetClient.state === meta.state) {
                 targetClient.writeRaw(buffer);
             } else if (meta.state === states.CONFIGURATION) {
-                toTargetQueue.push(buffer);
+                enqueue(toTargetQueue, buffer);
             } else {
                 rec.count(`dropped C2S ${meta.state} ${meta.name}`);
             }
@@ -152,7 +199,7 @@ server.on('login', (incomingClient) => {
     });
 
     targetClient.on('raw', (buffer, meta) => {
-        rec.raw('S2C', meta, buffer);
+        if (!rec.raw('S2C', meta, buffer)) return;
         if (endedIncoming) return;
 
         if (meta.state === states.CONFIGURATION || meta.state === states.PLAY) {
@@ -160,7 +207,7 @@ server.on('login', (incomingClient) => {
                 // recorded above as received; the client gets it repaired if the library damaged it on the way in (see sanitize.js)
                 incomingClient.writeRaw(meta.state === states.PLAY ? sanitize.forServer(meta.name, buffer, repairs) : buffer);
             } else if (meta.state === states.CONFIGURATION) {
-                toIncomingQueue.push(buffer);
+                enqueue(toIncomingQueue, buffer);
             } else {
                 rec.count(`dropped S2C ${meta.state} ${meta.name}`);
             }
@@ -209,3 +256,4 @@ server.on('login', (incomingClient) => {
         closeRecorder();
     });
 });
+server.on('error', (error) => { console.error('[Proxy Server Error]', error.message); shutdown(1); });
