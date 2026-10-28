@@ -4,7 +4,7 @@
 #
 # Every capture is training data except the held-out ones. Hold out two (a long one and a short one):
 # validation on a single session is noisy, and the best checkpoint is picked on it.
-VAL="EmeraldIngot64_1793056989898 EmeraldIngot64_1793060710488"
+VAL=${VAL:-"EmeraldIngot64_1793056989898 EmeraldIngot64_1793060710488"}
 OUT=${OUT:-dataset}
 
 cd "$(dirname "$0")"

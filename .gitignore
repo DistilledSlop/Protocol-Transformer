@@ -1,14 +1,42 @@
+# Dependencies and Python caches
 node_modules/
-__pycache__/
 .venv/
-proxy/data/
-data/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Captures and generated datasets. Keep reader/dataset/ source tracked.
+/proxy/data/
+/data/
+/dataset/
+/proxy/packets.jsonl
 *.bin
 *.parsed.jsonl
-proxy/packets.jsonl
-train/checkpoints/
-train/runs/
+*.ticks.jsonl
+*.terrain.u8
+
+# Model weights, checkpoints, and training output (at any depth)
+weights/
+checkpoints/
+runs/
+wandb/
 *.pt
 *.pth
 *.safetensors
+*.ckpt
+*.onnx
+*.gguf
+*.ggml
+*.h5
+*.hdf5
+*.weights
+
+# Local configuration, logs, and editor files
+.env
+.env.*
+!.env.example
+*.log
 .DS_Store
+.idea/
+.vscode/
