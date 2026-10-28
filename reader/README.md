@@ -197,7 +197,7 @@ The day cycle is the engine's; the model only makes one-off changes. `engine/mod
 
 ## Building the dataset (dataset.js build)
 
-`bash preprocess.sh` runs `dataset.js build`: every session and every turned copy is tokenized once, in parallel (cores - 2, at most 12),
+`bash preprocess.sh` runs `dataset.js build`: every session and every turned copy is tokenized once, in parallel (available CPUs minus two, limited by free memory),
 into `dataset/.cache`; the vocabulary is counted from the cached token rows of the training sessions; then each is encoded with it. A
 cached session is reused until its capture or any file under `reader/` (and `reader/dataset/`) changes, so adding a recording costs
-that recording only. Output is byte-identical to the older `vocab` and `export` commands. With 21 captures: 19 s cold, 1.3 s when nothing changed.
+that recording only. Output is byte-identical to the older `vocab` and `export` commands. The `--jobs N` option overrides the automatic worker count for both tokenization and encoding. The automatic budget reserves 30% of free memory and estimates each tokenization worker at 512 MiB plus four times the largest capture and index. Token and terrain writes are buffered in bounded batches; encoding streams cached rows in parallel while keeping manifest order deterministic. Each worker still loads its entire capture in memory, so choose a lower `--jobs` if other workloads need that memory. A changed vocabulary still requires all sessions to be encoded again.

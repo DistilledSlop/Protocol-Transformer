@@ -20,14 +20,47 @@ const os = require('os');
 const crypto = require('crypto');
 const { fork } = require('child_process');
 const path = require('path');
-const { loadCapture, events } = require('../capture');
-const { estimatePhase } = require('../phase');
-const { Reader, TERRAIN_EVERY, TERRAIN_SIDE } = require('../reader');
+const readline = require('readline');
+// Encoding does not need the heavy protocol codecs and registries.
+const encodingOnly = process.argv[2] === 'encode-worker';
+const { loadCapture, events } = encodingOnly ? {} : require('../capture');
+const { estimatePhase } = encodingOnly ? {} : require('../phase');
+const { Reader, TERRAIN_EVERY, TERRAIN_SIDE } = encodingOnly ? {} : require('../reader');
 const V = require('./vocab');
-const { createAugmenter } = require('../augment');
-const { TimeSynth } = require('../synth');
+const { createAugmenter } = encodingOnly ? {} : require('../augment');
+const { TimeSynth } = encodingOnly ? {} : require('../synth');
 
 const IO_CODE = { in: 0, out: 1, eng: 2 };
+
+// Account for a container memory limit when Linux reports host-wide free memory.
+function availableMemory() {
+    let free = os.freemem();
+    try {
+        const limit = Number(fs.readFileSync('/sys/fs/cgroup/memory.max', 'utf8').trim());
+        const used = Number(fs.readFileSync('/sys/fs/cgroup/memory.current', 'utf8').trim());
+        if (Number.isFinite(limit) && Number.isFinite(used)) free = Math.min(free, Math.max(0, limit - used));
+    } catch (_) { /* non-cgroup or cgroup v1: use OS free memory */ }
+    return free;
+}
+
+// Synchronous batched writes keep memory bounded even when tokenization outpaces disk.
+class BufferedWriter {
+    constructor(file) { this.fd = fs.openSync(file, 'w'); this.parts = []; this.size = 0; }
+    write(data) {
+        const b = Buffer.isBuffer(data) ? data : Buffer.from(data);
+        this.parts.push(b); this.size += b.length;
+        if (this.size >= 256 * 1024) this.flush();
+    }
+    flush() {
+        if (!this.size) return;
+        const b = Buffer.concat(this.parts, this.size);
+        let pos = 0;
+        while (pos < b.length) pos += fs.writeSync(this.fd, b, pos, b.length - pos);
+        this.parts = []; this.size = 0;
+    }
+    end() { this.flush(); fs.closeSync(this.fd); }
+}
+
 
 function arg(name, def) {
     const i = process.argv.indexOf(name);
@@ -159,8 +192,8 @@ if (cmd === 'vocab') {
         const name = copyName(base, k);
         const cache = path.join(outDir, '.cache');
         fs.mkdirSync(cache, { recursive: true });
-        const tokens = fs.createWriteStream(path.join(cache, `${name}.tokens.jsonl`));
-        const terrainFile = fs.createWriteStream(path.join(outDir, `${name}.terrain.u8`));
+        const tokens = new BufferedWriter(path.join(cache, `${name}.tokens.jsonl`));
+        const terrainFile = new BufferedWriter(path.join(outDir, `${name}.terrain.u8`));
         const counts = {};
         const rows = { in: 0, out: 0, eng: 0 };
         let first = null;
@@ -193,7 +226,8 @@ if (cmd === 'vocab') {
             });
             tokens.write(JSON.stringify({ t: tk.tick, r }) + '\n');
         }
-        await Promise.all([tokens, terrainFile].map((f) => new Promise((res) => f.end(res))));
+        tokens.end();
+        terrainFile.end();
         const meta = {
             key: arg('--key'), name, phase, firstTick: first, lastTick: last, ticks: last - first + 1, ticksWithRows: withRows, rows, counts,
             terrain: { file: `${name}.terrain.u8`, firstTick: terrainFirst, every: TERRAIN_EVERY, side: TERRAIN_SIDE, patches: terrainCount },
@@ -203,17 +237,44 @@ if (cmd === 'vocab') {
         console.error(e);
         process.exit(1);
     });
+} else if (cmd === 'encode-worker') {
+    (async () => {
+        const name = arg('--name');
+        const vocab = V.load(JSON.parse(fs.readFileSync(path.join(outDir, 'vocab.json'), 'utf8')));
+        const stats = { unk: new Map() };
+        const out = new BufferedWriter(path.join(outDir, `${name}.ticks.jsonl`));
+        const input = fs.createReadStream(path.join(outDir, '.cache', `${name}.tokens.jsonl`));
+        const lines = readline.createInterface({ input, crlfDelay: Infinity });
+        input.on('error', (error) => lines.emit('error', error));
+        for await (const line of lines) {
+            if (!line) continue;
+            const rec = JSON.parse(line);
+            out.write(JSON.stringify({ t: rec.t, r: rec.r.map((row) => [row[0], ...V.encode(row.slice(1), vocab, stats)]) }) + '\n');
+        }
+        out.end();
+        const unk = [...stats.unk.values()].reduce((a, b) => a + b, 0);
+        if (process.send) process.send({ unk, topUnk: [...stats.unk].sort((a, b) => b[1] - a[1]).slice(0, 8) });
+    })().catch((e) => { console.error(e); process.exitCode = 1; });
 } else if (cmd === 'build') {
     (async () => {
         const augment = +arg('--augment', 0);
         const val = (arg('--val', '') || '').split(',').filter(Boolean);
-        const pool = +arg('--jobs', Math.max(1, Math.min(os.cpus().length - 2, 12)));
+
         const jobs = [
             ...sessions().flatMap((base) => copies(augment).map((k) => ({ base, k, train: true }))),
             ...val.map((base) => ({ base, k: 0, train: false })),
         ];
         const cache = path.join(outDir, '.cache');
         fs.mkdirSync(cache, { recursive: true });
+        const names = jobs.map((j) => copyName(j.base, j.k));
+        if (new Set(names).size !== names.length) throw new Error('session names must be unique, including training and validation copies');
+        // Capture parsing loads the binary and index in memory. Budget four times the
+        // largest input plus 512 MiB per worker, leaving 30% of free memory for the OS.
+        const largest = Math.max(0, ...jobs.map((j) => fs.statSync(j.base + '.bin').size + fs.statSync(j.base + '.jsonl').size));
+        const cpus = typeof os.availableParallelism === 'function' ? os.availableParallelism() : os.cpus().length;
+        const automatic = Math.max(1, Math.min(Math.max(1, cpus - 2), Math.floor(availableMemory() * 0.7 / (512 * 1024 * 1024 + 4 * largest))));
+        const pool = +arg('--jobs', automatic);
+        if (!Number.isSafeInteger(pool) || pool < 1) throw new Error('--jobs must be a positive integer');
 
         // what a tokenized session depends on: the capture and the reader code
         const code = crypto.createHash('sha1');
@@ -235,21 +296,45 @@ if (cmd === 'vocab') {
         }
         const stale = jobs.filter((j) => !j.fresh);
         console.log(`${jobs.length} sessions and turned copies: ${jobs.length - stale.length} unchanged, ${stale.length} to tokenize on ${Math.min(pool, stale.length)} processes`);
+        // Abort outstanding workers on the first error, so none keep writing after failure.
+        const children = new Set();
+        const runChild = (args, result = false) => new Promise((resolve, reject) => {
+            const c = fork(__filename, args, { stdio: result ? ['ignore', 'inherit', 'inherit', 'ipc'] : 'inherit' });
+            children.add(c);
+            let message;
+            if (result) c.on('message', (m) => { message = m; });
+            c.on('error', reject);
+            c.on('exit', (code, signal) => {
+                children.delete(c);
+                if (code === 0 && (!result || message)) resolve(message);
+                else reject(new Error(`worker failed (${signal || code})`));
+            });
+        });
+        let aborted = false;
+        const runPool = async (count, task) => {
+            const tasks = Array.from({ length: count }, task);
+            try { await Promise.all(tasks); }
+            catch (e) {
+                aborted = true;
+                for (const c of children) c.kill();
+                await Promise.allSettled(tasks);
+                throw e;
+            }
+        };
         let next = 0;
         let done = 0;
         const t0 = Date.now();
         const worker = async () => {
-            while (next < stale.length) {
+            while (!aborted && next < stale.length) {
                 const j = stale[next++];
-                await new Promise((res, rej) => {
-                    const c = fork(__filename, ['worker', '--out', outDir, '--base', j.base, '--k', String(j.k), '--key', j.key, ...(j.train ? ['--synth'] : [])], { stdio: 'inherit' });
-                    c.on('exit', (code) => (code === 0 ? res() : rej(new Error(`tokenizing ${j.name} failed (${code})`))));
-                });
+                // Invalidate before overwriting, so an interrupted rewrite cannot look fresh.
+                fs.rmSync(path.join(cache, `${j.name}.meta.json`), { force: true });
+                await runChild(['worker', '--out', outDir, '--base', j.base, '--k', String(j.k), '--key', j.key, ...(j.train ? ['--synth'] : [])]);
                 done++;
                 if (done % 10 === 0 || done === stale.length) console.log(`  ${done}/${stale.length} tokenized (${((Date.now() - t0) / 1000).toFixed(0)} s)`);
             }
         };
-        await Promise.all(Array.from({ length: Math.min(pool, stale.length) }, worker));
+        await runPool(Math.min(pool, stale.length), worker);
 
         // vocabulary from the training sessions only, then every session encoded with it
         const metas = jobs.map((j) => JSON.parse(fs.readFileSync(path.join(cache, `${j.name}.meta.json`), 'utf8')));
@@ -260,21 +345,19 @@ if (cmd === 'vocab') {
         const v = V.build(counts, { minCount: +arg('--min-count', 1) });
         fs.writeFileSync(path.join(outDir, 'vocab.json'), JSON.stringify({ tokens: v.tokens, structural: v.structural, sessions: jobs.filter((j) => j.train).map((j) => j.name) }));
         console.log(`vocabulary: ${v.tokens.length} tokens (${v.structural} structural, ${v.tokens.length - v.structural} learned from ${counts.size} distinct tokens seen)`);
-        const vocab = V.load(JSON.parse(fs.readFileSync(path.join(outDir, 'vocab.json'), 'utf8')));
-        const manifest = { vocab: path.resolve(path.join(outDir, 'vocab.json')), sessions: [] };
-        for (const [i, j] of jobs.entries()) {
-            const m = metas[i];
-            const stats = { unk: new Map() };
-            const out = fs.createWriteStream(path.join(outDir, `${j.name}.ticks.jsonl`));
-            for (const line of fs.readFileSync(path.join(cache, `${j.name}.tokens.jsonl`), 'utf8').split('\n')) {
-                if (!line) continue;
-                const rec = JSON.parse(line);
-                out.write(JSON.stringify({ t: rec.t, r: rec.r.map((row) => [row[0], ...V.encode(row.slice(1), vocab, stats)]) }) + '\n');
+        const manifest = { vocab: path.resolve(path.join(outDir, 'vocab.json')), sessions: new Array(jobs.length) };
+        let encodeNext = 0;
+        console.log(`encoding ${jobs.length} sessions on ${Math.min(pool, jobs.length)} processes`);
+        const encodeWorker = async () => {
+            while (!aborted && encodeNext < jobs.length) {
+                const i = encodeNext++;
+                const j = jobs[i];
+                const result = await runChild(['encode-worker', '--out', outDir, '--name', j.name], true);
+                const m = metas[i];
+                manifest.sessions[i] = { name: j.name, phase: m.phase, firstTick: m.firstTick, lastTick: m.lastTick, ticks: m.ticks, ticksWithRows: m.ticksWithRows, rows: m.rows, terrain: m.terrain, unkTokens: result.unk, topUnk: result.topUnk };
             }
-            await new Promise((res) => out.end(res));
-            const unk = [...stats.unk.values()].reduce((a, b) => a + b, 0);
-            manifest.sessions.push({ name: j.name, phase: m.phase, firstTick: m.firstTick, lastTick: m.lastTick, ticks: m.ticks, ticksWithRows: m.ticksWithRows, rows: m.rows, terrain: m.terrain, unkTokens: unk, topUnk: [...stats.unk].sort((a, b) => b[1] - a[1]).slice(0, 8) });
-        }
+        };
+        await runPool(Math.min(pool, jobs.length), encodeWorker);
         fs.writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify(manifest, null, 1));
         // files of sessions that are no longer in the set
         const keep = new Set(jobs.map((j) => j.name));
