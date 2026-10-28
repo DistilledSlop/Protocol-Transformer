@@ -40,3 +40,37 @@ test('build rejects colliding output names before starting workers', (t) => {
     assert.notEqual(result.status, 0);
     assert.match(result.stderr, /session names must be unique/);
 });
+
+test('build collects all encoder results under high concurrency', { timeout: 120000 }, (t) => {
+    const crypto = require('node:crypto');
+    const out = fs.mkdtempSync(path.join(os.tmpdir(), 'dataset-pool-'));
+    t.after(() => fs.rmSync(out, { recursive: true, force: true }));
+    const cache = path.join(out, '.cache');
+    fs.mkdirSync(cache);
+    const readerDir = path.join(__dirname, '..');
+    const code = crypto.createHash('sha1');
+    for (const dir of ['', 'handlers', 'dataset']) {
+        for (const f of fs.readdirSync(path.join(readerDir, dir)).sort()) {
+            if (/\.(js|json|tsv)$/.test(f)) code.update(f).update(fs.readFileSync(path.join(readerDir, dir, f)));
+        }
+    }
+    code.update(fs.readFileSync(path.join(readerDir, 'wiki', 'entity_classes.json')));
+    const codeKey = code.digest('hex');
+    const bases = [];
+    for (let i = 0; i < 128; i++) {
+        const name = `capture-${i}`;
+        const base = path.join(out, name);
+        bases.push(base);
+        for (const ext of ['.bin', '.jsonl']) fs.writeFileSync(base + ext, '');
+        const st = ['.bin', '.jsonl'].map((ext) => fs.statSync(base + ext));
+        const key = crypto.createHash('sha1').update(`${codeKey}|${st.map((x) => `${x.size}:${x.mtimeMs}`)}|0|synth`).digest('hex');
+        fs.writeFileSync(path.join(cache, `${name}.meta.json`), JSON.stringify({ key, name, phase: 0, firstTick: 0, lastTick: 0, ticks: 1, ticksWithRows: 1, rows: { in: 1, out: 0, eng: 0 }, counts: { known: 1 }, terrain: {} }));
+        fs.writeFileSync(path.join(cache, `${name}.tokens.jsonl`), i % 2 ? '' : '{"t":0,"r":[[0,"known"]]}\n');
+        fs.writeFileSync(path.join(out, `${name}.terrain.u8`), '');
+    }
+    const result = spawnSync(process.execPath, [script, 'build', '--out', out, '--jobs', '48', ...bases], { encoding: 'utf8', timeout: 120000 });
+    assert.equal(result.status, 0, result.stderr);
+    const manifest = JSON.parse(fs.readFileSync(path.join(out, 'manifest.json'), 'utf8'));
+    assert.deepEqual(manifest.sessions.map((s) => s.name), bases.map((base) => path.basename(base)));
+    assert.ok(manifest.sessions.every((s) => s.unkTokens === 0));
+});

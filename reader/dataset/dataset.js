@@ -253,7 +253,10 @@ if (cmd === 'vocab') {
         }
         out.end();
         const unk = [...stats.unk.values()].reduce((a, b) => a + b, 0);
-        if (process.send) process.send({ unk, topUnk: [...stats.unk].sort((a, b) => b[1] - a[1]).slice(0, 8) });
+        if (process.send) await new Promise((resolve, reject) => process.send(
+            { unk, topUnk: [...stats.unk].sort((a, b) => b[1] - a[1]).slice(0, 8) },
+            (error) => error ? reject(error) : resolve()
+        ));
     })().catch((e) => { console.error(e); process.exitCode = 1; });
 } else if (cmd === 'build') {
     (async () => {
@@ -304,7 +307,9 @@ if (cmd === 'vocab') {
             let message;
             if (result) c.on('message', (m) => { message = m; });
             c.on('error', reject);
-            c.on('exit', (code, signal) => {
+            // close follows both process exit and IPC channel closure, so all messages
+            // have been delivered before checking the worker's result.
+            c.on('close', (code, signal) => {
                 children.delete(c);
                 if (code === 0 && (!result || message)) resolve(message);
                 else reject(new Error(`worker failed (${signal || code})`));
