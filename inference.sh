@@ -18,7 +18,7 @@ Usage: ./inference.sh [minecraft|serve|replay] [options]
 Default: minecraft. serve reads/writes JSON lines; replay requires --session NAME.
 TRAINING_ROOT, CKPT, DATASET, WORLD, TRAIN_EXTRA and DEVICE select assets and device.
 Minecraft options: HOST, PORT, ALSO, TIME, ENGINE_TIME, GAMEMODE, OP_LEVEL, MODEL_ARGS.
-GAMEMODE defaults to creative; OP_LEVEL defaults to 4. /gamemode works for yourself at level 2 or higher.
+GAMEMODE defaults to survival; OP_LEVEL defaults to 4. /gamemode works for yourself at level 2 or higher.
 Operator status does not implement other vanilla commands; /time is available with ENGINE_TIME.
 HELP
     exit 0

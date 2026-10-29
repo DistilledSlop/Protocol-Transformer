@@ -29,6 +29,7 @@ const { Writer } = require(R('writer/writer'));
 const { build } = require('./schedule');
 const { writerOwns } = require('./ownership');
 const { playerState, isPlayerStatePacket, parseGameModeCommand, addGameModeCommand } = require('./player_state');
+const { inventorySnapshot, playerContextSnapshot } = require('./inventory_snapshot');
 
 function arg(name, def) {
     const i = process.argv.indexOf(name);
@@ -51,7 +52,7 @@ const ALSO = (arg('--also', 'blocks,slots,text,events') || '').split(',').filter
 const MODEL_ARGS = (arg('--model-args', '') || '').split(/\s+/).filter(Boolean);
 const DATASET = arg('--dataset', path.join(__dirname, '..', 'dataset'));
 const JOIN_SPEED = +arg('--join-speed', 4);
-const GAME_MODE = arg('--gamemode', process.env.GAMEMODE || 'creative');
+const GAME_MODE = arg('--gamemode', process.env.GAMEMODE || 'survival');
 const OP_LEVEL = Number(arg('--op-level', process.env.OP_LEVEL ?? '4'));
 try { playerState(GAME_MODE, OP_LEVEL, 0); } catch (e) { console.error(e.message); process.exit(2); }
 // the world clock: keep (as the capture left it, which on a server with the day cycle off is a frozen night), cycle (the day
@@ -140,6 +141,7 @@ class Session {
         this.draining = false;
         this.blocks = { rows: 0, legal: 0, floating: 0, unknown: 0 }; // what the model's block rows do to the world it can't see
         this.stats = { ticks: 0, skipped: 0, rows: 0, packets: 0, encodeErrors: 0, modelErrors: 0, ms: 0, maxMs: 0, acks: 0 };
+        this.interactions = { dig: 0, place: 0, skipped: 0, generatedBlocks: 0, sentBlocks: 0, encodeErrors: 0 };
         this.lastStatus = { at: now(), ticks: 0 };
         this.lastKeepAlive = Date.now();
         this.kaId = 1;
@@ -164,6 +166,8 @@ class Session {
     onClientPacket(data, meta) {
         if (meta.state !== 'play') return;
         if (meta.name === 'keep_alive') this.lastKeepAlive = Date.now();
+        if (this.live && meta.name === 'block_dig') this.interactions.dig++;
+        if (this.live && meta.name === 'block_place') this.interactions.place++;
         // block breaking, placing and item use carry a sequence number the client waits to see acknowledged
         if (['block_dig', 'block_place', 'use_item'].includes(meta.name) && data.sequence !== undefined) {
             this.send(this.codec.encode('S2C', 'acknowledge_player_digging', { sequenceId: data.sequence }));
@@ -222,6 +226,8 @@ class Session {
         this.writer.seedFromReader(this.reader);
         this.startClock();
         await this.model.request({ op: 'reset' });
+        const seeded = await this.model.request({ op: 'tick', in: [], eng: playerContextSnapshot(this.reader), gen: false, feed_out: inventorySnapshot(this.reader) });
+        if (seeded.error) throw new Error(`initial context: ${seeded.error}`);
         this.queue = [];
         this.live = true;
         log(`${this.client.username} is in (${i} join packets). The model is running.`);
@@ -354,7 +360,10 @@ class Session {
         }
         this.stats.ticks++;
         this.tickClock();
-        if (!gen) this.stats.skipped++;
+        if (!gen) {
+            this.stats.skipped++;
+            if (inRows.some((r) => r.kind === 'DIG' || r.kind === 'PLACE')) this.interactions.skipped++;
+        }
         this.stats.ms += resp.ms;
         this.stats.maxMs = Math.max(this.stats.maxMs, resp.ms);
         this.stats.rows += resp.out.length;
@@ -363,6 +372,7 @@ class Session {
         // the engine rows and the model's rows become packets; the input rows never do, and neither do the reader's
         // own readings of packets already sent (io 'out')
         const outRows = resp.out.map((tokens) => ({ io: 'out', tokens }));
+        this.interactions.generatedBlocks += outRows.filter((r) => r.tokens[0] === 'BLOCK' && r.tokens.some((token) => token.startsWith('blk:'))).length;
         this.judgeBlocks(outRows, tk.player);
         const packets = this.writer.step([...engRows, ...outRows], { playerId: tk.player.entityId, player: tk.player, names: tk.names, blobs: tk.blobs, world: this.reader.S.world, info: this.reader.info, clock: this.clock });
         for (const pk of packets) {
@@ -372,10 +382,12 @@ class Session {
                 buf = this.codec.encode('S2C', pk.name, pk.params);
             } catch (e) {
                 this.stats.encodeErrors++;
+                if (pk.name === 'block_change' || pk.name === 'multi_block_change') this.interactions.encodeErrors++;
                 continue;
             }
             this.send(buf);
             this.stats.packets++;
+            if (pk.name === 'block_change' || pk.name === 'multi_block_change') this.interactions.sentBlocks++;
             this.echo(pk.name, buf);
         }
     }
@@ -418,6 +430,7 @@ class Session {
         this.lastStatus = { at, ticks: s.ticks };
         log(
             `TPS ${tps.toFixed(1)} | ${s.ticks} ticks (${s.skipped} read only), ${s.rows} rows, ${s.packets} packets sent; model ${(s.ms / Math.max(1, s.ticks - s.skipped)).toFixed(0)} ms/tick, max ${s.maxMs.toFixed(0)}; ` +
+                `interactions dig ${this.interactions.dig}, place ${this.interactions.place}, action ticks read-only ${this.interactions.skipped}, generated block rows ${this.interactions.generatedBlocks}, block packets ${this.interactions.sentBlocks}, block encode errors ${this.interactions.encodeErrors}; ` +
                 `backlog ${this.queue.length}; entities ${this.writer.bySlot.size}; clamped ${this.writer.stats.clamped ?? 0}; blocks ${this.blocks.rows} (legal ${this.blocks.legal}, floating ${this.blocks.floating}); rejected ${JSON.stringify(rej)}`
         );
     }

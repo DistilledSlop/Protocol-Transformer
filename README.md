@@ -94,7 +94,7 @@ limited to captured chunks. You may keep a local vanilla server in `server/`;
 that directory is ignored by Git and is not used by the captured-world engine. `HOST`, `PORT`, `ALSO`, `TIME`, `ENGINE_TIME`, and
 `MODEL_ARGS` control the server; see [reader/README.md](reader/README.md).
 
-The local player starts in Creative mode with operator level 4. Set `GAMEMODE`
+The local player starts in Survival mode with operator level 4. Set `GAMEMODE`
 to `survival`, `creative`, `adventure`, or `spectator`, and `OP_LEVEL` to 0–4
 to choose different defaults. At level 2 or higher, `/gamemode <mode> [your
 username]` changes your mode; modes may also be specified as 0–3. Operator
