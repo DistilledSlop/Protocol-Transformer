@@ -14,6 +14,8 @@ Next-row model for Protocol AI. Python 3.12 is managed with uv. Use `uv sync --l
 
     uv run --extra cpu python -m unittest discover -s tests          # data module tests (numpy only)
 
+From the repository root, `GPUS=4 DEVICE=cuda bash train.sh --batch 16` launches four CUDA workers. The launcher selects the CUDA extra automatically for `GPUS > 1`; `CUDA_VISIBLE_DEVICES` controls which GPUs they see. Batch size is per worker (64 total in this example), and each worker loads the dataset into host memory. See the root README for dataset and run paths and launcher options.
+
 For large validation sets, `--eval-windows-per-session N` bounds evaluation cost by sampling up to N evenly spaced windows from each held-out session (default 96). The final report reuses the last evaluation.
 
 Stream format: for every tick, `TICK`, the client's input rows (`IN`), engine-derived rows (`ENG`), then the target rows

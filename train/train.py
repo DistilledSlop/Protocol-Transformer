@@ -10,6 +10,7 @@ the field, and a unigram loss from the training sessions.
 from __future__ import annotations
 
 import argparse
+import builtins
 import os
 import json
 import math
@@ -19,6 +20,8 @@ from pathlib import Path
 
 import numpy as np
 import torch
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel
 
 from protocol_ai import data
 from protocol_ai.model import Config, RowModel
@@ -70,6 +73,31 @@ def sample_batch(sets: list[data.WindowSet], weights: np.ndarray, bs: int, rng: 
         ws = sets[rng.choice(len(sets), p=weights)]
         items.append((ws, int(rng.integers(len(ws)))))
     return collate(items, device)
+
+
+def sample_distributed_batch(sets, bs, rng, device, rank, world_size):
+    """Sample unique windows uniformly across the global batch, then shard by rank."""
+    sizes = np.array([len(ws) for ws in sets], dtype=np.int64)
+    ends = np.cumsum(sizes)
+    total = int(ends[-1]) if len(ends) else 0
+    global_batch = bs * world_size
+    if total < global_batch:
+        raise ValueError(f"distributed global batch ({global_batch}) exceeds train windows ({total})")
+    chosen = rng.choice(total, size=global_batch, replace=False)
+    items = []
+    for index in chosen[rank * bs : (rank + 1) * bs]:
+        set_index = int(np.searchsorted(ends, index, side="right"))
+        offset = int(ends[set_index - 1]) if set_index else 0
+        items.append((sets[set_index], int(index) - offset))
+    return collate(items, device)
+
+
+def distributed_token_loss(loss, mask, world_size):
+    """Weight rank-local token means so DDP produces the global token mean."""
+    local_tokens = mask.sum()
+    global_tokens = local_tokens.detach().clone()
+    dist.all_reduce(global_tokens)
+    return loss * (world_size * local_tokens / global_tokens.clamp(min=1))
 
 
 @torch.no_grad()
@@ -206,6 +234,14 @@ def overfit(args, vocab, streams, device):
 
 
 def main() -> int:
+    try:
+        return train_main()
+    finally:
+        if dist.is_initialized():
+            dist.destroy_process_group()
+
+
+def train_main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dataset", default="../dataset")
     ap.add_argument("--val", nargs="*", default=["session_EmeraldIngot64_1793051730684"])
@@ -235,6 +271,30 @@ def main() -> int:
     if args.steps < 1 or args.eval_every < 1 or args.eval_windows_per_session < 1:
         ap.error("--steps, --eval-every and --eval-windows-per-session must be positive")
 
+    world_size = int(os.environ.get("WORLD_SIZE", "1"))
+    rank = int(os.environ.get("RANK", "0"))
+    local_rank = int(os.environ.get("LOCAL_RANK", "0"))
+    if world_size < 1 or not 0 <= rank < world_size or local_rank < 0:
+        ap.error("invalid torchrun rank or world size")
+    if args.batch < 1:
+        ap.error("--batch must be positive")
+    distributed = world_size > 1
+    if distributed and args.overfit:
+        ap.error("--overfit does not support distributed training")
+    if distributed:
+        if args.device == "cpu":
+            backend = "gloo"
+        elif args.device == "cuda" or args.device.startswith("cuda:"):
+            if not torch.cuda.is_available() or local_rank >= torch.cuda.device_count():
+                ap.error(f"LOCAL_RANK {local_rank} has no available CUDA device")
+            torch.cuda.set_device(local_rank)
+            args.device = f"cuda:{local_rank}"
+            backend = "nccl"
+        else:
+            ap.error("distributed training requires --device cpu or cuda")
+        dist.init_process_group(backend=backend)
+    print = builtins.print if rank == 0 else lambda *a, **kw: None
+    print(f"training workers {world_size}; batch per worker {args.batch}; global batch {args.batch * world_size}")
     torch.manual_seed(args.seed)
     rng = np.random.default_rng(args.seed)
     ds = Path(args.dataset)
@@ -272,33 +332,57 @@ def main() -> int:
     w /= w.sum()
     print(f"train windows {int(sum(len(s) for s in tsets))}, val windows {sum(len(s) for s in vsets)}")
 
-    base = baselines(train, val, vocab, cats)
-    print(f"baselines on val: unigram NLL {base['unigram_nll']:.3f}; {base['idle_tick_fraction']:.2f} of ticks are idle (predicting END at once is right there)")
+    base = baselines(train, val, vocab, cats) if rank == 0 else None
+    if rank == 0:
+        print(f"baselines on val: unigram NLL {base['unigram_nll']:.3f}; {base['idle_tick_fraction']:.2f} of ticks are idle (predicting END at once is right there)")
 
+    if distributed:
+        if sum(len(s) for s in tsets) < args.batch * world_size:
+            raise ValueError("distributed global batch exceeds the number of training windows")
+        model = DistributedDataParallel(model, device_ids=[local_rank] if backend == "nccl" else None,
+                                        find_unused_parameters=use_terrain)
+    torch.manual_seed(args.seed + rank)
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr, betas=(0.9, 0.95), weight_decay=0.1)
     out = Path(args.run_root) / args.name
-    out.mkdir(parents=True, exist_ok=True)
+    if rank == 0:
+        out.mkdir(parents=True, exist_ok=True)
     best = float("inf")
     t0 = time.time()
     for step in range(1, args.steps + 1):
         for g in opt.param_groups:
             g["lr"] = lr_at(step - 1, args.steps, args.lr)
-        x, y, m, terrain = sample_batch(tsets, w, args.batch, rng, args.device)
+        if distributed:
+            x, y, m, terrain = sample_distributed_batch(tsets, args.batch, rng, args.device, rank, world_size)
+        else:
+            x, y, m, terrain = sample_batch(tsets, w, args.batch, rng, args.device)
         with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=args.device.startswith("cuda")):
             _, loss = model(x, y, m, terrain=terrain)
+        if distributed:
+            # DDP averages rank gradients; weight each rank by its target-token count
+            # so the result matches the loss over the complete global batch.
+            loss = distributed_token_loss(loss, m, world_size)
         opt.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         opt.step()
         if step % 50 == 0:
-            print(f"step {step:5d} train loss {loss.item():.4f}  ({time.time()-t0:.0f}s)")
+            report_loss = loss.detach().clone()
+            if distributed:
+                dist.all_reduce(report_loss)
+                report_loss /= world_size
+            print(f"step {step:5d} train loss {report_loss.item():.4f}  ({time.time()-t0:.0f}s)")
         if step % args.eval_every == 0 or step == args.steps:
-            ev = evaluate(model, vsets, cats, args.device, vocab.end, max_windows=args.eval_windows_per_session)
-            dc = ev["decision"]
-            print(f"  val: NLL {ev['nll']:.4f} (unigram {base['unigram_nll']:.3f}), token accuracy {ev['acc']:.3f}; tick decision {dc['acc']:.3f} (always-idle {dc['always_idle_acc']:.3f})")
-            if ev["nll"] < best:
-                best = ev["nll"]
-                torch.save({"model": model.state_dict(), "cfg": cfg.__dict__, "vocab": os.path.relpath(ds / "vocab.json", out), "vocab_relative_to_checkpoint": True}, out / "best.pt")
+            if rank == 0:
+                ev = evaluate(model.module if distributed else model, vsets, cats, args.device, vocab.end, max_windows=args.eval_windows_per_session)
+                dc = ev["decision"]
+                print(f"  val: NLL {ev['nll']:.4f} (unigram {base['unigram_nll']:.3f}), token accuracy {ev['acc']:.3f}; tick decision {dc['acc']:.3f} (always-idle {dc['always_idle_acc']:.3f})")
+                if ev["nll"] < best:
+                    best = ev["nll"]
+                    torch.save({"model": (model.module if distributed else model).state_dict(), "cfg": cfg.__dict__, "vocab": os.path.relpath(ds / "vocab.json", out), "vocab_relative_to_checkpoint": True}, out / "best.pt")
+            if distributed:
+                dist.barrier()
+    if rank != 0:
+        return 0
     dc = ev["decision"]
     print(f"\ntick decision 'does anything happen?' on {dc['ticks']} held-out ticks: accuracy {dc['acc']:.3f} vs {dc['always_idle_acc']:.3f} for always-idle; "
           f"active ticks found: recall {dc['recall_active']:.3f}, precision {dc['precision_active']:.3f}; NLL {dc['nll']:.3f}")
@@ -306,7 +390,7 @@ def main() -> int:
     print(f"  {'field':10s} {'tokens':>7s} {'NLL':>7s} {'acc':>6s} {'majority':>9s}")
     for c, r in sorted(ev["per_category"].items(), key=lambda kv: -kv[1]["n"]):
         print(f"  {c:10s} {r['n']:7d} {r['nll']:7.3f} {r['acc']:6.3f} {base['majority_acc'].get(c, float('nan')):9.3f}")
-    (out / "metrics.json").write_text(json.dumps({"args": vars(args), "val": ev, "baselines": base, "best_val_nll": best}, indent=1))
+    (out / "metrics.json").write_text(json.dumps({"args": vars(args), "world_size": world_size, "global_batch": args.batch * world_size, "val": ev, "baselines": base, "best_val_nll": best}, indent=1))
     print(f"\nbest val NLL {best:.4f}; wrote {out}/best.pt and metrics.json")
     return 0
 
