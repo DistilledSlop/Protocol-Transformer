@@ -15,8 +15,8 @@
 //
 // The reader also reads the writer's packets back, as it would a server's, so it knows which entities the client
 // has (an attack on one becomes an input row naming its slot). Range culling is off: every entity is the model's.
-// Families the model owns: 'scene' always, plus --also. Health, XP, weather and game mode ('globals') are left to
-// the join packets by default, because a model that writes health 0 leaves the player on the death screen.
+// Families the model owns: 'scene' always, plus --also. Health, XP and weather ('globals') are left to the
+// join packets by default. Player mode, abilities and permissions are always owned by this server.
 
 const path = require('path');
 const readline = require('readline');
@@ -28,6 +28,7 @@ const { Reader } = require(R('reader'));
 const { Writer } = require(R('writer/writer'));
 const { build } = require('./schedule');
 const { writerOwns } = require('./ownership');
+const { playerState, isPlayerStatePacket, parseGameModeCommand, addGameModeCommand } = require('./player_state');
 
 function arg(name, def) {
     const i = process.argv.indexOf(name);
@@ -50,6 +51,9 @@ const ALSO = (arg('--also', 'blocks,slots,text,events') || '').split(',').filter
 const MODEL_ARGS = (arg('--model-args', '') || '').split(/\s+/).filter(Boolean);
 const DATASET = arg('--dataset', path.join(__dirname, '..', 'dataset'));
 const JOIN_SPEED = +arg('--join-speed', 4);
+const GAME_MODE = arg('--gamemode', process.env.GAMEMODE || 'creative');
+const OP_LEVEL = Number(arg('--op-level', process.env.OP_LEVEL ?? '4'));
+try { playerState(GAME_MODE, OP_LEVEL, 0); } catch (e) { console.error(e.message); process.exit(2); }
 // the world clock: keep (as the capture left it, which on a server with the day cycle off is a frozen night), cycle (the day
 // runs, from morning), noon or midnight (locked there)
 const TIME = arg('--time', 'cycle');
@@ -119,6 +123,8 @@ class Session {
         this.client = client;
         this.sched = sched;
         this.model = model;
+        this.gameMode = GAME_MODE;
+        this.commandTree = null;
         this.alive = true;
         this.live = false;
         this.codec = createCodec(VERSION);
@@ -163,6 +169,7 @@ class Session {
             this.send(this.codec.encode('S2C', 'acknowledge_player_digging', { sequenceId: data.sequence }));
             this.stats.acks++;
         }
+        if ((meta.name === 'chat_command' || meta.name === 'chat_command_signed') && typeof data.command === 'string' && this.gameModeCommand(data.command)) return;
         // a command the engine answers itself is not shown to the model, which would only answer it a second time
         if ((meta.name === 'chat_command' || meta.name === 'chat_command_signed') && typeof data.command === 'string' && ENGINE_TIME && this.timeCommand(data.command)) return;
         try {
@@ -182,6 +189,9 @@ class Session {
                 const at = (now() - start) * JOIN_SPEED;
                 while (i < play.length && play[i].t <= at) {
                     const p = play[i++];
+                    if (p.name === 'declare_commands') {
+                        try { this.commandTree = this.codec.parse('S2C', p.buf).params; } catch (e) { log(`could not read captured command tree: ${e.message}`); }
+                    }
                     this.send(p.buf);
                     try {
                         this.echo(p.name, p.buf);
@@ -197,6 +207,15 @@ class Session {
             this.timers.push(pump);
         });
         if (!this.alive) return;
+        // Reconcile mode, abilities and permissions after all recorded join packets. Echo the
+        // same packets so the model and writer observe the actual client state.
+        this.collect(this.reader.flush());
+        this.sendPlayerState();
+        if (OP_LEVEL >= 2) {
+            try { this.send(this.codec.encode('S2C', 'declare_commands', addGameModeCommand(this.commandTree, this.client.username))); }
+            catch (e) { log(`could not add gamemode command suggestions: ${e.message}`); }
+        }
+        this.collect(this.reader.flush());
         // the model starts from the first tick after the join, with an empty context
         this.queue = [];
         this.reader.advanceTo(now());
@@ -214,6 +233,30 @@ class Session {
             }, KEEPALIVE_MS)
         );
         this.timers.push(setInterval(() => this.status(), STATUS_MS));
+    }
+
+    sendPlayerState() {
+        for (const pk of playerState(this.gameMode, OP_LEVEL, this.sched.playerId)) {
+            const buf = this.codec.encode('S2C', pk.name, pk.params);
+            this.send(buf);
+            this.echo(pk.name, buf);
+        }
+    }
+
+    gameModeCommand(command) {
+        const result = parseGameModeCommand(command, this.client.username, OP_LEVEL);
+        if (!result) return false;
+        if (result.mode) {
+            this.gameMode = result.mode;
+            this.collect(this.reader.flush());
+            this.sendPlayerState();
+            this.collect(this.reader.flush());
+        }
+        const content = this.writer._componentNbt({ text: result.error || `Set your game mode to ${result.mode}.` });
+        const buf = this.codec.encode('S2C', 'system_chat', { content, isActionBar: false });
+        this.send(buf);
+        this.echo('system_chat', buf);
+        return true;
     }
 
     // ---- the clock ------------------------------------------------------------------------------------------------
@@ -323,7 +366,7 @@ class Session {
         this.judgeBlocks(outRows, tk.player);
         const packets = this.writer.step([...engRows, ...outRows], { playerId: tk.player.entityId, player: tk.player, names: tk.names, blobs: tk.blobs, world: this.reader.S.world, info: this.reader.info, clock: this.clock });
         for (const pk of packets) {
-            if (!writerOwns(pk.name, pk.params, this.families, tk.player.entityId)) continue;
+            if (isPlayerStatePacket(pk.name, pk.params, tk.player.entityId) || !writerOwns(pk.name, pk.params, this.families, tk.player.entityId)) continue;
             let buf;
             try {
                 buf = this.codec.encode('S2C', pk.name, pk.params);
@@ -388,6 +431,7 @@ class Session {
 
 // ---- main ------------------------------------------------------------------------------------------------------------
 const sched = build(base, { mode: 'join', also: ALSO });
+log(`local player: ${GAME_MODE}, operator level ${OP_LEVEL}`);
 log(`world ${path.basename(base)}: ${sched.config.length} configuration packets, ${sched.play.length} join packets (${(sched.durationMs / 1000).toFixed(1)} s), player entity ${sched.playerId}; the model owns scene+${ALSO.join('+') || 'nothing else'}`);
 
 const model = new Model();
