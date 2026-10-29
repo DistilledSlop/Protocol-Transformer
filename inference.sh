@@ -58,15 +58,8 @@ ckpt=${paths[0]}
 dataset=${paths[1]}
 if [[ $mode == minecraft ]]; then
     if [[ -z ${WORLD:-} ]]; then
-        WORLD=$(python3 - "$training_root/worlds" <<'PYWORLD'
-import sys
-from pathlib import Path
-worlds = Path(sys.argv[1])
-pairs = [p for p in worlds.glob('*.bin') if p.is_file() and p.with_suffix('.jsonl').is_file()]
-if pairs:
-    print(max(pairs, key=lambda p: (p.stat().st_mtime_ns, str(p))).with_suffix(''))
-PYWORLD
-)
+        WORLD=$(python3 "$repo/train/world_asset.py" "$training_root" "$dataset")
+        echo "Selected training capture: $WORLD" >&2
     fi
     if [[ -z ${WORLD:-} || ! -f ${WORLD}.bin || ! -f ${WORLD}.jsonl ]]; then
         echo 'Minecraft mode needs WORLD set to the base path of a captured .bin/.jsonl pair, or a pair under TRAINING_ROOT/worlds' >&2

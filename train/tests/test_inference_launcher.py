@@ -17,6 +17,9 @@ class InferenceLauncherTest(unittest.TestCase):
             repo.mkdir()
             shutil.copy(source_repo / 'inference.sh', repo / 'inference.sh')
             (repo / 'train').mkdir()
+            shutil.copy(source_repo / 'train/world_asset.py', repo / 'train/world_asset.py')
+            (root / 'data set').mkdir()
+            (root / 'data set/source-index.json').write_text(json.dumps({'trainBases': ['/old/new world'], 'validationBases': ['/old/older']}))
             for package in ('minecraft-protocol', 'minecraft-data'):
                 package_dir = repo / 'proxy' / 'node_modules' / package
                 package_dir.mkdir(parents=True)
@@ -46,11 +49,15 @@ class InferenceLauncherTest(unittest.TestCase):
             self.assertEqual(args[args.index('--dataset') + 1], env['DATASET'])
             self.assertEqual(args[args.index('--device') + 1], 'cpu')
             self.assertEqual(args[-2:], ['--session', 'name with spaces'])
-            subprocess.run([str(repo / 'inference.sh'), 'minecraft', '--join-speed', '2'], env=env, check=True)
+            result = subprocess.run([str(repo / 'inference.sh'), 'minecraft', '--join-speed', '2'], env=env, check=True, capture_output=True, text=True)
+            self.assertIn('Selected training capture:', result.stderr)
             args = json.loads((root / 'args.json').read_text())
             self.assertEqual(args[1], str(worlds / 'new world'))
             self.assertEqual(args[-2:], ['--join-speed', '2'])
             self.assertIn('--device cpu', args[args.index('--model-args') + 1])
+            override = subprocess.run([str(repo / 'inference.sh'), 'minecraft'], env=dict(env, WORLD=str(worlds / 'older')), check=True, capture_output=True, text=True)
+            self.assertEqual(json.loads((root / 'args.json').read_text())[1], str(worlds / 'older'))
+            self.assertNotIn('Selected training capture:', override.stderr)
             relative_env = dict(env, CKPT='relative/best.pt', DATASET='relative/data',
                                 TRAINING_ROOT='relative/root', WORLD='relative/world')
             subprocess.run([str(repo / 'inference.sh'), 'serve'], env=relative_env, check=True)

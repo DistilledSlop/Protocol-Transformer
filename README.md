@@ -82,10 +82,13 @@ dataset name in the run's metrics as provenance, which cannot prove vocabulary
 identity. Set `DATASET` explicitly if the dataset cannot be identified.
 
 Minecraft mode also needs a raw capture's `.bin` and `.jsonl` pair containing
-join packets and chunks; exported terrain alone is insufficient. Place a pair
-in `TRAINING_ROOT/worlds/` (the newest complete pair is selected), or set
-`WORLD` to its base path without the suffix. Copy that pair when transferring to
-another host. Join with a Minecraft 1.21.1 client using any username; the server uses offline
+join packets and chunks; exported terrain alone is insufficient. By default, it randomly selects an available training capture listed in the
+selected dataset’s `source-index.json`. It prefers matching pairs in the
+dataset’s `captures/` directory, then `TRAINING_ROOT/worlds/`, then the original
+source paths. Transfer the dataset’s `captures/` directory to make the full
+training capture pool available on another host; this increases transfer size.
+Only locally available pairs can be selected. Set `WORLD` to a capture base path without the suffix to choose
+one explicitly. Join with a Minecraft 1.21.1 client using any username; the server uses offline
 mode. The recorded player name matches the captured player list. The world is
 limited to captured chunks. You may keep a local vanilla server in `server/`;
 that directory is ignored by Git and is not used by the captured-world engine. `HOST`, `PORT`, `ALSO`, `TIME`, `ENGINE_TIME`, and
