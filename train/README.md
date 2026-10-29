@@ -1,6 +1,6 @@
 # train
 
-Next-row model for Protocol AI. Python 3.12 is managed with uv. Use `uv sync --locked --extra cpu` for CPU PyTorch, or `uv sync --locked --extra cuda` for CUDA 12.8 (including RTX 50-series). The extras are mutually exclusive; use the same extra in each `uv run` invocation. The root `train.sh` defaults to CPU packages and selects a published dataset under the common training root, with `DATASET` and `TRAIN_EXTRA` overrides described in the root README. The data also comes from the JS reader:
+Next-row model for Protocol AI. Python 3.12 is managed with uv. Use `uv sync --locked --extra cpu` for CPU PyTorch, or `uv sync --locked --extra cuda` for CUDA 12.8 (including RTX 50-series). The extras are mutually exclusive; use the same extra in each `uv run` invocation. The root `train.sh` defaults to CUDA packages and selects a published dataset under the common training root, with `DATASET` and `TRAIN_EXTRA` overrides described in the root README. The data also comes from the JS reader:
 
     # 1. freeze a vocabulary on the training captures and export every capture (no GPU, a few MB)
     node reader/dataset/dataset.js vocab  --out dataset  proxy/data/session_A ...
@@ -14,7 +14,7 @@ Next-row model for Protocol AI. Python 3.12 is managed with uv. Use `uv sync --l
 
     uv run --extra cpu python -m unittest discover -s tests          # data module tests (numpy only)
 
-From the repository root, `GPUS=4 DEVICE=cuda bash train.sh --batch 16` launches four CUDA workers. The launcher selects the CUDA extra automatically for `GPUS > 1`; `CUDA_VISIBLE_DEVICES` controls which GPUs they see. Batch size is per worker (64 total in this example), and each worker loads the dataset into host memory. See the root README for dataset and run paths and launcher options.
+From the repository root, `bash train.sh` trains on the first visible CUDA GPU. Set `CUDA_VISIBLE_DEVICES` to select a GPU, or use `TRAIN_EXTRA=cpu DEVICE=cpu bash train.sh` for CPU. See the root README for dataset and run paths and launcher options.
 
 Training logs the first step and every 10 steps by default; use `--log-every N` to change the interval. Each distributed worker reports its process ID, device, startup phases, and first-step milestones. Milestones report when the host call returns; CUDA work can still be running asynchronously. For a stall after the first step, add `--debug-distributed` to report milestones on every step. Dataset loading happens on each worker and baseline calculation happens on rank 0 before distributed training starts. With terrain enabled, DDP may warn that `find_unused_parameters=True` found no unused parameters in a forward pass. This is a performance warning: terrain can be used conditionally on other batches, so the flag remains enabled. An actual reduction error is a separate issue.
 

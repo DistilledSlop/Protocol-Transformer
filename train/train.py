@@ -284,7 +284,7 @@ def train_main() -> int:
     ap.add_argument("--log-every", type=int, default=10, help="report training loss every N steps (also reports step 1)")
     ap.add_argument("--eval-every", type=int, default=250)
     ap.add_argument("--eval-windows-per-session", type=int, default=96, help="maximum evenly spaced validation windows per session")
-    ap.add_argument("--device", default="cuda:0" if torch.cuda.is_available() else "cpu")
+    ap.add_argument("--device", default="cuda:0")
     ap.add_argument("--overfit", action="store_true")
     ap.add_argument("--overfit-ticks", type=int, default=100)
     ap.add_argument("--seed", type=int, default=0)
@@ -303,6 +303,19 @@ def train_main() -> int:
     if args.batch < 1:
         ap.error("--batch must be positive")
     distributed = world_size > 1
+    if not distributed:
+        try:
+            selected_device = torch.device(args.device)
+        except (RuntimeError, ValueError) as exc:
+            ap.error(f"invalid device {args.device!r}: {exc}")
+        if selected_device.type == "cuda":
+            index = selected_device.index if selected_device.index is not None else 0
+            if not torch.cuda.is_available() or index >= torch.cuda.device_count():
+                ap.error(f"CUDA device {args.device} is unavailable; check the NVIDIA driver and CUDA_VISIBLE_DEVICES, or use TRAIN_EXTRA=cpu DEVICE=cpu for CPU")
+            try:
+                torch.cuda.set_device(index)
+            except RuntimeError as exc:
+                ap.error(f"could not initialize CUDA device {args.device}: {exc}")
     if distributed and args.overfit:
         ap.error("--overfit does not support distributed training")
     if distributed:

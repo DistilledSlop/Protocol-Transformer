@@ -50,41 +50,33 @@ for name in "${val[@]}"; do
     fi
 done
 
-gpus=${GPUS:-1}
-if [[ ! $gpus =~ ^[1-9][0-9]*$ ]]; then
-    echo "GPUS must be a positive integer: $gpus" >&2
+if [[ ${GPUS:-1} != 1 ]]; then
+    echo "train.sh supports one GPU; set GPUS=1 or unset GPUS" >&2
     exit 1
 fi
-# Divide the available CPUs between workers, capped at 32 threads per worker.
-# Users can override either variable for their workload and host.
+# Cap CPU compute threads; users can override either variable.
 if [[ -z ${OMP_NUM_THREADS:-} ]]; then
     available_cpus=$(nproc)
-    # Avoid arithmetic overflow for an absurdly large GPUS value.
-    if (( ${#gpus} > 6 )) || (( gpus > available_cpus )); then
-        available_cpus=1
-    else
-        available_cpus=$((available_cpus / gpus))
-    fi
     if (( available_cpus > 32 )); then available_cpus=32; fi
     OMP_NUM_THREADS=$available_cpus
 fi
 export OMP_NUM_THREADS
 export MKL_NUM_THREADS=${MKL_NUM_THREADS:-$OMP_NUM_THREADS}
-device=()
-if [[ -n ${DEVICE:-} ]]; then device=(--device "$DEVICE"); fi
-launcher=(python)
-extra=${TRAIN_EXTRA:-cpu}
-if [[ $gpus != 1 ]]; then
-    if [[ -n ${TRAIN_EXTRA:-} && $TRAIN_EXTRA != cuda ]]; then
-        echo "GPUS greater than 1 requires TRAIN_EXTRA=cuda" >&2
-        exit 1
-    fi
-    if [[ -n ${DEVICE:-} && ! $DEVICE =~ ^cuda(:[0-9]+)?$ ]]; then
-        echo "GPUS greater than 1 requires a CUDA DEVICE or an unset DEVICE" >&2
-        exit 1
-    fi
+if [[ -n ${TRAIN_EXTRA:-} ]]; then
+    extra=$TRAIN_EXTRA
+elif [[ ${DEVICE:-} == cpu ]]; then
+    extra=cpu
+else
     extra=cuda
-    launcher=(torchrun --standalone --nnodes=1 "--nproc-per-node=$gpus")
+fi
+if [[ $extra != cuda && $extra != cpu ]]; then
+    echo "TRAIN_EXTRA must be cuda or cpu" >&2
+    exit 1
+fi
+if [[ $extra == cpu ]]; then
+    device=${DEVICE:-cpu}
+else
+    device=${DEVICE:-cuda:0}
 fi
 cd train
-exec uv run --locked --extra "$extra" "${launcher[@]}" train.py --dataset "$DATASET" --val "${val[@]}" --steps "${STEPS:-3000}" --eval-every "${EVAL_EVERY:-100}" --name "${NAME:-night}" --run-root "$TRAINING_ROOT/runs" "${device[@]}" "$@"
+exec uv run --locked --extra "$extra" python train.py --dataset "$DATASET" --val "${val[@]}" --steps "${STEPS:-3000}" --eval-every "${EVAL_EVERY:-100}" --name "${NAME:-night}" --run-root "$TRAINING_ROOT/runs" --device "$device" "$@"

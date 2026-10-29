@@ -57,7 +57,7 @@ class LauncherTest(unittest.TestCase):
             args = json.loads((tmp / "args.json").read_text())
             self.assertEqual(args[args.index("--dataset") + 1], str(datasets / "training-new"))
 
-    def test_multi_gpu_launch_and_invalid_settings(self):
+    def test_default_cuda_and_single_gpu_only(self):
         root = Path(__file__).resolve().parents[2]
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
@@ -68,38 +68,25 @@ class LauncherTest(unittest.TestCase):
             (dataset / "val.txt").write_text("heldout\n")
             stub = tmp / "uv"
             stub.write_text('#!/usr/bin/env python3\nimport json, os, sys\n'
-                            'open(os.environ["ARGS_FILE"], "w").write(json.dumps({"args": sys.argv[1:], "omp": os.environ["OMP_NUM_THREADS"], "mkl": os.environ["MKL_NUM_THREADS"]}))\n')
+                            'open(os.environ["ARGS_FILE"], "w").write(json.dumps(sys.argv[1:]))\n')
             stub.chmod(0o755)
-            nproc = tmp / "nproc"
-            nproc.write_text("#!/bin/sh\necho 40\n")
-            nproc.chmod(0o755)
             env = dict(os.environ, PATH=f"{tmp}:{os.environ['PATH']}", DATASET=str(dataset),
-                       ARGS_FILE=str(tmp / "args.json"), GPUS="4", CUDA_VISIBLE_DEVICES="2,3,4,5")
-            env.pop("TRAIN_EXTRA", None)
-            env.pop("DEVICE", None)
-            env.pop("OMP_NUM_THREADS", None)
-            env.pop("MKL_NUM_THREADS", None)
-            subprocess.run(["bash", str(root / "train.sh"), "--batch", "2"], env=env, check=True)
-            result = json.loads((tmp / "args.json").read_text())
-            args = result["args"]
-            self.assertEqual((result["omp"], result["mkl"]), ("10", "10"))
-            self.assertEqual(args[:8], ["run", "--locked", "--extra", "cuda", "torchrun",
-                                       "--standalone", "--nnodes=1", "--nproc-per-node=4"])
-            self.assertEqual(args[8], "train.py")
-            self.assertEqual(args[-2:], ["--batch", "2"])
-            subprocess.run(["bash", str(root / "train.sh")],
-                           env=dict(env, DEVICE="cuda:0", OMP_NUM_THREADS="7", MKL_NUM_THREADS="3"), check=True)
-            result = json.loads((tmp / "args.json").read_text())
-            self.assertIn("cuda:0", result["args"])
-            self.assertEqual((result["omp"], result["mkl"]), ("7", "3"))
-            for overrides, error in (({"GPUS": "0"}, "positive integer"),
-                                     ({"GPUS": "two"}, "positive integer"),
-                                     ({"TRAIN_EXTRA": "cpu"}, "TRAIN_EXTRA=cuda"),
-                                     ({"DEVICE": "cpu"}, "CUDA DEVICE")):
+                       ARGS_FILE=str(tmp / "args.json"))
+            for key in ("TRAIN_EXTRA", "DEVICE", "GPUS"):
+                env.pop(key, None)
+            subprocess.run(["bash", str(root / "train.sh")], env=env, check=True)
+            args = json.loads((tmp / "args.json").read_text())
+            self.assertEqual(args[:6], ["run", "--locked", "--extra", "cuda", "python", "train.py"])
+            self.assertEqual(args[args.index("--device") + 1], "cuda:0")
+            subprocess.run(["bash", str(root / "train.sh")], env=dict(env, DEVICE="cpu"), check=True)
+            args = json.loads((tmp / "args.json").read_text())
+            self.assertEqual(args[3], "cpu")
+            self.assertEqual(args[args.index("--device") + 1], "cpu")
+            for value in ("0", "2", "two"):
                 result = subprocess.run(["bash", str(root / "train.sh")],
-                                        env=dict(env, **overrides), capture_output=True, text=True)
+                                        env=dict(env, GPUS=value), capture_output=True, text=True)
                 self.assertNotEqual(result.returncode, 0)
-                self.assertIn(error, result.stderr)
+                self.assertIn("supports one GPU", result.stderr)
 
     def test_empty_validation_list_is_rejected(self):
         root = Path(__file__).resolve().parents[2]

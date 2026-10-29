@@ -50,22 +50,9 @@ Without `DATASET`, the launcher chooses the newest published `training-*` datase
 is a point-in-time snapshot; check the Conductor admission receipts are still
 current before using it.
 
-The launcher defaults to 32 CPU threads per worker, capped at the CPUs available to the
-process divided by the number of workers (and at least one per worker); set `OMP_NUM_THREADS` and `MKL_NUM_THREADS` to change this. On the
-shared training host, 32 threads were within 4% of 48-thread throughput in a
-short benchmark with fewer PyTorch compute threads; these are not dedicated cores. Set `DEVICE=cpu` to
-force CPU or leave it unset for automatic GPU detection. To install and use the
-locked CUDA build, run `(cd train && uv sync --locked --extra cuda)` and launch
-with `TRAIN_EXTRA=cuda DEVICE=cuda:0 bash train.sh`; use this extra on each CUDA launch.
-Additional `train.py` options may be passed after `bash train.sh`.
+`bash train.sh` installs and uses the locked CUDA extra and trains on the first visible GPU (`cuda:0`). Set `CUDA_VISIBLE_DEVICES` to choose a physical GPU, for example `CUDA_VISIBLE_DEVICES=2 bash train.sh`. The launcher supports one GPU. For CPU, use `TRAIN_EXTRA=cpu DEVICE=cpu bash train.sh`.
 
-For multiple GPUs on one machine, set the number of GPUs to use:
-
-```bash
-GPUS=4 DEVICE=cuda NAME=multi-gpu bash train.sh --batch 16
-```
-
-`GPUS` defaults to 1; values greater than 1 launch one distributed worker per GPU and automatically select the CUDA extra. `TRAIN_EXTRA`, if specified, must be `cuda`, and `DEVICE` must select CUDA or be unset. Any CUDA device index supplied in `DEVICE` is ignored for distributed runs; each worker uses its local GPU. Use `CUDA_VISIBLE_DEVICES` to choose which GPUs are visible (for example, `CUDA_VISIBLE_DEVICES=2,3 GPUS=2`). The `--batch` value is per GPU, so this example has a global batch of 64. Each worker loads the dataset into host memory, so available RAM can limit scaling. Dataset selection and the shared run directory use the same `DATASET` and `TRAINING_ROOT` settings as a single-GPU run.
+The launcher caps CPU compute threads at 32 or the number available to the process; set `OMP_NUM_THREADS` and `MKL_NUM_THREADS` to change this. Additional `train.py` options may be passed after `bash train.sh`.
 
 ## Move training to a CUDA machine
 
@@ -75,7 +62,7 @@ Install uv and Python 3.12 on the target, then from the repository run:
 
 ```bash
 (cd train && uv sync --locked --extra cuda)
-TRAIN_EXTRA=cuda DEVICE=cuda:0 NAME=gpu-run bash train.sh
+NAME=gpu-run bash train.sh
 ```
 
 The target needs an NVIDIA driver compatible with the CUDA 12.8 PyTorch build. CUDA execution must be checked on that GPU machine; it was not hardware-tested on the CPU host. This starts a fresh run. To initialize from an existing checkpoint, add `--init-from /path/to/best.pt --init-vocab /path/to/the-original-dataset/vocab.json` and select the same architecture and context options used for that checkpoint. The vocabulary and configuration must match. This copies model weights only: optimizer, learning-rate schedule, random state, and step count start over. Existing CPU checkpoints may record an old absolute vocabulary path; supplying `--init-vocab` explicitly works after transfer. New checkpoints record a path relative to the checkpoint; inference can also use an explicit dataset or vocabulary.
