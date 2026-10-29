@@ -20,6 +20,8 @@ Training logs the first step and every 10 steps by default; use `--log-every N` 
 
 For large validation sets, `--eval-windows-per-session N` bounds evaluation cost by sampling up to N evenly spaced windows from each held-out session (default 96). Distributed workers share validation windows and aggregate the metrics; each worker reports its local progress. The final report reuses the last evaluation.
 
+Block changes are rare (about 0.5% of ticks) and the model has to copy their coordinates from the client's input, so uniform windows teach it too slowly. By default a quarter of each batch (`--focus-fraction 0.25`) is windows placed around server block-change rows (`OUT BLOCK ...`), with the input that caused the change in view, and those rows count five times in the loss (`--block-loss-weight 5`). Set `--focus-fraction 0 --block-loss-weight 1` for the old uniform behaviour. Each evaluation also scores up to `--eval-block-windows` held-out block-change windows: the share of block rows whose every token is the model's top choice ("whole row exact"), their mean joint probability, and token accuracy. The checkpoint with the best joint probability is saved as `best-block.pt` next to `best.pt`, which is still chosen by overall validation NLL (the one `inference.sh` loads); pass `CKPT` to use `best-block.pt`. These scores are over all block changes, not just dig-finishes.
+
 Stream format: for every tick, `TICK`, the client's input rows (`IN`), engine-derived rows (`ENG`), then the target rows
 (`OUT`), then `END`. Loss counts only the target rows and the `END`, so the model learns to answer each tick's input; an idle tick
 is `TICK END`. Windows start at tick boundaries. Hold out whole captures for validation (the frozen vocabulary turns their unseen

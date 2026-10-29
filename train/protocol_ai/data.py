@@ -234,14 +234,15 @@ class WindowSet(Sequence[tuple[np.ndarray, np.ndarray, np.ndarray]]):
     the loss mask of the target positions. Windows with no trained target are dropped at construction.
     """
 
-    def __init__(self, stream: Stream, ctx_len: int, stride_ticks: int = 1) -> None:
+    def __init__(self, stream: Stream, ctx_len: int, stride_ticks: int = 1, starts: Sequence[int] | None = None) -> None:
         if ctx_len < 1:
             raise ValueError("ctx_len must be at least 1")
         if stride_ticks < 1:
             raise ValueError("stride_ticks must be at least 1")
         self.stream = stream
         self.ctx_len = ctx_len
-        self.starts = _window_starts(stream, ctx_len, stride_ticks)
+        # Explicit starts (tick boundaries chosen by the caller) skip the stride scan; FocusSampler pins single windows this way.
+        self.starts = _window_starts(stream, ctx_len, stride_ticks) if starts is None else np.asarray(starts, dtype=np.int64)
 
     def __len__(self) -> int:
         return len(self.starts)
@@ -270,6 +271,63 @@ class WindowSet(Sequence[tuple[np.ndarray, np.ndarray, np.ndarray]]):
         s = int(self.starts[operator.index(i)])
         lo, hi = np.searchsorted(st.tick_start, [s, s + self.ctx_len], side="left")
         return st.tick_start[lo:hi] - s, terrain_index(st, st.tick_of[lo:hi])
+
+
+class FocusSampler:
+    """Windows centred on server block changes (OUT rows that open with BLOCK), for oversampling a rare, learnable event.
+
+    Block changes are about 0.5% of ticks, so uniform windows show the model few of them. Each sampled window starts at a
+    random tick boundary that keeps the anchor row inside the window with `lead` tokens of context before it, so the input
+    that caused the change (a dig-finish, a placement) is in view.
+    """
+
+    def __init__(self, streams: dict[str, Stream], vocab: Vocab, ctx_len: int, lead: int | None = None, row_type: str = "BLOCK") -> None:
+        self.ctx_len = ctx_len
+        # The anchor row is at most 8 tokens (OUT, type, coordinates, state), so it must end inside the window.
+        self.tail = 16
+        self.lead = ctx_len // 8 if lead is None else lead
+        if not 0 <= self.lead < ctx_len - self.tail:
+            raise ValueError("lead must leave room for the anchor row inside the window")
+        row = vocab.index[row_type]
+        self.anchors: list[tuple[Stream, int]] = []
+        for stream in streams.values():
+            t = stream.tokens
+            if len(t) < ctx_len + 1:
+                continue
+            for a in np.flatnonzero((t[:-1] == vocab.out) & (t[1:] == row)).tolist():
+                self.anchors.append((stream, a))
+
+    def __len__(self) -> int:
+        return len(self.anchors)
+
+    def _start(self, stream: Stream, a: int, pick) -> int:
+        ts = stream.tick_start
+        n = len(stream.tokens)
+        last = int(np.searchsorted(ts, n - self.ctx_len - 1, side="right")) - 1  # latest tick boundary that leaves a full window
+        lo = int(np.searchsorted(ts, a - (self.ctx_len - self.tail), side="left"))
+        hi = min(int(np.searchsorted(ts, a - self.lead, side="right")) - 1, last)
+        lo = max(min(lo, hi), 0)
+        hi = max(hi, 0)
+        return int(ts[pick(lo, hi + 1)])
+
+    def sample(self, rng: np.random.Generator, count: int) -> list[tuple[WindowSet, int]]:
+        """`count` single-window sets with a random start each, as (WindowSet, 0) items for the batch collator."""
+        items = []
+        for k in rng.integers(len(self.anchors), size=count).tolist():
+            stream, a = self.anchors[k]
+            start = self._start(stream, a, lambda lo, hi: int(rng.integers(lo, hi)))
+            items.append((WindowSet(stream, self.ctx_len, starts=[start]), 0))
+        return items
+
+    def evaluation_items(self, count: int) -> list[tuple[WindowSet, int]]:
+        """Up to `count` windows over evenly spaced anchors, each with a fixed start (the middle of its range)."""
+        picks = np.linspace(0, len(self.anchors) - 1, num=min(count, len(self.anchors)), dtype=int) if self.anchors else []
+        items = []
+        for k in picks:
+            stream, a = self.anchors[int(k)]
+            start = self._start(stream, a, lambda lo, hi: (lo + hi - 1) // 2)
+            items.append((WindowSet(stream, self.ctx_len, starts=[start]), 0))
+        return items
 
 
 def windows(stream: Stream, ctx_len: int, stride_ticks: int = 1) -> WindowSet:

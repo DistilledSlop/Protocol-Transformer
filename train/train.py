@@ -68,29 +68,100 @@ def collate(items: list, device: str):
     return t(xs, torch.long), t(ys, torch.long), t(ms, torch.float32), terrain
 
 
-def sample_batch(sets: list[data.WindowSet], weights: np.ndarray, bs: int, rng: np.random.Generator, device: str):
-    items = []
-    for _ in range(bs):
+def focus_count(focus_fraction: float, total: int) -> int:
+    return min(total, round(focus_fraction * total))
+
+
+def sample_batch(sets: list[data.WindowSet], weights: np.ndarray, bs: int, rng: np.random.Generator, device: str, focus: data.FocusSampler | None = None, focus_fraction: float = 0.0):
+    """Uniform windows, except that `focus_fraction` of the batch is windows around server block changes."""
+    items = focus.sample(rng, focus_count(focus_fraction, bs)) if focus is not None and len(focus) else []
+    for _ in range(bs - len(items)):
         ws = sets[rng.choice(len(sets), p=weights)]
         items.append((ws, int(rng.integers(len(ws)))))
     return collate(items, device)
 
 
-def sample_distributed_batch(sets, bs, rng, device, rank, world_size):
-    """Sample unique windows uniformly across the global batch, then shard by rank."""
+def sample_distributed_batch(sets, bs, rng, device, rank, world_size, focus: data.FocusSampler | None = None, focus_fraction: float = 0.0):
+    """Sample unique windows uniformly across the global batch, then shard by rank.
+
+    Every rank draws the whole global batch from the shared rng and keeps its own shard, so focus windows are drawn globally
+    too and shuffled in before sharding to spread them over the ranks."""
     sizes = np.array([len(ws) for ws in sets], dtype=np.int64)
     ends = np.cumsum(sizes)
     total = int(ends[-1]) if len(ends) else 0
     global_batch = bs * world_size
     if total < global_batch:
         raise ValueError(f"distributed global batch ({global_batch}) exceeds train windows ({total})")
-    chosen = rng.choice(total, size=global_batch, replace=False)
-    items = []
-    for index in chosen[rank * bs : (rank + 1) * bs]:
+    focused = focus.sample(rng, focus_count(focus_fraction, global_batch)) if focus is not None and len(focus) else []
+    chosen = rng.choice(total, size=global_batch - len(focused), replace=False)
+    items = list(focused)
+    for index in chosen:
         set_index = int(np.searchsorted(ends, index, side="right"))
         offset = int(ends[set_index - 1]) if set_index else 0
         items.append((sets[set_index], int(index) - offset))
-    return collate(items, device)
+    if focused:
+        items = [items[i] for i in rng.permutation(len(items))]
+    return collate(items[rank * bs : (rank + 1) * bs], device)
+
+
+def block_rows(y: torch.Tensor, ids: dict[str, int]):
+    """Locate the server block-change rows (OUT BLOCK ...) among target tokens y (B, T).
+
+    Returns (start, seg, in_row): `start` marks the OUT marker of each such row, `seg` numbers the rows (every marker opens a
+    new one), and `in_row` marks every token of those rows, marker included."""
+    is_marker = torch.isin(y, torch.tensor(ids["markers"], device=y.device))
+    following = torch.zeros_like(y)
+    following[:, :-1] = y[:, 1:]
+    start = is_marker & (y == ids["out"]) & (following == ids["block"])
+    seg = is_marker.long().cumsum(1)
+    flags = torch.zeros(y.shape[0], y.shape[1] + 1, dtype=torch.bool, device=y.device)
+    flags.scatter_(1, seg * is_marker, start)
+    return start, seg, flags.gather(1, seg)
+
+
+def weight_block_rows(mask: torch.Tensor, y: torch.Tensor, ids: dict[str, int], weight: float) -> torch.Tensor:
+    """Scale the loss mask on block-change rows. The loss is a weighted token mean, so this shifts the gradient toward them."""
+    if weight == 1.0:
+        return mask
+    _, _, in_row = block_rows(y, ids)
+    return mask * (1.0 + (weight - 1.0) * in_row.float())
+
+
+@torch.no_grad()
+def evaluate_blocks(model: RowModel, items: list, device: str, ids: dict[str, int], bs: int = 8, *, distributed: bool = False, rank: int = 0, world_size: int = 1):
+    """Teacher-forced scores on the block-change rows of held-out focus windows.
+
+    A row is exact when every one of its tokens is the model's top choice; joint P is the probability of the whole row.
+    A row cut off by the end of the window is skipped."""
+    if isinstance(model, DistributedDataParallel):
+        model = model.module
+    was_training = model.training
+    model.eval()
+    total = torch.zeros(6, dtype=torch.float64, device=device)  # rows, exact rows, joint P, tokens, token nll, token hits
+    try:
+        mine = items[rank::world_size] if distributed else items
+        for i in range(0, len(mine), bs):
+            x, y, m, terrain = collate(mine[i : i + bs], device)
+            with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=device.startswith("cuda")):
+                logits, _ = model(x, terrain=terrain)
+            lp = torch.log_softmax(logits.float(), dim=-1)
+            tgt = lp.gather(-1, y.unsqueeze(-1)).squeeze(-1)
+            correct = lp.argmax(-1) == y
+            start, seg, in_row = block_rows(y, ids)
+            closed = seg < seg[:, -1:]
+            tok = in_row & closed & m.bool()
+            row = start & closed
+            wrong = torch.zeros(y.shape[0], y.shape[1] + 1, dtype=torch.float64, device=device).scatter_add_(1, seg, (tok & ~correct).double())
+            joint = torch.zeros_like(wrong).scatter_add_(1, seg, torch.where(tok, tgt, torch.zeros_like(tgt)).double())
+            rows = int(row.sum())
+            total += torch.tensor([rows, rows - int((wrong.gather(1, seg)[row] > 0).sum()), float(joint.gather(1, seg)[row].exp().sum()),
+                                   int(tok.sum()), float(-tgt[tok].sum()), int((correct & tok).sum())], dtype=torch.float64, device=device)
+    finally:
+        model.train(was_training)
+    if distributed:
+        dist.all_reduce(total)
+    rows, exact, joint, tokens, nll, hits = total.tolist()
+    return {"rows": int(rows), "exact": exact / max(rows, 1), "joint_p": joint / max(rows, 1), "token_nll": nll / max(tokens, 1), "token_acc": hits / max(tokens, 1)}
 
 
 def distributed_token_loss(loss, mask, world_size):
@@ -289,6 +360,9 @@ def train_main() -> int:
     ap.add_argument("--overfit", action="store_true")
     ap.add_argument("--overfit-ticks", type=int, default=100)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--focus-fraction", type=float, default=0.25, help="share of each batch drawn from windows around server block changes (0 disables)")
+    ap.add_argument("--block-loss-weight", type=float, default=5.0, help="loss weight on block-change rows (1 disables)")
+    ap.add_argument("--eval-block-windows", type=int, default=512, help="held-out block-change windows scored at each evaluation")
     ap.add_argument("--terrain", action=argparse.BooleanOptionalAction, default=None, help="read the terrain patches (default: yes when the dataset has them)")
     args = ap.parse_args()
     if bool(args.init_from) != bool(args.init_vocab):
@@ -303,6 +377,8 @@ def train_main() -> int:
         ap.error("invalid torchrun rank or world size")
     if args.batch < 1:
         ap.error("--batch must be positive")
+    if not 0.0 <= args.focus_fraction <= 1.0 or args.block_loss_weight <= 0 or args.eval_block_windows < 0:
+        ap.error("--focus-fraction must be in [0, 1], --block-loss-weight positive, --eval-block-windows non-negative")
     distributed = world_size > 1
     if not distributed:
         try:
@@ -375,6 +451,13 @@ def train_main() -> int:
     w = np.array([len(s) for s in tsets], dtype=float)
     w /= w.sum()
     print(f"train windows {int(sum(len(s) for s in tsets))}, val windows {sum(len(s) for s in vsets)}")
+    if "BLOCK" not in vocab.index:
+        print("vocab has no BLOCK row type: block-change focus, loss weighting and scoring are off")
+        args.focus_fraction, args.block_loss_weight, args.eval_block_windows = 0.0, 1.0, 0
+    ids = {"out": vocab.out, "block": vocab.index.get("BLOCK", -1), "markers": [vocab.tick, vocab.end, vocab.in_, vocab.out, vocab.eng]}
+    focus = data.FocusSampler(train, vocab, args.ctx) if args.focus_fraction > 0 else None
+    block_eval = data.FocusSampler(val, vocab, args.ctx).evaluation_items(args.eval_block_windows) if args.eval_block_windows else []
+    print(f"block-change rows: {len(focus) if focus else 0} train anchors (focus fraction {args.focus_fraction}, loss weight {args.block_loss_weight}); {len(block_eval)} held-out windows")
 
     if rank == 0:
         progress("calculating validation baselines")
@@ -395,6 +478,7 @@ def train_main() -> int:
     if rank == 0:
         out.mkdir(parents=True, exist_ok=True)
     best = float("inf")
+    best_block = -1.0
     t0 = time.time()
     progress("starting training")
     for step in range(1, args.steps + 1):
@@ -405,9 +489,10 @@ def train_main() -> int:
             g["lr"] = lr_at(step - 1, args.steps, args.lr)
         milestone("sampling batch")
         if distributed:
-            x, y, m, terrain = sample_distributed_batch(tsets, args.batch, rng, args.device, rank, world_size)
+            x, y, m, terrain = sample_distributed_batch(tsets, args.batch, rng, args.device, rank, world_size, focus, args.focus_fraction)
         else:
-            x, y, m, terrain = sample_batch(tsets, w, args.batch, rng, args.device)
+            x, y, m, terrain = sample_batch(tsets, w, args.batch, rng, args.device, focus, args.focus_fraction)
+        m = weight_block_rows(m, y, ids, args.block_loss_weight)
         if distributed and step == 1:
             terrain_info = "none" if terrain is None else f"{terrain[0].device}, shape={tuple(terrain[0].shape)}"
             progress(f"step 1: batch x={x.device}, shape={tuple(x.shape)}; terrain patches={terrain_info}")
@@ -448,13 +533,21 @@ def train_main() -> int:
             ev = evaluate(model.module if distributed else model, vsets, cats, args.device, vocab.end,
                           max_windows=args.eval_windows_per_session, distributed=distributed,
                           rank=rank, world_size=world_size, progress=eval_progress)
+            ev["block_rows"] = evaluate_blocks(model, block_eval, args.device, ids, distributed=distributed, rank=rank, world_size=world_size) if block_eval else None
             progress(f"step {step}: validation metrics reduced")
             if rank == 0:
                 dc = ev["decision"]
                 print(f"  val: NLL {ev['nll']:.4f} (unigram {base['unigram_nll']:.3f}), token accuracy {ev['acc']:.3f}; tick decision {dc['acc']:.3f} (always-idle {dc['always_idle_acc']:.3f})")
+                saved = lambda: {"model": (model.module if distributed else model).state_dict(), "cfg": cfg.__dict__, "vocab": os.path.relpath(ds / "vocab.json", out), "vocab_relative_to_checkpoint": True, "vocab_sha256": fingerprint(ds / "vocab.json")}  # noqa: E731
                 if ev["nll"] < best:
                     best = ev["nll"]
-                    torch.save({"model": (model.module if distributed else model).state_dict(), "cfg": cfg.__dict__, "vocab": os.path.relpath(ds / "vocab.json", out), "vocab_relative_to_checkpoint": True, "vocab_sha256": fingerprint(ds / "vocab.json")}, out / "best.pt")
+                    torch.save(saved(), out / "best.pt")
+                br = ev["block_rows"]
+                if br:
+                    print(f"  val block-change rows ({br['rows']}): whole row exact {br['exact']:.3f}, mean joint P {br['joint_p']:.3f}, token acc {br['token_acc']:.3f}, token NLL {br['token_nll']:.3f}")
+                    if br["joint_p"] > best_block:
+                        best_block = br["joint_p"]
+                        torch.save(saved(), out / "best-block.pt")
             if distributed:
                 dist.barrier()
     if rank != 0:
@@ -466,8 +559,8 @@ def train_main() -> int:
     print(f"  {'field':10s} {'tokens':>7s} {'NLL':>7s} {'acc':>6s} {'majority':>9s}")
     for c, r in sorted(ev["per_category"].items(), key=lambda kv: -kv[1]["n"]):
         print(f"  {c:10s} {r['n']:7d} {r['nll']:7.3f} {r['acc']:6.3f} {base['majority_acc'].get(c, float('nan')):9.3f}")
-    (out / "metrics.json").write_text(json.dumps({"args": vars(args), "world_size": world_size, "global_batch": args.batch * world_size, "val": ev, "baselines": base, "best_val_nll": best}, indent=1))
-    print(f"\nbest val NLL {best:.4f}; wrote {out}/best.pt and metrics.json")
+    (out / "metrics.json").write_text(json.dumps({"args": vars(args), "world_size": world_size, "global_batch": args.batch * world_size, "val": ev, "baselines": base, "best_val_nll": best, "best_block_joint_p": best_block}, indent=1))
+    print(f"\nbest val NLL {best:.4f}; wrote {out}/best.pt and metrics.json" + (f"; best block-change joint P {best_block:.3f} in {out}/best-block.pt" if best_block >= 0 else ""))
     return 0
 
 
