@@ -52,8 +52,10 @@ dataset. Its `val.txt` must list one held-out session name per line. The split
 is a point-in-time snapshot; check the Conductor admission receipts are still
 current before using it.
 
-The launcher limits CPU compute to four threads by default on shared hosts; set
-`OMP_NUM_THREADS` and `MKL_NUM_THREADS` to change this. Set `DEVICE=cpu` to
+The launcher defaults to 32 CPU threads, capped at the CPUs available to the
+process; set `OMP_NUM_THREADS` and `MKL_NUM_THREADS` to change this. On the
+shared training host, 32 threads were within 4% of 48-thread throughput in a
+short benchmark while using fewer cores. Set `DEVICE=cpu` to
 force CPU or leave it unset for automatic GPU detection. To install and use the
 locked CUDA build, run `(cd train && uv sync --locked --extra cuda)` and launch
 with `TRAIN_EXTRA=cuda bash train.sh`; use this extra on each CUDA launch.

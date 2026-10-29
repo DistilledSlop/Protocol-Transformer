@@ -49,8 +49,14 @@ for name in "${val[@]}"; do
     fi
 done
 
-# Limit CPU contention on shared hosts. Users can override either variable.
-export OMP_NUM_THREADS=${OMP_NUM_THREADS:-4}
+# Cap CPU threads at 32 or the available CPU count, whichever is smaller.
+# Users can override either variable for their workload and host.
+if [[ -z ${OMP_NUM_THREADS:-} ]]; then
+    available_cpus=$(nproc)
+    if (( available_cpus > 32 )); then available_cpus=32; fi
+    OMP_NUM_THREADS=$available_cpus
+fi
+export OMP_NUM_THREADS
 export MKL_NUM_THREADS=${MKL_NUM_THREADS:-$OMP_NUM_THREADS}
 device=()
 if [[ -n ${DEVICE:-} ]]; then device=(--device "$DEVICE"); fi
