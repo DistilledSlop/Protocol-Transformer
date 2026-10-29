@@ -22,6 +22,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
+from assets import fingerprint
 from protocol_ai import data
 from protocol_ai.generate import Generator, Grammar, Sampling
 
@@ -29,19 +30,36 @@ from protocol_ai.generate import Generator, Grammar, Sampling
 def build_generator(args) -> Generator:
     ds = Path(args.dataset)
     device = args.device
+    print(f"Loading checkpoint {args.ckpt}", file=sys.stderr, flush=True)
     ck = torch.load(args.ckpt, map_location="cpu", weights_only=False)
     vocab_path = Path(args.vocab) if args.vocab else ds / "vocab.json"
+    expected = ck.get("vocab_sha256")
+    recorded = Path(ck["vocab"]) if ck.get("vocab") else None
+    if recorded is not None and ck.get("vocab_relative_to_checkpoint"):
+        recorded = Path(args.ckpt).resolve().parent / recorded
+    if not expected and recorded and recorded.is_file():
+        expected = fingerprint(recorded)
+    if expected and fingerprint(vocab_path) != expected:
+        raise ValueError(f"Vocabulary does not match checkpoint: {vocab_path}")
     vocab = data.load_vocab(vocab_path)
     pairs = None
     if not args.no_grammar:
         manifest = json.loads((ds / "manifest.json").read_text())
-        names = [s["name"] for s in manifest["sessions"] if s["name"] not in (args.exclude or [])]
-        streams = {}
-        for n in names:
+        excluded = args.exclude
+        if excluded is None:
+            val_path = ds / "val.txt"
+            excluded = val_path.read_text().splitlines() if val_path.is_file() else []
+        names = [s["name"] for s in manifest["sessions"] if s["name"] not in excluded]
+        pairs = set()
+        print(f"Learning grammar from {len(names)} sessions", file=sys.stderr, flush=True)
+        for i, n in enumerate(names, 1):
             first, last = data.load_session_range(ds / "manifest.json", n)
-            streams[n] = data.build_stream(data.load_ticks(ds / f"{n}.ticks.jsonl"), first, last, vocab)
-        pairs = Grammar.learn(vocab, streams)
+            stream = data.build_stream(data.load_ticks(ds / f"{n}.ticks.jsonl"), first, last, vocab)
+            pairs.update(Grammar.learn(vocab, {n: stream}))
+            if i % 50 == 0 or i == len(names):
+                print(f"Grammar: {i}/{len(names)} sessions", file=sys.stderr, flush=True)
     sampling = Sampling(temperature=args.temperature, top_k=args.top_k, greedy=args.greedy)
+    print(f"Initializing model on {device}", file=sys.stderr, flush=True)
     gen = Generator.load(args.ckpt, device, vocab_path, sampling, pairs)
     del ck
     return gen
@@ -200,7 +218,7 @@ def main() -> int:
     ap.add_argument("--dataset", default="../dataset")
     ap.add_argument("--vocab", default=None, help="default: <dataset>/vocab.json")
     ap.add_argument("--session", help="replay: the session to run (a name in the dataset manifest)")
-    ap.add_argument("--exclude", nargs="*", default=None, help="sessions the row grammar must not be learned from (default: none; pass the held-out one)")
+    ap.add_argument("--exclude", nargs="*", default=None, help="sessions the row grammar must not be learned from (default: sessions in dataset/val.txt; pass --exclude with no names to include all)")
     ap.add_argument("--feed", choices=["truth", "own"], default="truth")
     ap.add_argument("--temperature", type=float, default=0.8)
     ap.add_argument("--top-k", type=int, default=40)
@@ -211,9 +229,18 @@ def main() -> int:
     ap.add_argument("--max-ticks", type=int, default=0, help="replay: stop after this many ticks (0 = the whole session)")
     ap.add_argument("--show", type=int, default=3, help="replay: print this many ticks, real rows beside the model's")
     ap.add_argument("--out", default=None, help="replay: write every tick's real and generated rows here (JSON lines)")
-    ap.add_argument("--device", default="cuda:0" if torch.cuda.is_available() else "cpu")
+    ap.add_argument("--device", default="cuda:0")
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
+    try:
+        device = torch.device(args.device)
+        if device.type == "cuda":
+            index = device.index if device.index is not None else 0
+            if not torch.cuda.is_available() or index >= torch.cuda.device_count():
+                ap.error(f"CUDA device {args.device} is unavailable; use TRAIN_EXTRA=cpu DEVICE=cpu for CPU")
+            torch.cuda.set_device(index)
+    except (ValueError, RuntimeError) as exc:
+        ap.error(f"cannot initialize device {args.device!r}: {exc}")
     torch.manual_seed(args.seed)
     if args.mode == "replay":
         if not args.session:

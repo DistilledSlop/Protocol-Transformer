@@ -85,6 +85,8 @@ class DistributedTest(unittest.TestCase):
 
     def test_two_process_training(self):
         with tempfile.TemporaryDirectory() as tmp:
+            from protocol_ai.data import SPECIALS
+            Path(tmp, 'vocab.json').write_text(json.dumps({'tokens': list(SPECIALS)}))
             Path(tmp, 'manifest.json').write_text(json.dumps({'sessions': [{'name': 'train'}, {'name': 'val'}]}))
             env = dict(os.environ, DDP_TEST_ROOT=tmp, OMP_NUM_THREADS='1')
             result = subprocess.run([sys.executable, '-m', 'torch.distributed.run', '--standalone',

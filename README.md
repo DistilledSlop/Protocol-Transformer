@@ -67,22 +67,42 @@ NAME=gpu-run bash train.sh
 
 The target needs an NVIDIA driver compatible with the CUDA 12.8 PyTorch build. CUDA execution must be checked on that GPU machine; it was not hardware-tested on the CPU host. This starts a fresh run. To initialize from an existing checkpoint, add `--init-from /path/to/best.pt --init-vocab /path/to/the-original-dataset/vocab.json` and select the same architecture and context options used for that checkpoint. The vocabulary and configuration must match. This copies model weights only: optimizer, learning-rate schedule, random state, and step count start over. Existing CPU checkpoints may record an old absolute vocabulary path; supplying `--init-vocab` explicitly works after transfer. New checkpoints record a path relative to the checkpoint; inference can also use an explicit dataset or vocabulary.
 
-## Serve a model
+## Run inference
 
-Inference needs the generated dataset, a checkpoint, and a recording containing
-the world's join packets:
+For Minecraft mode, install Node.js 22 or newer and run `(cd proxy && npm ci)`
+to install its dependencies.
+
+`./inference.sh` starts a Minecraft 1.21.1 server on `127.0.0.1:25569`.
+It selects the newest completed `best.pt` with `metrics.json` in
+`../vibrato-training/runs`, and its matching dataset. Set `TRAINING_ROOT` to
+relocate this sibling directory, or set `CKPT` and `DATASET` to choose assets.
+New checkpoints verify the dataset vocabulary fingerprint. Older checkpoints
+use their recorded vocabulary when available; after relocation they may use the
+dataset name in the run's metrics as provenance, which cannot prove vocabulary
+identity. Set `DATASET` explicitly if the dataset cannot be identified.
+
+Minecraft mode also needs a raw capture's `.bin` and `.jsonl` pair containing
+join packets and chunks; exported terrain alone is insufficient. Place a pair
+in `TRAINING_ROOT/worlds/` (the newest complete pair is selected), or set
+`WORLD` to its base path without the suffix. Copy that pair when transferring to
+another host. Join with a Minecraft 1.21.1 client using any username; the server uses offline
+mode. The recorded player name matches the captured player list. The world is
+limited to captured chunks. You may keep a local vanilla server in `server/`;
+that directory is ignored by Git and is not used by the captured-world engine. `HOST`, `PORT`, `ALSO`, `TIME`, `ENGINE_TIME`, and
+`MODEL_ARGS` control the server; see [reader/README.md](reader/README.md).
 
 ```bash
-WORLD=proxy/data/session_Player_1234567890 \
-CKPT=../vibrato-training/runs/first/best.pt \
-DATASET=../vibrato-training/datasets/YOUR_DATASET \
-bash inference.sh
+./inference.sh                                  # Minecraft server
+./inference.sh serve                            # JSONL on stdin/stdout
+./inference.sh replay --session SESSION --max-ticks 10
+WORLD=/path/to/capture ./inference.sh minecraft
 ```
 
-Replace `WORLD` with an actual capture base path (without `.bin`). Join
-`127.0.0.1:25569` in offline mode using that recording's player name. The world
-is limited to captured chunks. See [reader/README.md](reader/README.md) for
-replay modes, model controls, and packet reconstruction limitations.
+The default is CUDA (`TRAIN_EXTRA=cuda`, `DEVICE=cuda:0`); use
+`TRAIN_EXTRA=cpu DEVICE=cpu ./inference.sh serve` for CPU. There is no automatic
+CPU fallback. Extra arguments to `serve` and `replay` go to `train/infer.py`;
+run `./inference.sh serve --help` for options. Grammar learning excludes the
+sessions in the dataset's `val.txt` by default; `--no-grammar` disables it.
 
 ## Checks
 

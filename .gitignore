@@ -40,3 +40,6 @@ wandb/
 .DS_Store
 .idea/
 .vscode/
+
+# Optional local vanilla Minecraft server
+/server/

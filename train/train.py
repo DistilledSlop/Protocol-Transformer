@@ -10,6 +10,7 @@ the field, and a unigram loss from the training sessions.
 from __future__ import annotations
 
 import argparse
+from assets import fingerprint
 import builtins
 import os
 import json
@@ -453,7 +454,7 @@ def train_main() -> int:
                 print(f"  val: NLL {ev['nll']:.4f} (unigram {base['unigram_nll']:.3f}), token accuracy {ev['acc']:.3f}; tick decision {dc['acc']:.3f} (always-idle {dc['always_idle_acc']:.3f})")
                 if ev["nll"] < best:
                     best = ev["nll"]
-                    torch.save({"model": (model.module if distributed else model).state_dict(), "cfg": cfg.__dict__, "vocab": os.path.relpath(ds / "vocab.json", out), "vocab_relative_to_checkpoint": True}, out / "best.pt")
+                    torch.save({"model": (model.module if distributed else model).state_dict(), "cfg": cfg.__dict__, "vocab": os.path.relpath(ds / "vocab.json", out), "vocab_relative_to_checkpoint": True, "vocab_sha256": fingerprint(ds / "vocab.json")}, out / "best.pt")
             if distributed:
                 dist.barrier()
     if rank != 0:
