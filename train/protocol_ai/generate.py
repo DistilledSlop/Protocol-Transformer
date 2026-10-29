@@ -87,6 +87,8 @@ class Generator:
         model = RowModel(cfg).to(device)
         model.load_state_dict(ck["model"])
         vp = Path(vocab_path or ck["vocab"])
+        if vocab_path is None and ck.get("vocab_relative_to_checkpoint"):
+            vp = Path(ckpt_path).resolve().parent / vp
         vocab = data.load_vocab(vp)
         grammar = Grammar(vocab, device, grammar_pairs) if grammar_pairs is not None else None
         return cls(model, vocab, device, sampling, grammar)

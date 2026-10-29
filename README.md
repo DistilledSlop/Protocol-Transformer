@@ -44,22 +44,33 @@ from Git and are not supplied with the source.
    patches, rotated training examples, and validation list. Its defaults refer
    to the original author's local captures, so set `VAL` for a fresh dataset.
 4. Train with `DATASET="$PWD/dataset" STEPS=3000 NAME=first bash train.sh`.
-   The best checkpoint is written to `train/runs/first/best.pt`.
+   The best checkpoint is written to `../vibrato-training/runs/first/best.pt`.
 
-Without `DATASET`, the launcher chooses the newest published Conductor `training-*` dataset by manifest modification
-time, checking its source index, ready split, validation list, and required files, falling back to `dataset/`. Set `DATASET` to select another exported
-dataset. Its `val.txt` must list one held-out session name per line. The split
+Without `DATASET`, the launcher chooses the newest published `training-*` dataset in `../vibrato-training/datasets/` by manifest modification time, checking its source index, ready split, validation list, and required files, falling back to `dataset/`. Set `TRAINING_ROOT` to relocate the common `datasets/` and `runs/` directories, or `DATASET` to select another exported dataset. Its `val.txt` must list one held-out session name per line. The split
 is a point-in-time snapshot; check the Conductor admission receipts are still
 current before using it.
 
 The launcher defaults to 32 CPU threads, capped at the CPUs available to the
 process; set `OMP_NUM_THREADS` and `MKL_NUM_THREADS` to change this. On the
 shared training host, 32 threads were within 4% of 48-thread throughput in a
-short benchmark while using fewer cores. Set `DEVICE=cpu` to
+short benchmark with fewer PyTorch compute threads; these are not dedicated cores. Set `DEVICE=cpu` to
 force CPU or leave it unset for automatic GPU detection. To install and use the
 locked CUDA build, run `(cd train && uv sync --locked --extra cuda)` and launch
-with `TRAIN_EXTRA=cuda bash train.sh`; use this extra on each CUDA launch.
+with `TRAIN_EXTRA=cuda DEVICE=cuda:0 bash train.sh`; use this extra on each CUDA launch.
 Additional `train.py` options may be passed after `bash train.sh`.
+
+## Move training to a CUDA machine
+
+Clone the Protocol-Transformer source on the target and copy the `vibrato-training` directory as its sibling. Exclude generated `.venv/`, `node_modules/`, and dataset `.cache/` directories from the transfer; these are not required for training. Copy only the run checkpoints you want to keep. The latter contains `datasets/<dataset>/` (including its manifest, vocabulary, validation list, tick and terrain files, and source index) and `runs/<run>/` for optional checkpoints. Raw Conductor captures and Conductor itself are not needed to train an already exported dataset. Preserve the directory layout; set `TRAINING_ROOT` if it is elsewhere. The source index records provenance from the original host and is not a runtime path.
+
+Install uv and Python 3.12 on the target, then from the repository run:
+
+```bash
+(cd train && uv sync --locked --extra cuda)
+TRAIN_EXTRA=cuda DEVICE=cuda:0 NAME=gpu-run bash train.sh
+```
+
+The target needs an NVIDIA driver compatible with the CUDA 12.8 PyTorch build. CUDA execution must be checked on that GPU machine; it was not hardware-tested on the CPU host. This starts a fresh run. To initialize from an existing checkpoint, add `--init-from /path/to/best.pt --init-vocab /path/to/the-original-dataset/vocab.json` and select the same architecture and context options used for that checkpoint. The vocabulary and configuration must match. This copies model weights only: optimizer, learning-rate schedule, random state, and step count start over. Existing CPU checkpoints may record an old absolute vocabulary path; supplying `--init-vocab` explicitly works after transfer. New checkpoints record a path relative to the checkpoint; inference can also use an explicit dataset or vocabulary.
 
 ## Serve a model
 
@@ -68,7 +79,8 @@ the world's join packets:
 
 ```bash
 WORLD=proxy/data/session_Player_1234567890 \
-CKPT=train/runs/first/best.pt \
+CKPT=../vibrato-training/runs/first/best.pt \
+DATASET=../vibrato-training/datasets/YOUR_DATASET \
 bash inference.sh
 ```
 

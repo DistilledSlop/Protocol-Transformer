@@ -72,7 +72,7 @@ const now = () => Number(process.hrtime.bigint() - t0) / 1e6;
 class Model {
     constructor() {
         const trainDir = path.join(__dirname, '..', 'train');
-        const args = ['run', 'python', 'infer.py', 'serve', '--ckpt', path.resolve(ckpt), '--dataset', path.resolve(DATASET), ...MODEL_ARGS];
+        const args = ['run', '--locked', '--extra', process.env.TRAIN_EXTRA || 'cpu', 'python', 'infer.py', 'serve', '--ckpt', path.resolve(ckpt), '--dataset', path.resolve(DATASET), ...MODEL_ARGS];
         log(`starting the model: uv ${args.join(' ')}`);
         this.proc = spawn('uv', args, { cwd: trainDir, stdio: ['pipe', 'pipe', 'inherit'] });
         this.waiting = []; // resolvers of requests in flight, in order

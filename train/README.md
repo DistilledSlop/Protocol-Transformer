@@ -1,6 +1,6 @@
 # train
 
-Next-row model for Protocol AI. Python 3.12 is managed with uv. Use `uv sync --locked --extra cpu` for CPU PyTorch, or `uv sync --locked --extra cuda` for CUDA 12.8 (including RTX 50-series). The extras are mutually exclusive; use the same extra in each `uv run` invocation. The root `train.sh` defaults to CPU packages and selects a published Conductor dataset, with `DATASET` and `TRAIN_EXTRA` overrides described in the root README. The data also comes from the JS reader:
+Next-row model for Protocol AI. Python 3.12 is managed with uv. Use `uv sync --locked --extra cpu` for CPU PyTorch, or `uv sync --locked --extra cuda` for CUDA 12.8 (including RTX 50-series). The extras are mutually exclusive; use the same extra in each `uv run` invocation. The root `train.sh` defaults to CPU packages and selects a published dataset under the common training root, with `DATASET` and `TRAIN_EXTRA` overrides described in the root README. The data also comes from the JS reader:
 
     # 1. freeze a vocabulary on the training captures and export every capture (no GPU, a few MB)
     node reader/dataset/dataset.js vocab  --out dataset  proxy/data/session_A ...

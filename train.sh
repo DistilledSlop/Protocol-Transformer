@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# Train on a verified Conductor dataset, or set DATASET to an exported dataset.
+# Train from the portable training root, or set DATASET to an exported dataset.
 set -euo pipefail
 cd "$(dirname "$0")"
 root=$PWD
+TRAINING_ROOT=$(python3 -c 'import os, sys; print(os.path.abspath(sys.argv[1]))' "${TRAINING_ROOT:-$root/../vibrato-training}")
 
 if [[ -z ${DATASET:-} ]]; then
     # Published Conductor exports include an admission snapshot and a ready split.
-    DATASET=$(python3 - "$root/../Vibrato-Conductor/.state" <<'PYDATA'
+    DATASET=$(python3 - "$TRAINING_ROOT/datasets" <<'PYDATA'
 import glob, json, os, sys
 candidates = []
 for dataset in glob.glob(os.path.join(sys.argv[1], 'training-*')):
@@ -61,4 +62,4 @@ export MKL_NUM_THREADS=${MKL_NUM_THREADS:-$OMP_NUM_THREADS}
 device=()
 if [[ -n ${DEVICE:-} ]]; then device=(--device "$DEVICE"); fi
 cd train
-exec uv run --locked --extra "${TRAIN_EXTRA:-cpu}" python train.py --dataset "$DATASET" --val "${val[@]}" --steps "${STEPS:-3000}" --eval-every "${EVAL_EVERY:-100}" --name "${NAME:-night}" "${device[@]}" "$@"
+exec uv run --locked --extra "${TRAIN_EXTRA:-cpu}" python train.py --dataset "$DATASET" --val "${val[@]}" --steps "${STEPS:-3000}" --eval-every "${EVAL_EVERY:-100}" --name "${NAME:-night}" --run-root "$TRAINING_ROOT/runs" "${device[@]}" "$@"

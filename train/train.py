@@ -10,6 +10,7 @@ the field, and a unigram loss from the training sessions.
 from __future__ import annotations
 
 import argparse
+import os
 import json
 import math
 import time
@@ -159,6 +160,17 @@ def baselines(train_streams, val_streams, vocab: data.Vocab, cats: np.ndarray):
     }
 
 
+def load_initial_weights(model, cfg, vocab, checkpoint_path, vocab_path):
+    """Load model weights only after checking the exact architecture and token order."""
+    initial_vocab = data.load_vocab(Path(vocab_path))
+    if initial_vocab.tokens != vocab.tokens:
+        raise ValueError("initial checkpoint vocabulary does not match the training dataset")
+    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+    if checkpoint["cfg"] != cfg.__dict__:
+        raise ValueError("initial checkpoint configuration does not match the requested model")
+    model.load_state_dict(checkpoint["model"], strict=True)
+
+
 def lr_at(step: int, steps: int, lr: float, warmup: int = 100) -> float:
     if step < warmup:
         return lr * (step + 1) / warmup
@@ -199,6 +211,9 @@ def main() -> int:
     ap.add_argument("--val", nargs="*", default=["session_EmeraldIngot64_1793051730684"])
     ap.add_argument("--train", nargs="*", default=None, help="default: every other session in the manifest")
     ap.add_argument("--name", default="run")
+    ap.add_argument("--run-root", default="runs", help="directory for training runs")
+    ap.add_argument("--init-from", help="initialize model weights from a checkpoint (optimizer and step are reset)")
+    ap.add_argument("--init-vocab", help="vocab.json used by --init-from, for compatibility validation")
     ap.add_argument("--steps", type=int, default=1500)
     ap.add_argument("--batch", type=int, default=16)
     ap.add_argument("--ctx", type=int, default=2048)
@@ -215,6 +230,8 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--terrain", action=argparse.BooleanOptionalAction, default=None, help="read the terrain patches (default: yes when the dataset has them)")
     args = ap.parse_args()
+    if bool(args.init_from) != bool(args.init_vocab):
+        ap.error("--init-from and --init-vocab must be provided together")
     if args.steps < 1 or args.eval_every < 1 or args.eval_windows_per_session < 1:
         ap.error("--steps, --eval-every and --eval-windows-per-session must be positive")
 
@@ -242,6 +259,12 @@ def main() -> int:
         raise SystemExit("--terrain needs every session exported with terrain patches (re-run dataset.js export)")
     cfg = Config(vocab_size=len(vocab.tokens), ctx_len=args.ctx, n_layer=args.layers, n_head=args.heads, n_embd=args.embd, dropout=args.dropout, terrain=use_terrain)
     model = RowModel(cfg).to(args.device)
+    if args.init_from:
+        try:
+            load_initial_weights(model, cfg, vocab, args.init_from, args.init_vocab)
+        except ValueError as error:
+            raise SystemExit(str(error)) from error
+        print("initialized model weights; optimizer and step start fresh")
     print(f"model {model.n_params()/1e6:.1f}M params, context {args.ctx} tokens, terrain input {'on' if use_terrain else 'off'}")
     tsets = windows_of(train, args.ctx, stride=2)
     vsets = windows_of(val, args.ctx, stride=8)
@@ -253,7 +276,7 @@ def main() -> int:
     print(f"baselines on val: unigram NLL {base['unigram_nll']:.3f}; {base['idle_tick_fraction']:.2f} of ticks are idle (predicting END at once is right there)")
 
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr, betas=(0.9, 0.95), weight_decay=0.1)
-    out = Path("runs") / args.name
+    out = Path(args.run_root) / args.name
     out.mkdir(parents=True, exist_ok=True)
     best = float("inf")
     t0 = time.time()
@@ -275,7 +298,7 @@ def main() -> int:
             print(f"  val: NLL {ev['nll']:.4f} (unigram {base['unigram_nll']:.3f}), token accuracy {ev['acc']:.3f}; tick decision {dc['acc']:.3f} (always-idle {dc['always_idle_acc']:.3f})")
             if ev["nll"] < best:
                 best = ev["nll"]
-                torch.save({"model": model.state_dict(), "cfg": cfg.__dict__, "vocab": str(ds / "vocab.json")}, out / "best.pt")
+                torch.save({"model": model.state_dict(), "cfg": cfg.__dict__, "vocab": os.path.relpath(ds / "vocab.json", out), "vocab_relative_to_checkpoint": True}, out / "best.pt")
     dc = ev["decision"]
     print(f"\ntick decision 'does anything happen?' on {dc['ticks']} held-out ticks: accuracy {dc['acc']:.3f} vs {dc['always_idle_acc']:.3f} for always-idle; "
           f"active ticks found: recall {dc['recall_active']:.3f}, precision {dc['precision_active']:.3f}; NLL {dc['nll']:.3f}")
