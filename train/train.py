@@ -206,12 +206,15 @@ def main() -> int:
     ap.add_argument("--embd", type=int, default=256)
     ap.add_argument("--dropout", type=float, default=0.1)
     ap.add_argument("--eval-every", type=int, default=250)
+    ap.add_argument("--eval-windows-per-session", type=int, default=96, help="maximum evenly spaced validation windows per session")
     ap.add_argument("--device", default="cuda:0" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--overfit", action="store_true")
     ap.add_argument("--overfit-ticks", type=int, default=100)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--terrain", action=argparse.BooleanOptionalAction, default=None, help="read the terrain patches (default: yes when the dataset has them)")
     args = ap.parse_args()
+    if args.steps < 1 or args.eval_every < 1 or args.eval_windows_per_session < 1:
+        ap.error("--steps, --eval-every and --eval-windows-per-session must be positive")
 
     torch.manual_seed(args.seed)
     rng = np.random.default_rng(args.seed)
@@ -265,13 +268,12 @@ def main() -> int:
         if step % 50 == 0:
             print(f"step {step:5d} train loss {loss.item():.4f}  ({time.time()-t0:.0f}s)")
         if step % args.eval_every == 0 or step == args.steps:
-            ev = evaluate(model, vsets, cats, args.device, vocab.end)
+            ev = evaluate(model, vsets, cats, args.device, vocab.end, max_windows=args.eval_windows_per_session)
             dc = ev["decision"]
             print(f"  val: NLL {ev['nll']:.4f} (unigram {base['unigram_nll']:.3f}), token accuracy {ev['acc']:.3f}; tick decision {dc['acc']:.3f} (always-idle {dc['always_idle_acc']:.3f})")
             if ev["nll"] < best:
                 best = ev["nll"]
                 torch.save({"model": model.state_dict(), "cfg": cfg.__dict__, "vocab": str(ds / "vocab.json")}, out / "best.pt")
-    ev = evaluate(model, vsets, cats, args.device, vocab.end)
     dc = ev["decision"]
     print(f"\ntick decision 'does anything happen?' on {dc['ticks']} held-out ticks: accuracy {dc['acc']:.3f} vs {dc['always_idle_acc']:.3f} for always-idle; "
           f"active ticks found: recall {dc['recall_active']:.3f}, precision {dc['precision_active']:.3f}; NLL {dc['nll']:.3f}")

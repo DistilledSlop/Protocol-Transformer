@@ -13,14 +13,14 @@ an always-idle baseline. See the component documentation for known limitations.
 
 Use Node.js 22 or newer, npm, Bash, and uv. Training requires Python 3.12;
 `train/.python-version` and `train/uv.lock` pin the Python environment. The
-default PyTorch source uses CUDA 12.8 for NVIDIA GPUs; the training CLI also
-accepts `--device cpu`.
+default launcher installs CPU-only PyTorch; a locked CUDA 12.8 build is available
+for NVIDIA GPUs.
 
 From the repository root:
 
 ```bash
 (cd proxy && npm ci)
-(cd train && uv sync --locked)
+(cd train && uv sync --locked --extra cpu)
 ```
 
 The reader and engine share the dependencies installed in `proxy/node_modules`.
@@ -43,8 +43,21 @@ from Git and are not supplied with the source.
    training data. The script builds `dataset/`, including the vocabulary, terrain
    patches, rotated training examples, and validation list. Its defaults refer
    to the original author's local captures, so set `VAL` for a fresh dataset.
-4. Train with `STEPS=3000 NAME=first bash train.sh`. The best checkpoint is
-   written to `train/runs/first/best.pt`.
+4. Train with `DATASET="$PWD/dataset" STEPS=3000 NAME=first bash train.sh`.
+   The best checkpoint is written to `train/runs/first/best.pt`.
+
+Without `DATASET`, the launcher chooses the newest published Conductor `training-*` dataset by manifest modification
+time, checking its source index, ready split, validation list, and required files, falling back to `dataset/`. Set `DATASET` to select another exported
+dataset. Its `val.txt` must list one held-out session name per line. The split
+is a point-in-time snapshot; check the Conductor admission receipts are still
+current before using it.
+
+The launcher limits CPU compute to four threads by default on shared hosts; set
+`OMP_NUM_THREADS` and `MKL_NUM_THREADS` to change this. Set `DEVICE=cpu` to
+force CPU or leave it unset for automatic GPU detection. To install and use the
+locked CUDA build, run `(cd train && uv sync --locked --extra cuda)` and launch
+with `TRAIN_EXTRA=cuda bash train.sh`; use this extra on each CUDA launch.
+Additional `train.py` options may be passed after `bash train.sh`.
 
 ## Serve a model
 
@@ -67,7 +80,7 @@ replay modes, model controls, and packet reconstruction limitations.
 ```bash
 (cd proxy && npm test)
 node --test reader/test/*.test.js reader/test/families/*.test.js
-(cd train && uv run python -m unittest discover -s tests)
+(cd train && uv run --extra cpu python -m unittest discover -s tests)
 ```
 
 ## Components

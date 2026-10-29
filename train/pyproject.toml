@@ -3,13 +3,28 @@ name = "protocol-ai-train"
 version = "0.1.0"
 description = "Next-row model for Protocol AI: trains on the token rows the reader exports"
 requires-python = ">=3.12,<3.13"
-dependencies = ["torch", "numpy"]
+dependencies = ["numpy"]
 
-# The RTX 50-series (Blackwell) needs the CUDA 12.8+ builds of PyTorch, which are on this index and not on PyPI.
+[project.optional-dependencies]
+cpu = ["torch"]
+cuda = ["torch"]
+
+[tool.uv]
+conflicts = [[{ extra = "cpu" }, { extra = "cuda" }]]
+
+# The CUDA 12.8 build supports RTX 50-series GPUs.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
 [[tool.uv.index]]
 name = "pytorch-cu128"
 url = "https://download.pytorch.org/whl/cu128"
 explicit = true
 
 [tool.uv.sources]
-torch = { index = "pytorch-cu128" }
+torch = [
+    { index = "pytorch-cu128", extra = "cuda" },
+    { index = "pytorch-cpu", extra = "cpu" },
+]
