@@ -101,8 +101,12 @@ def distributed_token_loss(loss, mask, world_size):
 
 
 @torch.no_grad()
-def evaluate(model: RowModel, sets: list[data.WindowSet], cats: np.ndarray, device: str, vocab_end: int, max_windows: int = 96, bs: int = 8):
+def evaluate(model: RowModel, sets: list[data.WindowSet], cats: np.ndarray, device: str, vocab_end: int, max_windows: int = 96, bs: int = 8, *, distributed: bool = False, rank: int = 0, world_size: int = 1, progress=None):
     """Teacher-forced loss and accuracy on the masked (target) positions, overall and per field category."""
+    # Avoid DDP forward collectives: ranks may have unequal batch counts.
+    if isinstance(model, DistributedDataParallel):
+        model = model.module
+    was_training = model.training
     model.eval()
     names = sorted(set(cats.tolist()))
     nll = {c: 0.0 for c in names}
@@ -111,35 +115,53 @@ def evaluate(model: RowModel, sets: list[data.WindowSet], cats: np.ndarray, devi
     # The first target position of a tick is the decision 'does anything happen now?': OUT starts a row, END says idle.
     dec = {"n": 0, "hit": 0, "idle": 0, "pred_active_hit": 0, "active": 0, "pred_active": 0, "nll": 0.0}
     items = [(ws, int(i)) for ws in sets for i in np.linspace(0, len(ws) - 1, num=min(len(ws), max_windows), dtype=int)] if sets else []
-    for i in range(0, len(items), bs):
-        x, y, m, terrain = collate(items[i : i + bs], device)
-        m = m.bool()
-        with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=device.startswith("cuda")):
-            logits, _ = model(x, terrain=terrain)
-        lp = torch.log_softmax(logits.float(), dim=-1)
-        tgt_lp = lp.gather(-1, y.unsqueeze(-1)).squeeze(-1)[m].cpu().numpy()
-        correct = (lp.argmax(-1) == y)[m].cpu().numpy()
-        # tick decisions: masked positions whose previous position is not masked
-        prev = torch.zeros_like(m)
-        prev[:, 1:] = m[:, :-1]
-        start = m & ~prev
-        ys, ps = y[start], lp.argmax(-1)[start]
-        is_end = ys == vocab_end
-        dec["n"] += int(start.sum())
-        dec["hit"] += int((ys == ps).sum())
-        dec["idle"] += int(is_end.sum())
-        dec["active"] += int((~is_end).sum())
-        dec["pred_active"] += int((ps != vocab_end).sum())
-        dec["pred_active_hit"] += int(((ps != vocab_end) & ~is_end).sum())
-        dec["nll"] -= float(lp.gather(-1, y.unsqueeze(-1)).squeeze(-1)[start].sum())
-        c = cats[y[m].cpu().numpy()]
-        for cat in names:
-            sel = c == cat
-            if sel.any():
-                nll[cat] -= float(tgt_lp[sel].sum())
-                hit[cat] += int(correct[sel].sum())
-                cnt[cat] += int(sel.sum())
-    model.train()
+    if distributed:
+        items = items[rank::world_size]
+    try:
+        for i in range(0, len(items), bs):
+            x, y, m, terrain = collate(items[i : i + bs], device)
+            m = m.bool()
+            with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=device.startswith("cuda")):
+                logits, _ = model(x, terrain=terrain)
+            lp = torch.log_softmax(logits.float(), dim=-1)
+            tgt_lp = lp.gather(-1, y.unsqueeze(-1)).squeeze(-1)[m].cpu().numpy()
+            correct = (lp.argmax(-1) == y)[m].cpu().numpy()
+            # tick decisions: masked positions whose previous position is not masked
+            prev = torch.zeros_like(m)
+            prev[:, 1:] = m[:, :-1]
+            start = m & ~prev
+            ys, ps = y[start], lp.argmax(-1)[start]
+            is_end = ys == vocab_end
+            dec["n"] += int(start.sum())
+            dec["hit"] += int((ys == ps).sum())
+            dec["idle"] += int(is_end.sum())
+            dec["active"] += int((~is_end).sum())
+            dec["pred_active"] += int((ps != vocab_end).sum())
+            dec["pred_active_hit"] += int(((ps != vocab_end) & ~is_end).sum())
+            dec["nll"] -= float(lp.gather(-1, y.unsqueeze(-1)).squeeze(-1)[start].sum())
+            c = cats[y[m].cpu().numpy()]
+            for cat in names:
+                sel = c == cat
+                if sel.any():
+                    nll[cat] -= float(tgt_lp[sel].sum())
+                    hit[cat] += int(correct[sel].sum())
+                    cnt[cat] += int(sel.sum())
+            if progress is not None:
+                progress(min(i + bs, len(items)), len(items))
+    finally:
+        model.train(was_training)
+    if distributed:
+        # Fixed layout permits ranks without windows to join the same reduction.
+        values = [v for c in names for v in (nll[c], hit[c], cnt[c])]
+        keys = ("n", "hit", "idle", "pred_active_hit", "active", "pred_active", "nll")
+        values.extend(dec[k] for k in keys)
+        reduced = torch.tensor(values, dtype=torch.float64, device=device)
+        dist.all_reduce(reduced, op=dist.ReduceOp.SUM)
+        values = reduced.cpu().tolist()
+        for j, c in enumerate(names):
+            nll[c], hit[c], cnt[c] = values[3 * j], int(values[3 * j + 1]), int(values[3 * j + 2])
+        for j, k in enumerate(keys, 3 * len(names)):
+            dec[k] = values[j] if k == "nll" else int(values[j])
     total = sum(cnt.values())
     per = {c: {"n": cnt[c], "nll": nll[c] / cnt[c], "acc": hit[c] / cnt[c]} for c in names if cnt[c]}
     d = dec["n"] or 1
@@ -258,6 +280,8 @@ def train_main() -> int:
     ap.add_argument("--heads", type=int, default=4)
     ap.add_argument("--embd", type=int, default=256)
     ap.add_argument("--dropout", type=float, default=0.1)
+    ap.add_argument("--debug-distributed", action="store_true", help="log distributed milestones on every step")
+    ap.add_argument("--log-every", type=int, default=10, help="report training loss every N steps (also reports step 1)")
     ap.add_argument("--eval-every", type=int, default=250)
     ap.add_argument("--eval-windows-per-session", type=int, default=96, help="maximum evenly spaced validation windows per session")
     ap.add_argument("--device", default="cuda:0" if torch.cuda.is_available() else "cpu")
@@ -268,8 +292,8 @@ def train_main() -> int:
     args = ap.parse_args()
     if bool(args.init_from) != bool(args.init_vocab):
         ap.error("--init-from and --init-vocab must be provided together")
-    if args.steps < 1 or args.eval_every < 1 or args.eval_windows_per_session < 1:
-        ap.error("--steps, --eval-every and --eval-windows-per-session must be positive")
+    if args.steps < 1 or args.log_every < 1 or args.eval_every < 1 or args.eval_windows_per_session < 1:
+        ap.error("--steps, --log-every, --eval-every and --eval-windows-per-session must be positive")
 
     world_size = int(os.environ.get("WORLD_SIZE", "1"))
     rank = int(os.environ.get("RANK", "0"))
@@ -292,8 +316,13 @@ def train_main() -> int:
             backend = "nccl"
         else:
             ap.error("distributed training requires --device cpu or cuda")
+        device_name = f"{torch.cuda.get_device_name(local_rank)}, current CUDA device {torch.cuda.current_device()}" if backend == "nccl" else "CPU"
+        builtins.print(f"[rank {rank}/{world_size} local_rank {local_rank}] pid {os.getpid()}; device {args.device} ({device_name}); CUDA_VISIBLE_DEVICES={os.environ.get('CUDA_VISIBLE_DEVICES', '<unset>')}; initializing {backend} process group", flush=True)
         dist.init_process_group(backend=backend)
-    print = builtins.print if rank == 0 else lambda *a, **kw: None
+    def progress(message):
+        builtins.print(f"[rank {rank}/{world_size}] {message}", flush=True)
+    print = (lambda *a, **kw: builtins.print(*a, **kw, flush=True)) if rank == 0 else lambda *a, **kw: None
+    progress(f"device {args.device}; loading dataset")
     print(f"training workers {world_size}; batch per worker {args.batch}; global batch {args.batch * world_size}")
     torch.manual_seed(args.seed)
     rng = np.random.default_rng(args.seed)
@@ -304,6 +333,7 @@ def train_main() -> int:
     train_names = args.train if args.train else [n for n in all_names if n not in args.val]
     train = load_streams(ds, train_names, vocab)
     val = load_streams(ds, args.val, vocab) if not args.overfit else {}
+    progress("dataset loaded; preparing model and windows")
     cats = np.array([category(t) for t in vocab.tokens], dtype=object)
     print(f"vocab {len(vocab.tokens)} tokens; train {train_names}; val {args.val}; device {args.device}")
     for n, s in {**train, **val}.items():
@@ -332,6 +362,8 @@ def train_main() -> int:
     w /= w.sum()
     print(f"train windows {int(sum(len(s) for s in tsets))}, val windows {sum(len(s) for s in vsets)}")
 
+    if rank == 0:
+        progress("calculating validation baselines")
     base = baselines(train, val, vocab, cats) if rank == 0 else None
     if rank == 0:
         print(f"baselines on val: unigram NLL {base['unigram_nll']:.3f}; {base['idle_tick_fraction']:.2f} of ticks are idle (predicting END at once is right there)")
@@ -339,8 +371,10 @@ def train_main() -> int:
     if distributed:
         if sum(len(s) for s in tsets) < args.batch * world_size:
             raise ValueError("distributed global batch exceeds the number of training windows")
+        progress("waiting for workers and initializing distributed model")
         model = DistributedDataParallel(model, device_ids=[local_rank] if backend == "nccl" else None,
                                         find_unused_parameters=use_terrain)
+        progress("distributed model initialized")
     torch.manual_seed(args.seed + rank)
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr, betas=(0.9, 0.95), weight_decay=0.1)
     out = Path(args.run_root) / args.name
@@ -348,24 +382,40 @@ def train_main() -> int:
         out.mkdir(parents=True, exist_ok=True)
     best = float("inf")
     t0 = time.time()
+    progress("starting training")
     for step in range(1, args.steps + 1):
+        def milestone(stage):
+            if distributed and (step == 1 or args.debug_distributed):
+                progress(f"step {step}: {stage}")
         for g in opt.param_groups:
             g["lr"] = lr_at(step - 1, args.steps, args.lr)
+        milestone("sampling batch")
         if distributed:
             x, y, m, terrain = sample_distributed_batch(tsets, args.batch, rng, args.device, rank, world_size)
         else:
             x, y, m, terrain = sample_batch(tsets, w, args.batch, rng, args.device)
+        if distributed and step == 1:
+            terrain_info = "none" if terrain is None else f"{terrain[0].device}, shape={tuple(terrain[0].shape)}"
+            progress(f"step 1: batch x={x.device}, shape={tuple(x.shape)}; terrain patches={terrain_info}")
+        milestone("starting forward")
         with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=args.device.startswith("cuda")):
             _, loss = model(x, y, m, terrain=terrain)
+        milestone("forward returned")
         if distributed:
             # DDP averages rank gradients; weight each rank by its target-token count
             # so the result matches the loss over the complete global batch.
+            milestone("starting token-count all-reduce")
             loss = distributed_token_loss(loss, m, world_size)
+            milestone("token-count all-reduce returned")
         opt.zero_grad(set_to_none=True)
+        milestone("starting backward")
         loss.backward()
+        milestone("backward returned")
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        milestone("starting optimizer step")
         opt.step()
-        if step % 50 == 0:
+        milestone("optimizer step returned")
+        if step == 1 or step % args.log_every == 0:
             report_loss = loss.detach().clone()
             if distributed:
                 dist.all_reduce(report_loss)
@@ -373,7 +423,19 @@ def train_main() -> int:
             print(f"step {step:5d} train loss {report_loss.item():.4f}  ({time.time()-t0:.0f}s)")
         if step % args.eval_every == 0 or step == args.steps:
             if rank == 0:
-                ev = evaluate(model.module if distributed else model, vsets, cats, args.device, vocab.end, max_windows=args.eval_windows_per_session)
+                print(f"  evaluating at step {step}" + (f" across {world_size} workers" if distributed else ""))
+            progress(f"step {step}: starting validation shard")
+            last_report = 0
+            def eval_progress(completed, total):
+                nonlocal last_report
+                if completed == total or completed - last_report >= 128:
+                    progress(f"validation: {completed}/{total} local windows processed")
+                    last_report = completed
+            ev = evaluate(model.module if distributed else model, vsets, cats, args.device, vocab.end,
+                          max_windows=args.eval_windows_per_session, distributed=distributed,
+                          rank=rank, world_size=world_size, progress=eval_progress)
+            progress(f"step {step}: validation metrics reduced")
+            if rank == 0:
                 dc = ev["decision"]
                 print(f"  val: NLL {ev['nll']:.4f} (unigram {base['unigram_nll']:.3f}), token accuracy {ev['acc']:.3f}; tick decision {dc['acc']:.3f} (always-idle {dc['always_idle_acc']:.3f})")
                 if ev["nll"] < best:

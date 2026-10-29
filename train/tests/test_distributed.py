@@ -92,6 +92,13 @@ class DistributedTest(unittest.TestCase):
                                     text=True, capture_output=True, timeout=90)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertEqual(result.stdout.count('best val NLL'), 1)
+            self.assertIn('[rank 0/2] device cpu; loading dataset', result.stdout)
+            self.assertIn('[rank 1/2] device cpu; loading dataset', result.stdout)
+            self.assertIn('step     1 train loss', result.stdout)
+            for rank in (0, 1):
+                self.assertIn(f'[rank {rank}/2] step 1: backward returned', result.stdout)
+                self.assertIn(f'[rank {rank}/2] step 1: batch x=cpu', result.stdout)
+            self.assertIn('evaluating at step 1 across 2 workers', result.stdout)
             out = Path(tmp, 'out')
             checkpoint = torch.load(out / 'best.pt', map_location='cpu', weights_only=False)
             self.assertTrue(checkpoint['model'])

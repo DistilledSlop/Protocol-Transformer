@@ -16,7 +16,9 @@ Next-row model for Protocol AI. Python 3.12 is managed with uv. Use `uv sync --l
 
 From the repository root, `GPUS=4 DEVICE=cuda bash train.sh --batch 16` launches four CUDA workers. The launcher selects the CUDA extra automatically for `GPUS > 1`; `CUDA_VISIBLE_DEVICES` controls which GPUs they see. Batch size is per worker (64 total in this example), and each worker loads the dataset into host memory. See the root README for dataset and run paths and launcher options.
 
-For large validation sets, `--eval-windows-per-session N` bounds evaluation cost by sampling up to N evenly spaced windows from each held-out session (default 96). The final report reuses the last evaluation.
+Training logs the first step and every 10 steps by default; use `--log-every N` to change the interval. Each distributed worker reports its process ID, device, startup phases, and first-step milestones. Milestones report when the host call returns; CUDA work can still be running asynchronously. For a stall after the first step, add `--debug-distributed` to report milestones on every step. Dataset loading happens on each worker and baseline calculation happens on rank 0 before distributed training starts. With terrain enabled, DDP may warn that `find_unused_parameters=True` found no unused parameters in a forward pass. This is a performance warning: terrain can be used conditionally on other batches, so the flag remains enabled. An actual reduction error is a separate issue.
+
+For large validation sets, `--eval-windows-per-session N` bounds evaluation cost by sampling up to N evenly spaced windows from each held-out session (default 96). Distributed workers share validation windows and aggregate the metrics; each worker reports its local progress. The final report reuses the last evaluation.
 
 Stream format: for every tick, `TICK`, the client's input rows (`IN`), engine-derived rows (`ENG`), then the target rows
 (`OUT`), then `END`. Loss counts only the target rows and the `END`, so the model learns to answer each tick's input; an idle tick
