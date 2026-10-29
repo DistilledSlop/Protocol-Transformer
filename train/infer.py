@@ -24,7 +24,8 @@ import torch
 
 from assets import fingerprint
 from protocol_ai import data
-from protocol_ai.generate import Generator, Grammar, Sampling
+from protocol_ai.generate import Generator, Sampling
+from protocol_ai.grammar_cache import learn_cached
 
 
 def build_generator(args) -> Generator:
@@ -44,23 +45,19 @@ def build_generator(args) -> Generator:
     vocab = data.load_vocab(vocab_path)
     pairs = None
     if not args.no_grammar:
-        manifest = json.loads((ds / "manifest.json").read_text())
         excluded = args.exclude
         if excluded is None:
             val_path = ds / "val.txt"
             excluded = val_path.read_text().splitlines() if val_path.is_file() else []
-        names = [s["name"] for s in manifest["sessions"] if s["name"] not in excluded]
-        pairs = set()
-        print(f"Learning grammar from {len(names)} sessions", file=sys.stderr, flush=True)
-        for i, n in enumerate(names, 1):
-            first, last = data.load_session_range(ds / "manifest.json", n)
-            stream = data.build_stream(data.load_ticks(ds / f"{n}.ticks.jsonl"), first, last, vocab)
-            pairs.update(Grammar.learn(vocab, {n: stream}))
-            if i % 50 == 0 or i == len(names):
-                print(f"Grammar: {i}/{len(names)} sessions", file=sys.stderr, flush=True)
+        pairs = learn_cached(ds, vocab, excluded, args.grammar_jobs)
     sampling = Sampling(temperature=args.temperature, top_k=args.top_k, greedy=args.greedy)
     print(f"Initializing model on {device}", file=sys.stderr, flush=True)
     gen = Generator.load(args.ckpt, device, vocab_path, sampling, pairs)
+    actual_device = next(gen.model.parameters()).device
+    requested = torch.device(device)
+    if actual_device.type != requested.type or (requested.index is not None and actual_device.index != requested.index):
+        raise RuntimeError(f"Model device {actual_device} does not match requested {requested}")
+    print(f"Model ready on {actual_device}", file=sys.stderr, flush=True)
     del ck
     return gen
 
@@ -223,6 +220,7 @@ def main() -> int:
     ap.add_argument("--temperature", type=float, default=0.8)
     ap.add_argument("--top-k", type=int, default=40)
     ap.add_argument("--greedy", action="store_true")
+    ap.add_argument("--grammar-jobs", type=int, default=None, help="CPU workers for grammar preparation (default: based on available cores and memory, up to 16)")
     ap.add_argument("--no-grammar", action="store_true", help="do not limit tokens to what the row grammar allows")
     ap.add_argument("--max-tokens", type=int, default=600, help="per tick; END is forced after this many")
     ap.add_argument("--max-rows", type=int, default=32, help="per tick; after this many rows the model can only finish the last one (0 = no limit)")
@@ -232,6 +230,8 @@ def main() -> int:
     ap.add_argument("--device", default="cuda:0")
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
+    if args.grammar_jobs is not None and args.grammar_jobs < 1:
+        ap.error("--grammar-jobs must be at least 1")
     try:
         device = torch.device(args.device)
         if device.type == "cuda":

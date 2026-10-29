@@ -106,6 +106,15 @@ The default is CUDA (`TRAIN_EXTRA=cuda`, `DEVICE=cuda:0`); use
 CPU fallback. Extra arguments to `serve` and `replay` go to `train/infer.py`;
 run `./inference.sh serve --help` for options. Grammar learning excludes the
 sessions in the dataset's `val.txt` by default; `--no-grammar` disables it.
+Grammar preparation scans the training sessions on CPU to learn allowed token
+category transitions; it does not train model weights. GPU inference starts after
+this preparation. The scan uses multiple CPU workers, capped by available cores,
+memory and 16 by default; set `--grammar-jobs 32` to choose a different worker
+count. Results are cached in the dataset's `grammar-cache` directory and reused
+when the vocabulary, selected sessions, ranges and source file metadata match.
+For Minecraft mode, pass options via `MODEL_ARGS`, for example
+`MODEL_ARGS="--grammar-jobs 32" ./inference.sh`. File timestamp changes,
+including those caused by copying a dataset, can require a fresh scan.
 
 ## Checks
 
