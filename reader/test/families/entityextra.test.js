@@ -228,3 +228,50 @@ function air(v) {
 function nbtText(s) {
     return { type: 'compound', name: '', value: { text: { type: 'string', value: s } } };
 }
+
+test('join metadata seeds player and entity deltas using the captured entity IDs', () => {
+    const { makeReader, pkt: feedPacket, startPackets, spawnPkt } = require('../helpers');
+    const { Writer } = require('../../writer/writer');
+    const reader = makeReader();
+    for (const p of startPackets()) reader.feedPacket(p);
+    reader.feedPacket(spawnPkt(10, 10000, 3, 64, 0, { type: PIG }));
+    reader.feedPacket(feedPacket(11, 'S2C', 'entity_metadata', { entityId: 10000, metadata: [{ key: 1, type: 'int', value: 280 }] }));
+    reader.feedPacket(feedPacket(12, 'S2C', 'entity_metadata', { entityId: 1, metadata: [{ key: 1, type: 'int', value: 300 }] }));
+    reader.advanceTo(100);
+    const writer = new Writer();
+    writer.seedFromReader(reader);
+    const ctx = { playerId: 1, player: { x: 0, y: 64, z: 0 } };
+    const out = writer.step([
+        { tokens: ['ENTITY', 's1', 'META', 'mk:pig:1:int', 'Δ-10'] },
+        { tokens: ['ENTITY', 's0', 'META', 'mk:player:1:int', 'Δ-5'] },
+    ], ctx).filter(p => p.name === 'entity_metadata');
+    assert.deepEqual(out.map(p => [p.params.entityId, p.params.metadata[0].value]), [[10000, 270], [1, 295]]);
+    assert.equal(writer.nextEntityId, 10001);
+    for (const p of out) require('./helper').checkWire(p);
+});
+
+test('unresolvable deltas are rejected without stopping other rows or poisoning metadata', () => {
+    const { Writer } = require('../../writer/writer');
+    const writer = new Writer();
+    const ctx = { playerId: 1, player: { x: 0, y: 64, z: 0 } };
+    const row = (...tokens) => ({ tokens });
+    const out = writer.step([
+        row('ENTITY', 's0', 'META', 'mk:player:1:int', 'Δ-10'),
+        row('ENTITY', 's0', 'META', 'mk:player:1:int', 'i300'),
+        row('ENTITY', 's0', 'META', 'mk:player:1:int', 'Δ-5'),
+        row('ENTITY', 's1', 'META', 'mk:pig:1:int', 'Δ-1'),
+    ], ctx);
+    assert.equal(out.find(p => p.name === 'entity_metadata').params.metadata[0].value, 295);
+    assert.equal(writer.stats.rejected.get('META delta without a matching baseline'), 1);
+    assert.equal(writer.stats.rejected.get('META of an empty slot'), 1);
+});
+
+
+test('join reserves the player ID even when its entity record is absent', () => {
+    const { Writer } = require('../../writer/writer');
+    const writer = new Writer();
+    writer.seedFromReader({ S: { playerId: 10000, entities: new Map(), slotToId: [] } });
+    const out = writer.step([{ tokens: ['ENTITY', 's1', 'SPAWN', 'type:pig', 'px', 'ob9', 'of6', 'py', 'ob0', 'of0', 'pz', 'ob8', 'of8', 'yaw0', 'pitch0', 'hy0'] }],
+        { playerId: 10000, player: { x: 0, y: 64, z: 0 } });
+    assert.equal(out.find(p => p.name === 'spawn_entity').params.entityId, 10001);
+});

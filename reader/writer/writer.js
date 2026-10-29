@@ -49,6 +49,34 @@ class Writer {
         };
     }
 
+    // Adopt the actual client state after raw join packets were sent. IDs must stay the
+    // captured IDs, and only metadata actually observed on the wire is a delta base.
+    seedFromReader(reader) {
+        const state = reader.S;
+        if (Number.isSafeInteger(state.playerId) && state.playerId >= 0) {
+            this.nextEntityId = Math.max(this.nextEntityId, state.playerId + 1);
+        }
+        this.bySlot.clear();
+        this.playerMeta = new Map();
+        this.playerMetaTypes = new Map();
+        for (const e of state.entities.values()) {
+            this.nextEntityId = Math.max(this.nextEntityId, e.id + 1);
+            const meta = new Map();
+            const metaTypes = new Map();
+            for (const [key, m] of e.meta || []) {
+                meta.set(key, m.value);
+                metaTypes.set(key, m.type);
+            }
+            if (e.id === state.playerId) {
+                this.playerMeta = meta;
+                this.playerMetaTypes = metaTypes;
+            } else if (e.slot !== null && e.slot !== undefined && state.slotToId[e.slot] === e.id) {
+                this.bySlot.set(e.slot, { id: e.id, uuid: e.uuid, type: e.type, x: e.x, y: e.y, z: e.z,
+                    yaw: e.yaw, pitch: e.pitch, headYaw: e.headYaw, meta, metaTypes });
+            }
+        }
+    }
+
     _count(map, key, n = 1) {
         map.set(key, (map.get(key) || 0) + n);
     }

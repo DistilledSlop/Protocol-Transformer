@@ -200,6 +200,7 @@ class Session {
         // the model starts from the first tick after the join, with an empty context
         this.queue = [];
         this.reader.advanceTo(now());
+        this.writer.seedFromReader(this.reader);
         this.startClock();
         await this.model.request({ op: 'reset' });
         this.queue = [];

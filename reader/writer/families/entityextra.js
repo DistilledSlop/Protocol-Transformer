@@ -197,10 +197,16 @@ const compile = {
         if (e && !e.meta) e.meta = new Map();
         if (!e && !this.playerMeta) this.playerMeta = new Map();
         const store = e ? e.meta : this.playerMeta;
+        const types = e ? (e.metaTypes || (e.metaTypes = new Map())) : (this.playerMetaTypes || (this.playerMetaTypes = new Map()));
+        // A delta is meaningful only against an observed value of the same serializer.
+        if (p.raw[0]?.startsWith('Δ') && (!store.has(p.key) || types.get(p.key) !== p.type || !Number.isFinite(store.get(p.key)))) {
+            return this._reject('META delta without a matching baseline');
+        }
         const c = new Cursor(p.raw);
         const value = metaValue(this, c, p.type, p.key, ctx, store);
         if (!c.eof()) throw new Error('trailing META tokens');
         store.set(p.key, value);
+        types.set(p.key, p.type);
         // one entity_metadata per entity per tick, built in finish
         if (!tick.meta) tick.meta = new Map();
         const id = this._entityId(p.slot, ctx);
