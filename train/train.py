@@ -135,6 +135,8 @@ def baselines(train_streams, val_streams, vocab: data.Vocab, cats: np.ndarray):
         for t in tgt.tolist():
             by_cat.setdefault(cats[t], Counter())[t] += 1
     total = sum(counts.values())
+    # Counter preserves first-seen order for ties, as in the uncached calculation.
+    majority = {c: counter.most_common(1)[0][0] for c, counter in by_cat.items()}
     v = len(vocab.tokens)
     unigram_nll = 0.0
     n = 0
@@ -146,7 +148,7 @@ def baselines(train_streams, val_streams, vocab: data.Vocab, cats: np.ndarray):
             unigram_nll -= math.log((counts.get(t, 0) + 0.5) / (total + 0.5 * v))
             c = cats[t]
             majority_n[c] += 1
-            if by_cat.get(c) and by_cat[c].most_common(1)[0][0] == t:
+            if majority.get(c) == t:
                 majority_hit[c] += 1
         n += len(tgt)
     idle = np.mean([1 - data.describe(s, vocab)["fraction_ticks_with_out"] for s in val_streams.values()]) if val_streams else float("nan")
