@@ -282,7 +282,7 @@ def train_main() -> int:
     ap.add_argument("--dropout", type=float, default=0.1)
     ap.add_argument("--debug-distributed", action="store_true", help="log distributed milestones on every step")
     ap.add_argument("--log-every", type=int, default=10, help="report training loss every N steps (also reports step 1)")
-    ap.add_argument("--eval-every", type=int, default=250)
+    ap.add_argument("--eval-every", type=int, default=1000)
     ap.add_argument("--eval-windows-per-session", type=int, default=96, help="maximum evenly spaced validation windows per session")
     ap.add_argument("--device", default="cuda:0")
     ap.add_argument("--overfit", action="store_true")

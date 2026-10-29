@@ -72,12 +72,16 @@ class LauncherTest(unittest.TestCase):
             stub.chmod(0o755)
             env = dict(os.environ, PATH=f"{tmp}:{os.environ['PATH']}", DATASET=str(dataset),
                        ARGS_FILE=str(tmp / "args.json"))
-            for key in ("TRAIN_EXTRA", "DEVICE", "GPUS"):
+            for key in ("TRAIN_EXTRA", "DEVICE", "GPUS", "EVAL_EVERY"):
                 env.pop(key, None)
             subprocess.run(["bash", str(root / "train.sh")], env=env, check=True)
             args = json.loads((tmp / "args.json").read_text())
             self.assertEqual(args[:6], ["run", "--locked", "--extra", "cuda", "python", "train.py"])
             self.assertEqual(args[args.index("--device") + 1], "cuda:0")
+            self.assertEqual(args[args.index("--eval-every") + 1], "1000")
+            subprocess.run(["bash", str(root / "train.sh")], env=dict(env, EVAL_EVERY="25"), check=True)
+            args = json.loads((tmp / "args.json").read_text())
+            self.assertEqual(args[args.index("--eval-every") + 1], "25")
             subprocess.run(["bash", str(root / "train.sh")], env=dict(env, DEVICE="cpu"), check=True)
             args = json.loads((tmp / "args.json").read_text())
             self.assertEqual(args[3], "cpu")

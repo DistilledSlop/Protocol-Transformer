@@ -79,4 +79,4 @@ else
     device=${DEVICE:-cuda:0}
 fi
 cd train
-exec uv run --locked --extra "$extra" python train.py --dataset "$DATASET" --val "${val[@]}" --steps "${STEPS:-3000}" --eval-every "${EVAL_EVERY:-100}" --name "${NAME:-night}" --run-root "$TRAINING_ROOT/runs" --device "$device" "$@"
+exec uv run --locked --extra "$extra" python train.py --dataset "$DATASET" --val "${val[@]}" --steps "${STEPS:-3000}" --eval-every "${EVAL_EVERY:-1000}" --name "${NAME:-night}" --run-root "$TRAINING_ROOT/runs" --device "$device" "$@"

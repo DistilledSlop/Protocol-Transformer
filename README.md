@@ -52,7 +52,7 @@ current before using it.
 
 `bash train.sh` installs and uses the locked CUDA extra and trains on the first visible GPU (`cuda:0`). Set `CUDA_VISIBLE_DEVICES` to choose a physical GPU, for example `CUDA_VISIBLE_DEVICES=2 bash train.sh`. The launcher supports one GPU. For CPU, use `TRAIN_EXTRA=cpu DEVICE=cpu bash train.sh`.
 
-The launcher caps CPU compute threads at 32 or the number available to the process; set `OMP_NUM_THREADS` and `MKL_NUM_THREADS` to change this. Additional `train.py` options may be passed after `bash train.sh`.
+The launcher caps CPU compute threads at 32 or the number available to the process; set `OMP_NUM_THREADS` and `MKL_NUM_THREADS` to change this. Validation runs every 1000 steps and at the final step; set `EVAL_EVERY` to change the interval. Additional `train.py` options may be passed after `bash train.sh`.
 
 ## Move training to a CUDA machine
 
